@@ -1,0 +1,152 @@
+{
+  "tabs": {
+    "tryOn": "Try on",
+    "garnet": "Garnet",
+    "tasks": "Queue",
+    "wardrobe": "Wardrobe",
+    "profile": "Profile",
+    "user": "User",
+    "login": "Login"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "share": "Share",
+    "save": "Save",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading…",
+    "error": "Error",
+    "tryAgain": "Try again",
+    "done": "Done",
+    "select": "Select",
+    "change": "Change",
+    "notSelected": "Not selected"
+  },
+  "home": {
+    "title": "Try on",
+    "yourPhoto": "Your photo",
+    "noPhoto": "No photo",
+    "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
+    "garment": "Garment",
+    "noGarment": "No garment selected",
+    "generate": "Generate try-on",
+    "selectGarmentTitle": "Select a garment",
+    "selectDressMsg": "Upload a dress image.",
+    "selectUpperLowerMsg": "Upload a top, a bottom, or both."
+  },
+  "welcome": {
+    "title": "Virtual Try-On",
+    "subtitle": "Take a photo and try on clothes online",
+    "takePhoto": "Take a photo",
+    "pickFromGallery": "Choose from gallery",
+    "clear": "Clear",
+    "tips": "Tips: plain background, light from the front, don’t crop shoulders/hips.",
+    "consentLabel": "I agree to photo processing",
+    "policy": "Policy",
+    "continue": "Continue",
+    "needPhotoTitle": "Add a photo",
+    "needPhotoText": "Pick or take a photo first.",
+    "needConsentTitle": "Consent",
+    "needConsentText": "Please confirm the consent to process your photo."
+  },
+  "garnet": {
+    "title": "Garments",
+    "modeDress": "Dress",
+    "modeSeparate": "Top / Bottom",
+    "cardDress": "Dress (full-body)",
+    "cardTop": "Top (upper)",
+    "cardBottom": "Bottom (lower)",
+    "noImage": "No image selected",
+    "upload": "Upload",
+    "replace": "Replace",
+    "clear": "Clear",
+    "tip": "Tip: upload front-facing PNG/JPEG on a light background. For “Dress”, do not use top/bottom at the same time."
+  },
+  "queue": {
+    "title": "Try-on queue",
+    "empty": "Queue is empty. On Home, pick a photo and garments, then tap “Generate try-on”.",
+    "creating": "Creating…",
+    "clearFinished": "Clear finished"
+  },
+  "task": {
+    "statusQueued": "Queued",
+    "statusRunning": "Running",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed",
+    "retry": "Retry",
+    "remove": "Remove",
+    "taskId": "Task: {{id}}",
+    "resultNotFound": "Image URL not found"
+  },
+  "tryon": {
+    "generatingTitle": "Generating try-on…"
+  },
+  "wardrobe": {
+    "createdAt": "Created: {{date}}",
+    "sources": "Sources",
+    "model": "Model",
+    "dress": "Dress",
+    "top": "Top",
+    "bottom": "Bottom",
+    "title": "Looks",
+    "emptyTitle": "Nothing here yet",
+    "emptyText": "Save your favorite try-ons — they will appear here.",
+    "makeTryOn": "Make a try-on",
+    "detailTitle": "Wardrobe details"
+  },
+  "profile": {
+    "title": "Profile",
+    "stats": "Stats",
+    "looks": "Looks",
+    "garments": "Garments",
+    "name": "Name",
+    "email": "Email",
+    "id": "ID",
+    "editProfile": "Edit profile",
+    "logout": "Log out",
+    "confirmLogout": "Sign out of your account?",
+    "appVersion": "App version: {{version}}"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "signInWithGoogle": "Sign in with Google",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "guestCtaTitle": "Save and sync your looks",
+    "guestCtaSubtitle": "Create an account to keep your try-ons across devices.",
+    "guestCtaButton": "Sign in"
+  },
+  "alerts": {
+    "deleteLookTitle": "Delete the look?",
+    "deleteLookText": "This action cannot be undone."
+  },
+  "errors": {
+    "failedToLoad": "Failed to load",
+    "failedToDelete": "Failed to delete",
+    "failedToCreate": "Failed to create task",
+    "authRequired": "Sign in to continue",
+    "cameraPermission": "We need Camera and Photos permissions.",
+    "googlePlayServices": "Update Google Play Services",
+    "pickImageTitle": "Image selection error",
+    "pickImageFallback": "Could not select an image.",
+    "cameraTitle": "Camera error",
+    "cameraFallback": "Could not take a photo."
+  },
+  "permissions": {
+    "required": "Permission required",
+    "photos": {
+      "ios": "Open Settings → Privacy → Photos and allow access.",
+      "android": "Go to app settings → Permissions → Photos/Files."
+    },
+    "camera": {
+      "ios": "Open Settings → Privacy → Camera and allow access.",
+      "android": "Go to app settings → Permissions → Camera."
+    }
+  }
+}
