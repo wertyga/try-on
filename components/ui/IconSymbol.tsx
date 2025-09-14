@@ -5,7 +5,10 @@ import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Record<
+  SymbolViewProps['name'],
+  ComponentProps<typeof MaterialIcons>['name']
+>;
 export type IconSymbolName = keyof typeof MAPPING;
 
 /**
@@ -15,18 +18,18 @@ export type IconSymbolName = keyof typeof MAPPING;
  */
 const MAPPING = {
   // Try on
-  'tshirt.fill': 'checkroom',          // футболка → вешалка (Material)
-  
-  // Garnet (одежда/каталог)
-  'bag.fill': 'local-mall',            // сумка/шоппинг
-  
+  'tshirt.fill': 'checkroom', // футболка → вешалка (Material)
+
+  // Garment (одежда/каталог)
+  'bag.fill': 'local-mall', // сумка/шоппинг
+
   // Tasks list / очередь
-  'clock.fill': 'schedule',            // часы
-  
+  'clock.fill': 'schedule', // часы
+
   // User / профиль
   'person.crop.circle': 'account-circle',
   'person.fill': 'person',
-  
+
   // на всякий: оставим прежние
   'house.fill': 'home',
   'paperplane.fill': 'send',
@@ -51,5 +54,12 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return (
+    <MaterialIcons
+      color={color}
+      size={size}
+      name={MAPPING[name]}
+      style={style}
+    />
+  );
 }

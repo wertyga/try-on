@@ -15,6 +15,7 @@ import { useWardrobeStore } from '@/hooks/useWardrobeStore';
 import { Button } from '@/components/ui/button';
 import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';
+import { Analytics } from '@/analytics';
 
 type WardrobeItem = {
   _id: string;
@@ -43,6 +44,12 @@ export default function WardrobeDetailScreen() {
 
   useEffect(() => {
     setItem(storeItem);
+
+    if (storeItem) {
+      Analytics.event('wardrobe_item_open', {
+        item_hint: storeItem._id.slice(-6),
+      });
+    }
   }, [storeItem?._id]);
 
   // fetch from backend if not in store
@@ -83,6 +90,10 @@ export default function WardrobeDetailScreen() {
         style: 'destructive',
         onPress: async () => {
           try {
+            Analytics.event('wardrobe_item_delete', {
+              item_hint: item._id.slice(-6),
+            });
+
             await removeItem(item._id);
             router.replace('/(tabs)/wardrobe');
           } catch (e: any) {
@@ -99,6 +110,8 @@ export default function WardrobeDetailScreen() {
   const onShare = useCallback(async () => {
     if (!item) return;
     try {
+      Analytics.event('wardrobe_item_share', { item_hint: item._id.slice(-6) });
+
       await Share.share({
         message: item.title ? `${item.title}\n${item.imageUrl}` : item.imageUrl,
         url: item.imageUrl,

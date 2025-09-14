@@ -4,12 +4,11 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { storage } from '@/utils';
 import Constants from 'expo-constants';
 
-export const baseQuery = async (
-  {
-    headers,
-    silentError,
-    ...config
-  }: AxiosRequestConfig & { silentError?: boolean }) => {
+export const baseQuery = async ({
+  headers,
+  silentError,
+  ...config
+}: AxiosRequestConfig & { silentError?: boolean }) => {
   try {
     const token = await storage.get('token');
 
@@ -23,7 +22,7 @@ export const baseQuery = async (
         ...authHeader,
         ...headers,
       },
-      baseURL:  Constants.expoConfig?.extra?.API_BASE_URL,
+      baseURL: Constants.expoConfig?.extra?.API_BASE_URL,
       ...config,
     } as AxiosRequestConfig);
 

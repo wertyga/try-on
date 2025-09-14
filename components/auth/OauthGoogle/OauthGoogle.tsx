@@ -4,31 +4,44 @@ import Toast from 'react-native-toast-message';
 
 import { FontAwesome } from '@expo/vector-icons';
 
-import { sendLogs } from '@/api';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { router } from 'expo-router';
+import { Analytics } from '@/analytics';
 
 const OauthGoogle = () => {
   const { registerWithGoogle, isLoading } = useAuthStore();
 
   const signIn = async () => {
     try {
+      Analytics.event('login_google_start');
+
       GoogleSignin.configure();
 
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
       const {
-        data: { user },
+        data: { user: gUser },
       } = (await GoogleSignin.signIn()) as any;
 
-      await registerWithGoogle({ email: user.email, username: user.name });
+      const user = await registerWithGoogle({
+        email: gUser.email,
+        username: gUser.name,
+      });
+
+      await Analytics.event('login_google_success');
+      await Analytics.userId(user._id);
+      await Analytics.userProp('auth', 'user');
 
       router.replace('/try-on');
     } catch (e: any) {
-      sendLogs(e);
+      Analytics.event('login_google_error', {
+        code: e.code || 'unknown',
+        message: e.message,
+      });
+
       Toast.show({
         type: 'error',
         text1: e.message,

@@ -1,16 +1,19 @@
 import { View, Text, Pressable } from 'react-native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import '@/i18n';
 import { useEffect } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
+import { Analytics } from '@/analytics';
+import { Toast } from '@/components/Toast';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const pathname = usePathname();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -20,6 +23,10 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    Analytics.screen(pathname);
+  }, [pathname]);
 
   if (!loaded) return null;
 
@@ -31,6 +38,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
+      <Toast />
       <UpdateBanner />
     </>
   );

@@ -1,4 +1,9 @@
 {
+  "notFound": {
+    "title": "Not Found",
+    "path": "Path",
+    "goHome": "Go main screen"
+  },
   "tabs": {
     "tryOn": "Try on",
     "garnet": "Garnet",

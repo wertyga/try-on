@@ -15,8 +15,8 @@ function getLocalIP() {
 }
 
 const ENVS = {
-  API_BASE_URL: 'https://api.zws.ink',
-  // API_BASE_URL: `http://${getLocalIP()}:3001`,
+  // API_BASE_URL: 'https://api.zws.ink',
+  API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -51,6 +51,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#0F172A',
       monochromeImage: './assets/icon.png',
     },
+    googleServicesFile: './google-services.json',
     edgeToEdgeEnabled: true,
     permissions: [
       'CAMERA',
@@ -78,6 +79,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'com.googleusercontent.apps.277624245533-hmaoaah21er9j4b7le8rhgeu9tvpogcr',
       },
     ],
+    '@react-native-firebase/app',
   ],
   experiments: {
     typedRoutes: true,

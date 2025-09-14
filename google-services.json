@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "227305557601",
+    "project_id": "tryon-286da",
+    "storage_bucket": "tryon-286da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227305557601:android:79b3e2a57e3e9ba5fca420",
+        "android_client_info": {
+          "package_name": "com.wertyga.tryon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvxt_XEjqHvV74H9jStygjt60gAbu_rWs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

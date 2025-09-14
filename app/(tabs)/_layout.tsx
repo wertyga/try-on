@@ -10,16 +10,22 @@ import { Colors } from '@/constants/Colors';
 import { useUserStore } from '@/hooks/useUserStore';
 import { useWardrobeAutoSync } from '@/hooks/useWardrobeStore';
 
-const getTabs = (): {hidden?: boolean; name: string; title: string; withLogin?: boolean; icon: IconSymbolName}[] => {
-  return   [
+const getTabs = (): {
+  hidden?: boolean;
+  name: string;
+  title: string;
+  withLogin?: boolean;
+  icon: IconSymbolName;
+}[] => {
+  return [
     {
       name: 'try-on',
       title: 'Try on',
       icon: 'tshirt.fill',
     },
     {
-      name: 'garnet',
-      title: 'Garnet',
+      name: 'garment',
+      title: 'Garment',
       icon: 'bag.fill',
     },
     {
@@ -50,13 +56,13 @@ const getTabs = (): {hidden?: boolean; name: string; title: string; withLogin?: 
       title: 'wardrobe_id',
       icon: 'person.crop.circle',
       hidden: true,
-    }
-  ]
+    },
+  ];
 };
 
 export default function TabLayout() {
-  const {user} = useUserStore();
-  
+  const { user } = useUserStore();
+
   useWardrobeAutoSync();
 
   return (
@@ -71,30 +77,33 @@ export default function TabLayout() {
             position: 'absolute',
           },
         }),
-      }}>
-      {getTabs().map(({name, title, icon, withLogin, hidden}) => {
+      }}
+    >
+      {getTabs().map(({ name, title, icon, withLogin, hidden }) => {
         let href = null;
         if (withLogin === false && !user) {
           href = undefined;
-        } else if (withLogin === true && !!user ) {
+        } else if (withLogin === true && !!user) {
           href = undefined;
         } else if (withLogin === undefined) {
-          href = undefined
+          href = undefined;
         }
-        
+
         if (hidden) href = null;
-        
-        return <Tabs.Screen
-          key={name}
-          name={name}
-          options={{
-            title,
-            href,
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name={icon as any} color={color} />
-            ),
-          }}
-        />
+
+        return (
+          <Tabs.Screen
+            key={name}
+            name={name}
+            options={{
+              title,
+              href,
+              tabBarIcon: ({ color }) => (
+                <IconSymbol size={28} name={icon as any} color={color} />
+              ),
+            }}
+          />
+        );
       })}
     </Tabs>
   );

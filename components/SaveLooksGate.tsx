@@ -1,16 +1,10 @@
-
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { router } from 'expo-router';
 import { useUserStore } from '@/hooks/useUserStore';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Button } from '@/components/ui/button';
+import { Analytics } from '@/analytics';
 
 type Props = {
   /** Hide the banner when user is logged in (default: true) */
@@ -34,25 +28,32 @@ export const SaveLooksGate: React.FC<Props> = ({
   compact,
 }) => {
   const user = useUserStore((s) => s.user);
-  
+
+  useEffect(() => {
+    Analytics.event('save_gate_shown');
+  }, []);
+
   if (user) return null;
-  
+
   const goLogin = () => {
+    Analytics.event('save_gate_cta');
+
     if (onSignInPress) return onSignInPress();
+
     router.push('/(tabs)/login');
   };
-  
+
   return (
     <View style={[s.card, compact && s.cardCompact, style]}>
       <View style={s.iconWrap}>
         <IconSymbol name="square.grid.2x2.fill" size={20} color="#111827" />
       </View>
-      
+
       <View style={{ flex: 1 }}>
         <Text style={s.title}>{title}</Text>
         <Text style={s.subtitle}>{subtitle}</Text>
       </View>
-      
+
       <Button onPress={goLogin} style={s.cta} fullWidth={false}>
         Sign in
       </Button>
