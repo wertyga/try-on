@@ -42,7 +42,6 @@ export type EventName =
   | 'policy_open'
   | 'permission_prompt'
   | 'permission_result'
-  | 'screen_view'
   | 'error_alert';
 
 const a = () => getAnalytics(getApp());
