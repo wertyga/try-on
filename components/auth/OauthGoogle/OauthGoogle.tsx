@@ -26,14 +26,10 @@ const OauthGoogle = () => {
         data: { user: gUser },
       } = (await GoogleSignin.signIn()) as any;
 
-      const user = await registerWithGoogle({
+      await registerWithGoogle({
         email: gUser.email,
         username: gUser.name,
       });
-
-      await Analytics.event('login_google_success');
-      await Analytics.userId(user._id);
-      await Analytics.userProp('auth', 'user');
 
       router.replace('/try-on');
     } catch (e: any) {

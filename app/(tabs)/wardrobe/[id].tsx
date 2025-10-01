@@ -95,6 +95,11 @@ export default function WardrobeDetailScreen() {
             });
 
             await removeItem(item._id);
+
+            Analytics.event('wardrobe_item_delete_success', {
+              item_id: item._id,
+            });
+
             router.replace('/(tabs)/wardrobe');
           } catch (e: any) {
             Alert.alert(

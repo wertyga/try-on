@@ -12,6 +12,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LoaderOverlay } from '@/components/Loader';
 
 export type TContainerProps = ScrollViewProps & {
   children: ReactNode;
@@ -52,7 +53,7 @@ const ScrollContent = ({
         {children}
       </View>
 
-      {isLoading && <ActivityIndicator style={s.loading} />}
+      {isLoading && <LoaderOverlay />}
     </ScrollView>
   );
 };
@@ -94,5 +95,4 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
   },
-  loading: StyleSheet.absoluteFillObject,
 });

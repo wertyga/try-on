@@ -35,6 +35,10 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
 
     useUserStore.getState().setUser(user);
 
+    await Analytics.event('login_google_success');
+    await Analytics.userId(user._id);
+    await Analytics.userProp('auth', 'user');
+
     set({ isLoading: false });
 
     return user;

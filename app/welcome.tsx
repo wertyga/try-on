@@ -16,6 +16,7 @@ import Checkbox from 'expo-checkbox';
 import { useTryOnStore } from '@/hooks/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
+import { Analytics } from '@/analytics';
 
 export default function Welcome() {
   const { t } = useTranslation();
@@ -25,6 +26,8 @@ export default function Welcome() {
 
   async function pickFromGallery() {
     try {
+      await Analytics.event('photo_pick_start', { source: 'gallery' });
+
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (perm.status !== 'granted') {
         Alert.alert(
@@ -43,7 +46,18 @@ export default function Welcome() {
       if (res.canceled) return;
       const a = res.assets[0];
       await processAndSet(a.uri, a.width, a.height);
+
+      await Analytics.event('photo_pick_success', {
+        source: 'gallery',
+        width: a.width,
+        height: a.height,
+      });
     } catch (e: any) {
+      await Analytics.event('photo_pick_error', {
+        source: 'gallery',
+        message: e?.message,
+      });
+
       Alert.alert(
         t('errors.pickImageTitle'),
         e?.message || t('errors.pickImageFallback'),
@@ -53,6 +67,8 @@ export default function Welcome() {
 
   async function takeFromCamera() {
     try {
+      await Analytics.event('photo_pick_start', { source: 'camera' });
+
       const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (perm.status !== 'granted') {
         Alert.alert(
@@ -64,11 +80,22 @@ export default function Welcome() {
         );
         return;
       }
+
       const res = await ImagePicker.launchCameraAsync({ quality: 1 });
+
       if (res.canceled) return;
+
       const a = res.assets[0];
+
       await processAndSet(a.uri, a.width, a.height);
+
+      await Analytics.event('photo_pick_success', { source: 'camera' });
     } catch (e: any) {
+      await Analytics.event('photo_pick_error', {
+        source: 'camera',
+        message: e?.message,
+      });
+
       Alert.alert(
         t('errors.cameraTitle'),
         e?.message || t('errors.cameraFallback'),
@@ -110,11 +137,17 @@ export default function Welcome() {
     }
   }
 
-  function clear() {
+  async function clear() {
+    await Analytics.event('photo_clear');
     setUserPhoto(null);
   }
 
-  function onContinue() {
+  async function onContinue() {
+    await Analytics.event('welcome_continue_click', {
+      has_photo: !!userPhoto,
+      consent: !!consent,
+    });
+
     if (!userPhoto) {
       return Alert.alert(
         t('welcome.needPhotoTitle'),

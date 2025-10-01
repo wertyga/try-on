@@ -16,9 +16,7 @@ import { Container } from '@/components/ui/Container';
 
 export default function UserScreen() {
   const { t } = useTranslation();
-  const { user, init, dropUser } = useUserStore();
-
-  const [refreshing, setRefreshing] = useState(false);
+  const { user, dropUser } = useUserStore();
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -28,15 +26,6 @@ export default function UserScreen() {
     const parts = (name || '').trim().split(/\s+/);
     return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
   }, [name]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await init();
-    } finally {
-      setRefreshing(false);
-    }
-  }, [init]);
 
   const onLogout = useCallback(() => {
     Alert.alert(t('profile.confirmLogout'), undefined, [

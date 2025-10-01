@@ -47,13 +47,20 @@ export default function WardrobeScreen() {
       {
         text: t('common.delete'),
         style: 'destructive',
-        onPress: () =>
-          removeItem(id).catch((e) =>
-            Alert.alert(
-              t('common.error'),
-              e?.message || t('errors.failedToDelete'),
-            ),
-          ),
+        onPress: () => {
+          Analytics.event('wardrobe_item_delete_click', { item_id: id });
+
+          removeItem(id)
+            .then(() => {
+              Analytics.event('wardrobe_item_delete_success', { item_id: id });
+            })
+            .catch((e) =>
+              Alert.alert(
+                t('common.error'),
+                e?.message || t('errors.failedToDelete'),
+              ),
+            );
+        },
       },
     ]);
   };

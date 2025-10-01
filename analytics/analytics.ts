@@ -13,12 +13,15 @@ export type EventName =
   | 'app_open'
   | 'screen_view'
   | 'consent_toggle'
+  | 'error'
   | 'photo_pick_start'
   | 'photo_pick_success'
   | 'photo_pick_error'
   | 'photo_clear'
   | 'garment_mode_set'
   | 'garment_pick'
+  | 'wardrobe_item_delete_click'
+  | 'wardrobe_item_delete_success'
   | 'garment_clear'
   | 'tryon_generate_tap'
   | 'task_created'
@@ -42,7 +45,16 @@ export type EventName =
   | 'policy_open'
   | 'permission_prompt'
   | 'permission_result'
-  | 'error_alert';
+  | 'error_alert'
+  | 'welcome_continue_click'
+  | 'garment_pick_start'
+  | 'garment_pick_error'
+  | 'garment_pick_success'
+  | 'tryon_generate_click'
+  | 'tryon_task_create_start'
+  | 'tryon_task_create_success'
+  | 'tryon_task_remove'
+  | 'consent_photo_processing';
 
 const a = () => getAnalytics(getApp());
 
@@ -58,8 +70,8 @@ const sanitize = (params?: EventParams) => {
 };
 
 export const Analytics = {
-  event: async (name: string, params?: Record<string, any>) => {
-    await logEvent(a(), name, sanitize(params));
+  event: async (name: EventName, params?: Record<string, any>) => {
+    await logEvent(a(), name as string, sanitize(params));
   },
   userId: async (id: string | null) => {
     await setUserId(a(), id ?? '');

@@ -33,7 +33,7 @@ export default function Garment() {
     clearUpper,
     clearLower,
   } = useTryOnStore();
-  console.log({ mode });
+
   const [busy, setBusy] = useState(false);
 
   const clear = (slot: 'dress' | 'upper' | 'lower', setter: () => void) => {
@@ -46,6 +46,8 @@ export default function Garment() {
     setter: (x: { uri: string; base64: string } | null) => void,
   ) {
     try {
+      Analytics.event('garment_pick_start', { slot });
+
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (perm.status !== 'granted') {
         Alert.alert(
@@ -77,13 +79,10 @@ export default function Garment() {
         base64: `data:image/jpeg;base64,${manip.base64!}`,
       });
 
-      Analytics.event('garment_pick', {
-        slot, // 'dress' | 'upper' | 'lower'
-        w: manip.width, // необязательно, но полезно
-        h: manip.height,
-        source: 'gallery', // если будешь поддерживать камеру — меняй на 'camera'
-      });
+      Analytics.event('garment_pick_success', { slot });
     } catch (e: any) {
+      Analytics.event('garment_pick_error', { slot });
+
       Alert.alert(
         t('common.error'),
         e?.message || t('errors.pickImageFallback'),

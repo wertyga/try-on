@@ -88,23 +88,38 @@ export const useTryOnStore = create<TryOnState>((set) => ({
   tasks: [],
 
   consent: false,
-  setConsent: (consent: boolean) => set({ consent }),
+  setConsent: (consent: boolean) => {
+    Analytics.event('consent_photo_processing', { value: consent });
+
+    set({ consent });
+  },
 
   clearDress: () => {
+    Analytics.event('garment_clear', { slot: 'dress' });
+
     set({ dress: null });
   },
-  clearUpper: () => set({ upper: null }),
-  clearLower: () => set({ lower: null }),
+  clearUpper: () => {
+    Analytics.event('garment_clear', { slot: 'upper' });
+
+    set({ upper: null });
+  },
+  clearLower: () => {
+    Analytics.event('garment_clear', { slot: 'lower' });
+
+    set({ lower: null });
+  },
 
   setUserPhoto: (userPhoto) => set({ userPhoto }),
-  setMode: (mode) => {
-    Analytics.event('garment_mode_set', { mode });
-
+  setMode: async (mode) => {
     set((state) =>
       mode === 'dress'
         ? { mode, upper: null, lower: null }
         : { mode, dress: null },
     );
+
+    await Analytics.event('garment_mode_set', { mode });
+    Analytics.userProp('tryon_mode', mode);
   },
   setDress: (dress) => set({ dress }),
   setUpper: (upper) => set({ upper }),
@@ -118,8 +133,10 @@ export const useTryOnStore = create<TryOnState>((set) => ({
     set((s) => ({
       tasks: s.tasks.map((x) => (x.id === id ? { ...x, ...patch } : x)),
     })),
-  removeTask: (id) =>
-    set((s) => ({ tasks: s.tasks.filter((x) => x.id !== id) })),
+  removeTask: (id) => {
+    Analytics.event('tryon_task_remove', { task_id: id });
+    set((s) => ({ tasks: s.tasks.filter((x) => x.id !== id) }));
+  },
   clearFinished: () => {
     Analytics.event('queue_clear_finished');
 

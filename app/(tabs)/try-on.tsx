@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { createTask } from '@/api';
 import { Analytics } from '@/analytics';
+import { LoaderOverlay } from '@/components/Loader';
 
 function hash(s: string) {
   let h = 5381;
@@ -56,9 +57,21 @@ export default function Home() {
   async function tryCreateTask(payload: TryOnPayload, fp: string) {
     setCreating(true);
     try {
-      Analytics.event('tryon_generate_tap', { has_photo: !!userPhoto, mode });
+      Analytics.event('tryon_generate_click', {
+        has_photo: !!userPhoto,
+        mode,
+        has_dress: !!dress,
+        has_upper: !!upper,
+        has_lower: !!lower,
+      });
+
+      Analytics.event('tryon_task_create_start', {
+        fingerprint: fp,
+        mode: payload.mode,
+      });
 
       const { id, assets } = await createTask(payload);
+
       addTask({
         id,
         status: 'queued',
@@ -70,11 +83,12 @@ export default function Home() {
         assets,
       });
 
-      Analytics.event('task_created', { mode, task_hint: id.slice(-6) });
+      Analytics.event('tryon_task_create_success', {
+        task_id: id,
+        fingerprint: fp,
+      });
 
       router.push('/(tabs)/tasks-list');
-    } catch (e) {
-      console.log({ e });
     } finally {
       setCreating(false);
     }
@@ -112,7 +126,6 @@ export default function Home() {
           </Text>
         </Pressable>
       </View>
-
       {/* Garments */}
       <View style={s.card}>
         <View style={s.rowBetween}>
@@ -179,7 +192,6 @@ export default function Home() {
           </Text>
         </Pressable>
       </View>
-
       {/* Generate */}
       <Pressable
         style={[s.primaryBtn, !currentPayload && s.btnDisabled]}

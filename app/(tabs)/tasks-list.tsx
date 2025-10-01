@@ -52,7 +52,7 @@ export default function TryOnQueueScreen() {
       active.map(async (task) => {
         try {
           const j = await getTask(task.id);
-          const status: string = j?.data?.status || 'queued';
+          const status: string = j.status || 'queued';
 
           Analytics.event('task_status', {
             task_hint: task.id.slice(-6),
@@ -60,14 +60,7 @@ export default function TryOnQueueScreen() {
           });
 
           if (status === 'completed') {
-            const works = j?.data?.output?.works ?? [];
-            const url =
-              works[0]?.cover?.resource ||
-              works[0]?.image?.resource ||
-              j?.data?.output?.resource ||
-              null;
-
-            updateTask(task.id, { status: 'completed', resultUrl: url });
+            updateTask(task.id, { status: 'completed', resultUrl: j.image });
 
             // clear inputs after first success
             resetInputs();
@@ -79,8 +72,8 @@ export default function TryOnQueueScreen() {
             return;
           }
 
-          if (status === 'failed' || j?.data?.error?.code) {
-            const msg = j?.data?.error?.message || t('task.resultNotFound');
+          if (status === 'failed' || j.error?.code) {
+            const msg = j.error?.message || t('task.resultNotFound');
             updateTask(task.id, { status: 'failed', error: msg });
 
             Analytics.event('task_failed', {
