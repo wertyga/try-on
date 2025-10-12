@@ -1,22 +1,22 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
-// import * as os from 'os';
-//
-// function getLocalIP() {
-//   const interfaces = os.networkInterfaces();
-//   for (const iface of Object.values(interfaces)) {
-//     for (const config of iface as any) {
-//       if (config.family === 'IPv4' && !config.internal) {
-//         return config.address;
-//       }
-//     }
-//   }
-//   return '0.0.0.0';
-// }
+import * as os from 'os';
+
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const iface of Object.values(interfaces)) {
+    for (const config of iface as any) {
+      if (config.family === 'IPv4' && !config.internal) {
+        return config.address;
+      }
+    }
+  }
+  return '0.0.0.0';
+}
 
 const ENVS = {
-  API_BASE_URL: 'https://api.zws.ink',
-  // API_BASE_URL: `http://${getLocalIP()}:3001`,
+  // API_BASE_URL: 'https://api.zws.ink',
+  API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -31,7 +31,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: 'com.wertyga.tryon',
     supportsTablet: true,
-    googleServicesFile: "./GoogleService-Info.plist",
+    googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       NSCameraUsageDescription:
         'Allow $(PRODUCT_NAME) to use the camera to take your photo.',
@@ -73,10 +73,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-localization',
     'expo-router',
-    [
-      '@react-native-google-signin/google-signin/app.plugin.js'
-    ],
+    ['@react-native-google-signin/google-signin/app.plugin.js'],
     '@react-native-firebase/app',
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          useFrameworks: 'static',
+        },
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

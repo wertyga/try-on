@@ -93,7 +93,7 @@ export default function Garment() {
   }
 
   return (
-    <Container.WithScrollBar>
+    <Container.WithTabBar>
       <Text style={s.title}>{t('garnet.title')}</Text>
 
       {/* Mode switch */}
@@ -145,7 +145,7 @@ export default function Garment() {
       {busy && <ActivityIndicator size="large" style={{ marginTop: 8 }} />}
 
       <Text style={s.hint}>{t('garnet.tip')}</Text>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

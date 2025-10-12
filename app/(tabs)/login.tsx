@@ -7,7 +7,7 @@ import { Container } from '@/components/ui/Container';
 
 export default function Login() {
   return (
-    <Container.WithScrollBar
+    <Container.WithTabBar
       title={'Login'}
       childrenStyle={{
         justifyContent: 'center',
@@ -17,7 +17,7 @@ export default function Login() {
       <View style={styles.oauth}>
         <OauthGoogle />
       </View>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

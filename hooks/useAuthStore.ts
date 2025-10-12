@@ -31,17 +31,23 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   ) => {
     set({ isLoading: true });
 
-    const { user } = await oauthGoogleRegister(...data);
+    try {
+      const { user } = await oauthGoogleRegister(...data);
 
-    useUserStore.getState().setUser(user);
+      useUserStore.getState().setUser(user);
 
-    await Analytics.event('login_google_success');
-    await Analytics.userId(user._id);
-    await Analytics.userProp('auth', 'user');
+      await Analytics.event('login_google_success');
+      await Analytics.userId(user._id);
+      await Analytics.userProp('auth', 'user');
 
-    set({ isLoading: false });
+      set({ isLoading: false });
 
-    return user;
+      return user;
+    } catch (e) {
+      throw e;
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
   signIn: async (...data: Parameters<typeof signInRequest>) => {

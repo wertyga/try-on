@@ -22,9 +22,10 @@ const OauthGoogle = () => {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
       });
-      const {
-        data: { user: gUser },
-      } = (await GoogleSignin.signIn()) as any;
+      const data = (await GoogleSignin.signIn()) as any;
+
+      const gUser = data?.data?.user;
+      if (!gUser) return;
 
       await registerWithGoogle({
         email: gUser.email,

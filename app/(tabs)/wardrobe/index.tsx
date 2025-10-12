@@ -66,7 +66,7 @@ export default function WardrobeScreen() {
   };
 
   return (
-    <Container.WithScrollBar
+    <Container.WithTabBar
       title={t('wardrobe.title')}
       isLoading={isLoading}
       refreshControl={
@@ -103,7 +103,7 @@ export default function WardrobeScreen() {
           ))}
         </View>
       )}
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 
