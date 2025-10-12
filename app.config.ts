@@ -1,36 +1,37 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
-import * as os from 'os';
-
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const config of iface as any) {
-      if (config.family === 'IPv4' && !config.internal) {
-        return config.address;
-      }
-    }
-  }
-  return '0.0.0.0';
-}
+// import * as os from 'os';
+//
+// function getLocalIP() {
+//   const interfaces = os.networkInterfaces();
+//   for (const iface of Object.values(interfaces)) {
+//     for (const config of iface as any) {
+//       if (config.family === 'IPv4' && !config.internal) {
+//         return config.address;
+//       }
+//     }
+//   }
+//   return '0.0.0.0';
+// }
 
 const ENVS = {
-  // API_BASE_URL: 'https://api.zws.ink',
-  API_BASE_URL: `http://${getLocalIP()}:3001`,
+  API_BASE_URL: 'https://api.zws.ink',
+  // API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
-  version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
+  runtimeVersion: '1.0.0',
   ios: {
     bundleIdentifier: 'com.wertyga.tryon',
     supportsTablet: true,
+    googleServicesFile: "./GoogleService-Info.plist",
     infoPlist: {
       NSCameraUsageDescription:
         'Allow $(PRODUCT_NAME) to use the camera to take your photo.',
@@ -73,11 +74,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-localization',
     'expo-router',
     [
-      '@react-native-google-signin/google-signin',
-      {
-        iosUrlScheme:
-          'com.googleusercontent.apps.277624245533-hmaoaah21er9j4b7le8rhgeu9tvpogcr',
-      },
+      '@react-native-google-signin/google-signin/app.plugin.js'
     ],
     '@react-native-firebase/app',
   ],
@@ -92,9 +89,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       assetPatternsToBeBundled: ['**/*'],
     },
     ...ENVS,
-  },
-  runtimeVersion: {
-    policy: 'appVersion',
   },
   updates: {
     url: 'https://u.expo.dev/fb5b533f-70bc-4b73-a453-a0028be64c33',
