@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import { OauthGoogle } from '@/components/auth';
 import { Container } from '@/components/ui/Container';
@@ -16,6 +16,16 @@ export default function Login() {
     >
       <View style={styles.oauth}>
         <OauthGoogle />
+      </View>
+
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'flex-end',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Text>v.1</Text>
       </View>
     </Container.WithScrollBar>
   );

@@ -15,14 +15,14 @@ function getLocalIP() {
 }
 
 const ENVS = {
-  // API_BASE_URL: 'https://api.zws.ink',
-  API_BASE_URL: `http://${getLocalIP()}:3001`,
+  API_BASE_URL: 'https://api.zws.ink',
+  // API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
-  version: '1.0.0',
+  version: '1.1.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
@@ -46,6 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: {
+    versionCode: 2,
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#0F172A',
@@ -76,10 +77,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       '@react-native-google-signin/google-signin',
       {
         iosUrlScheme:
-          'com.googleusercontent.apps.277624245533-hmaoaah21er9j4b7le8rhgeu9tvpogcr',
+          'com.googleusercontent.apps.876705886550-69onectr8996dlrdjko1s1o8hjaovlj1',
       },
     ],
-    '@react-native-firebase/app',
   ],
   experiments: {
     typedRoutes: true,

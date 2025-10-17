@@ -34,7 +34,7 @@ export const baseQuery = async ({
 
       Toast.show({
         type: 'error',
-        text1: e.response?.data.message || e.message,
+        text1: e.response?.data?.error?.message || e.message,
       });
     }
 

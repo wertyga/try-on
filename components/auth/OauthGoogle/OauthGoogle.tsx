@@ -9,6 +9,7 @@ import { useAuthStore } from '@/hooks/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { router } from 'expo-router';
 import { Analytics } from '@/analytics';
+import { sendLogs } from '@/api';
 
 const OauthGoogle = () => {
   const { registerWithGoogle, isLoading } = useAuthStore();
@@ -18,17 +19,12 @@ const OauthGoogle = () => {
       Analytics.event('login_google_start');
 
       GoogleSignin.configure();
-
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
-      });
-      const {
-        data: { user: gUser },
-      } = (await GoogleSignin.signIn()) as any;
+      await GoogleSignin.hasPlayServices();
+      const { user: gUser } = await GoogleSignin.signIn();
 
       await registerWithGoogle({
         email: gUser.email,
-        username: gUser.name,
+        username: gUser.name ?? '',
       });
 
       router.replace('/try-on');
@@ -37,6 +33,8 @@ const OauthGoogle = () => {
         code: e.code || 'unknown',
         message: e.message,
       });
+
+      sendLogs(e.message);
 
       Toast.show({
         type: 'error',
