@@ -102,7 +102,7 @@ export default function Home() {
   }
 
   return (
-    <Container.WithScrollBar
+    <Container.WithTabBar
       keyboardShouldPersistTaps="handled"
       title={t('home.title')}
     >
@@ -206,7 +206,7 @@ export default function Home() {
           {creating ? t('queue.creating') : t('home.generate')}
         </Text>
       </Pressable>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

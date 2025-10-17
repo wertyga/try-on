@@ -127,7 +127,7 @@ export default function WardrobeDetailScreen() {
   if (!id) return null;
 
   return (
-    <Container.WithScrollBar
+    <Container.WithTabBar
       title={item?.title || t('wardrobe.detailTitle')}
       isLoading={loading}
     >
@@ -209,7 +209,7 @@ export default function WardrobeDetailScreen() {
           )}
         </Pressable>
       </Modal>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

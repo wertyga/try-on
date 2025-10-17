@@ -7,7 +7,7 @@ import { Container } from '@/components/ui/Container';
 
 export default function Login() {
   return (
-    <Container.WithScrollBar
+    <Container.WithTabBar
       title={'Login'}
       childrenStyle={{
         justifyContent: 'center',
@@ -27,7 +27,7 @@ export default function Login() {
       >
         <Text>v.1</Text>
       </View>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

@@ -44,7 +44,7 @@ export default function UserScreen() {
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <Container.WithScrollBar>
+    <Container.WithTabBar>
       {/* Header */}
       <View style={s.header}>
         {avatarUrl ? (
@@ -80,7 +80,7 @@ export default function UserScreen() {
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
       </View>
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

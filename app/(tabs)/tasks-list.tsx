@@ -128,7 +128,7 @@ export default function TryOnQueueScreen() {
   );
 
   return (
-    <Container.WithScrollBar title={t('queue.title')}>
+    <Container.WithTabBar title={t('queue.title')}>
       <SaveLooksGate style={{ marginBottom: 12 }} />
 
       <View style={s.actions}>
@@ -146,7 +146,7 @@ export default function TryOnQueueScreen() {
           onRemove={removeTask}
         />
       ))}
-    </Container.WithScrollBar>
+    </Container.WithTabBar>
   );
 }
 

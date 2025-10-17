@@ -13,6 +13,7 @@ import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LoaderOverlay } from '@/components/Loader';
+import { buildStyles } from '@/utils';
 
 export type TContainerProps = ScrollViewProps & {
   children: ReactNode;
@@ -38,12 +39,12 @@ const ScrollContent = ({
 
   return (
     <ScrollView
-      style={[s.container, style]}
-      contentContainerStyle={[
+      style={buildStyles(s.container, style)}
+      contentContainerStyle={buildStyles(
         s.content,
-        { paddingTop: insets.top + 16 },
+        { paddingTop: insets.top },
         contentContainerStyle,
-      ]}
+      )}
       showsVerticalScrollIndicator={false}
       {...scrollViewProps}
     >
@@ -63,15 +64,10 @@ export const Container = ({
   contentContainerStyle,
   ...props
 }: TContainerProps) => {
-  const insets = useSafeAreaInsets();
-
   return (
     <ScrollContent
       {...props}
-      contentContainerStyle={[
-        { paddingBottom: insets.bottom + 16 },
-        contentContainerStyle,
-      ]}
+      contentContainerStyle={[{ paddingBottom: 16 }, contentContainerStyle]}
     >
       {children}
     </ScrollContent>
@@ -83,10 +79,19 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   contentContainerStyle,
   ...props
 }) => {
-  return <ScrollContent {...props}>{children}</ScrollContent>;
+  const tabBarHeight = useBottomTabBarHeight();
+
+  return (
+    <ScrollContent
+      {...props}
+      contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
+    >
+      {children}
+    </ScrollContent>
+  );
 };
 
-Container.WithScrollBar = ScrollableContainerWithTabs;
+Container.WithTabBar = ScrollableContainerWithTabs;
 
 const s = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '800', marginBottom: 16 },

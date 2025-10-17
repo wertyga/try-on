@@ -15,6 +15,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import Checkbox from 'expo-checkbox';
 import { useTryOnStore } from '@/hooks/useTryOnStore';
 import { Container } from '@/components/ui/Container';
+import { Input } from '@/components/ui/Input';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
 
