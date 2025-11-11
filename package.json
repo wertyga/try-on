@@ -12,8 +12,8 @@
     "build:android:development": "eas build -p android --profile development",
     "build:ios:development": "eas build -p ios --profile development",
     "build:ios:development:local": "eas build -p ios --profile development --local",
-    "build:android:preview:local": "eas build -p android --profile preview --local",
-    "build:android:preview": "eas build --platform android --profile previeyw"
+    "build:android:preview:local": "eas build -p android --profile preview:local",
+    "build:android:preview": "eas build --platform android --profile preview"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -54,6 +54,7 @@
     "react-i18next": "^15.7.3",
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-localize": "^3.6.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",

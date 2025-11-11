@@ -7,3 +7,4 @@ export * from './router';
 export * from './tech';
 export * from './user';
 export * from './wardrobe';
+export * from './product';

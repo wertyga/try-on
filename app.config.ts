@@ -15,14 +15,14 @@ function getLocalIP() {
 }
 
 const ENVS = {
-  API_BASE_URL: 'https://api.zws.ink',
-  // API_BASE_URL: `http://${getLocalIP()}:3001`,
+  // API_BASE_URL: 'https://api.zws.ink',
+  API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
-  version: '1.1.0',
+  version: '1.2.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
@@ -46,7 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: {
-    versionCode: 2,
+    versionCode: 4,
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#0F172A',
@@ -61,6 +61,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'CAMERA',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
+      'com.google.android.gms.permission.AD_ID',
     ],
     package: 'com.wertyga.tryon',
   },

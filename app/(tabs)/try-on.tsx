@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { TryOnPayload, useTryOnStore } from '@/hooks/useTryOnStore';
 import { Container } from '@/components/ui/Container';
@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { createTask } from '@/api';
 import { Analytics } from '@/analytics';
-import { LoaderOverlay } from '@/components/Loader';
+import { storage } from '@/utils';
+import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 
 function hash(s: string) {
   let h = 5381;
@@ -70,7 +71,9 @@ export default function Home() {
         mode: payload.mode,
       });
 
-      const { id, assets } = await createTask(payload);
+      const { id, assets, imagesCategories } = await createTask(payload);
+
+      storage.preferredProductCategories = imagesCategories;
 
       addTask({
         id,
@@ -206,6 +209,8 @@ export default function Home() {
           {creating ? t('queue.creating') : t('home.generate')}
         </Text>
       </Pressable>
+
+      <ReccomendationProducts />
     </Container.WithTabBar>
   );
 }

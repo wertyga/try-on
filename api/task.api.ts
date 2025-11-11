@@ -9,6 +9,7 @@ export async function createTask(data: TryOnPayload): Promise<{
     upper: string;
     lower: string;
   };
+  imagesCategories: string[];
 }> {
   const { data: create } = await baseQuery({
     method: 'post',
@@ -24,6 +25,7 @@ export async function createTask(data: TryOnPayload): Promise<{
   return {
     id,
     assets: create.assets,
+    imagesCategories: create.imagesCategories,
   };
 }
 
