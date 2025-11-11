@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { TryOnPayload, useTryOnStore } from '@/hooks/useTryOnStore';
@@ -27,7 +27,7 @@ function fingerprintFromPayload(p: TryOnPayload) {
   return key;
 }
 
-export default function Home() {
+export default function TryOn() {
   const { t } = useTranslation();
 
   const { userPhoto, mode, dress, upper, lower, addTask } = useTryOnStore();
@@ -72,7 +72,7 @@ export default function Home() {
       });
 
       const { id, assets, imagesCategories } = await createTask(payload);
-
+      console.log({ imagesCategories });
       storage.preferredProductCategories = imagesCategories;
 
       addTask({
@@ -100,6 +100,7 @@ export default function Home() {
   function goWelcome() {
     router.push('/welcome');
   }
+
   function goGarnet() {
     router.push('/(tabs)/garment');
   }

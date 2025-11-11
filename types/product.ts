@@ -15,7 +15,10 @@ export enum Categories {
 }
 
 export type TProduct = {
-  categories: Categories[];
+  categories: {
+    slug: string;
+    title: string;
+  }[];
   _id: string;
   title: string;
   description: string;

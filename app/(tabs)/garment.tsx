@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Container } from '@/components/ui/Container';
 import { useTryOnStore } from '@/hooks/useTryOnStore';
 import { Analytics } from '@/analytics';
+import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 
 export default function Garment() {
   const { t } = useTranslation();
@@ -145,6 +146,8 @@ export default function Garment() {
       {busy && <ActivityIndicator size="large" style={{ marginTop: 8 }} />}
 
       <Text style={s.hint}>{t('garnet.tip')}</Text>
+
+      <ReccomendationProducts />
     </Container.WithTabBar>
   );
 }

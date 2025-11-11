@@ -82,10 +82,7 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   const tabBarHeight = useBottomTabBarHeight();
 
   return (
-    <ScrollContent
-      {...props}
-      contentContainerStyle={{ paddingBottom: tabBarHeight + 16 }}
-    >
+    <ScrollContent {...props} contentContainerStyle={{ paddingBottom: 16 }}>
       {children}
     </ScrollContent>
   );
