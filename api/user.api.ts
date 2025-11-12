@@ -1,8 +1,9 @@
 import { baseQuery } from './base-query';
 
-import { User } from '@/types/user';
+import { TUser } from '@/types/user';
+import { Categories } from '@/types';
 
-export const fetchSelfUser = async (): Promise<User> => {
+export const fetchSelfUser = async (): Promise<TUser> => {
   const { data } = await baseQuery({
     method: 'get',
     url: '/users/self',
@@ -10,4 +11,19 @@ export const fetchSelfUser = async (): Promise<User> => {
   });
 
   return data;
+};
+
+export const updateUserCategories = async (
+  categories: Categories[],
+): Promise<TUser> => {
+  const { data } = await baseQuery({
+    method: 'put',
+    url: '/users/categories',
+    data: {
+      categories,
+    },
+    silentError: true,
+  });
+
+  return data.user;
 };

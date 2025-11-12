@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { createTask } from '@/api';
 import { Analytics } from '@/analytics';
-import { storage } from '@/utils';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
+import { useUserStore } from '@/hooks/useUserStore';
 
 function hash(s: string) {
   let h = 5381;
@@ -31,6 +31,7 @@ export default function TryOn() {
   const { t } = useTranslation();
 
   const { userPhoto, mode, dress, upper, lower, addTask } = useTryOnStore();
+  const { updateUserCategories } = useUserStore();
 
   const [creating, setCreating] = useState(false);
 
@@ -72,8 +73,7 @@ export default function TryOn() {
       });
 
       const { id, assets, imagesCategories } = await createTask(payload);
-      console.log({ imagesCategories });
-      storage.preferredProductCategories = imagesCategories;
+      updateUserCategories(imagesCategories);
 
       addTask({
         id,

@@ -1,5 +1,6 @@
 import { TryOnPayload } from '@/hooks/useTryOnStore';
 import { baseQuery } from '@/api/base-query';
+import { Categories } from '@/types';
 
 export async function createTask(data: TryOnPayload): Promise<{
   id: string;
@@ -9,7 +10,7 @@ export async function createTask(data: TryOnPayload): Promise<{
     upper: string;
     lower: string;
   };
-  imagesCategories: string[];
+  imagesCategories: Categories[];
 }> {
   const { data: create } = await baseQuery({
     method: 'post',

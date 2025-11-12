@@ -1,4 +1,4 @@
-import { User } from './user';
+import { TUser } from './user';
 
 export type AuthCommonRequest = {
   email: string;
@@ -26,7 +26,7 @@ export type OauthFacebookRequest = {
 };
 
 export type UserResponse = {
-  user: User;
+  user: TUser;
 };
 
 export type SignUpRequest = {

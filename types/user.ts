@@ -1,8 +1,4 @@
-import { City } from '@/types/city';
-import { Guide, Path } from '@/types/guide';
-import { Place } from '@/types/place';
-
-import { Like } from './likes';
+import { Categories } from '@/types/product';
 
 export enum USER_TAGS {
   User = 'User',
@@ -26,29 +22,15 @@ export type Language = {
   flag: string;
 };
 
-export type User = {
+export type TUser = {
   createdAt: string;
   updatedAt: string;
   _id: string;
   username: string;
   email: string;
   token: string;
-  country: string;
-  city: string;
-  likes: Like;
-  subscribers: Like;
-  subscriptions: Like;
   avatar: string;
+  categories: Categories[];
   status: USER_TYPES;
-  rank: USER_RANKS;
-  slug: string;
-  story: string;
   languages: Language[];
-  isVisible: boolean;
-  lastCity?: City;
-};
-
-export type UserFavoritesResponse = {
-  guides: Guide[];
-  places: Place[];
 };

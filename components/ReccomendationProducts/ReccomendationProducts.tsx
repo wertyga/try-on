@@ -12,6 +12,7 @@ export const ReccomendationProducts = () => {
 
   const getProducts = async () => {
     const categories = await storage.preferredProductCategories;
+
     if (!categories?.length) return;
 
     const zone = Localization.getLocales()?.[0]?.regionCode ?? 'US';
