@@ -1,27 +1,24 @@
 import { create } from 'zustand';
 import { Analytics } from '@/analytics';
+import { TaskStatus, TTask } from '@/types/task';
+import { getFinishedTask, removeTask } from '@/api';
+import { getTryOnTaskFromTask, storage } from '@/utils';
+import { useUserStore } from '@/hooks/useUserStore';
 
 type Source = 'camera' | 'gallery';
 
 export type UserPhoto = {
   uri: string;
-  base64?: string;
-  width?: number;
-  height?: number;
-  source?: Source;
+  base64: string;
 } | null;
 
 export type GarmentImage = { uri: string; base64?: string } | null;
 export type GarmentMode = 'dress' | 'separate';
 
-export type TTryOnPayloadWardrobeKeys =
-  | 'dressBase64'
-  | 'upperBase64'
-  | 'lowerBase64';
-
-export type TryOnPayload = Partial<
-  Record<TTryOnPayloadWardrobeKeys, string>
-> & {
+export type TryOnPayload = {
+  dressBase64?: string;
+  upperBase64?: string;
+  lowerBase64?: string;
   mode: GarmentMode;
   userBase64: string;
 };
@@ -33,19 +30,18 @@ export type TryOnTaskAssets = {
   lower?: string;
 };
 
-export type TryOnTask = {
-  id: string; // task_id из PiAPI
-  status: 'queued' | 'running' | 'completed' | 'failed';
+export type TryOnTask = TTask & {
+  id: string;
   fingerprint: string; // для дедупликации
-  payload: TryOnPayload; // чтобы можно было «Попробовать ещё»
-  resultUrl?: string | null;
-  error?: string | null;
-  createdAt: number;
   isSaved: boolean;
   assets: TryOnTaskAssets;
+  mode: GarmentMode;
 };
 
 type TryOnState = {
+  //abort controllers
+  abortControllers: Record<string, AbortController>;
+
   // входы
   userPhoto: UserPhoto;
   mode: GarmentMode;
@@ -71,14 +67,23 @@ type TryOnState = {
   setLower: (g: GarmentImage) => void;
   resetInputs: () => void;
 
+  clearFinished: () => void;
+
+  fetchFinishedTask: (id: string) => void;
+
+  addTasksList: (tasks: TryOnTask[]) => void;
+  updateTasksState: (tasks: TryOnTask[]) => void;
+  removeTask: (id: string) => void;
   addTask: (t: TryOnTask) => void;
   addBunchTasks: (t: TryOnTask[]) => void;
   updateTask: (id: string, patch: Partial<TryOnTask>) => void;
-  removeTask: (id: string) => void;
-  clearFinished: () => void;
+
+  clear: () => void;
+
+  init: () => Promise<void>;
 };
 
-export const useTryOnStore = create<TryOnState>((set) => ({
+export const useTryOnStore = create<TryOnState>((set, get) => ({
   userPhoto: null,
   mode: 'dress',
   dress: null,
@@ -87,7 +92,16 @@ export const useTryOnStore = create<TryOnState>((set) => ({
 
   tasks: [],
 
+  abortControllers: {},
+
   consent: false,
+
+  init: async () => {
+    const userPhoto = await storage.get('userPhoto');
+
+    set({ userPhoto });
+  },
+
   setConsent: (consent: boolean) => {
     Analytics.event('consent_photo_processing', { value: consent });
 
@@ -110,7 +124,12 @@ export const useTryOnStore = create<TryOnState>((set) => ({
     set({ lower: null });
   },
 
-  setUserPhoto: (userPhoto) => set({ userPhoto }),
+  setUserPhoto: (userPhoto: UserPhoto) => {
+    storage.set('userPhoto', userPhoto);
+
+    set({ userPhoto });
+  },
+
   setMode: async (mode) => {
     set((state) =>
       mode === 'dress'
@@ -127,23 +146,88 @@ export const useTryOnStore = create<TryOnState>((set) => ({
   resetInputs: () =>
     set({ dress: null, upper: null, lower: null /* userPhoto оставим */ }),
 
-  addTask: (t) => set((s) => ({ tasks: [t, ...s.tasks] })),
+  addTask: (t) => {
+    const updatedTaskList = [t, ...get().tasks];
+    storage.set('userPhoto', { uri: t.assets.model, base64: t.assets.model });
+
+    get().updateTasksState(updatedTaskList);
+  },
   addBunchTasks: (tasks) => set((s) => ({ tasks: [...tasks, ...s.tasks] })),
-  updateTask: (id, patch) =>
-    set((s) => ({
-      tasks: s.tasks.map((x) => (x.id === id ? { ...x, ...patch } : x)),
-    })),
+
+  updateTask: (id, patch) => {
+    const updatedTaskList = get().tasks.map((x) =>
+      x.id === id ? { ...x, ...patch } : x,
+    );
+
+    get().updateTasksState(updatedTaskList);
+  },
+
   removeTask: (id) => {
     Analytics.event('tryon_task_remove', { task_id: id });
-    set((s) => ({ tasks: s.tasks.filter((x) => x.id !== id) }));
+
+    const user = useUserStore.getState().user;
+    const updatedTaskList = get().tasks.filter((x) => x.id !== id);
+
+    get().updateTasksState(updatedTaskList);
+
+    if (user) {
+      removeTask(id);
+    }
   },
+
+  updateTasksState: (tasks: TryOnTask[]) => {
+    set({ tasks });
+
+    storage.set('tasks', tasks);
+  },
+
+  addTasksList: (tasks: TryOnTask[]) => {
+    const map = new Map<string, TryOnTask>();
+
+    tasks.forEach((t) => map.set(t.id, t));
+
+    get().tasks.forEach((t) => map.set(t.id, t));
+
+    const updated = Array.from(map.values());
+
+    set({ tasks: updated });
+    storage.set('tasks', updated);
+  },
+
+  clear: () => {
+    set({ tasks: [] });
+    get().resetInputs();
+
+    storage.set('tasks', []);
+  },
+
   clearFinished: () => {
     Analytics.event('queue_clear_finished');
 
-    set((s) => ({
-      tasks: s.tasks.filter(
-        (x) => x.status !== 'completed' && x.status !== 'failed',
-      ),
-    }));
+    const updatedTaskList = get().tasks.filter(
+      (x) =>
+        x.status !== TaskStatus.completed && x.status !== TaskStatus.failed,
+    );
+
+    storage.set('tasks', updatedTaskList);
+
+    set({ tasks: updatedTaskList });
+  },
+
+  fetchFinishedTask: async (id: string) => {
+    try {
+      const abortController = get().abortControllers[id];
+      abortController?.abort();
+
+      get().abortControllers[id] = new AbortController();
+
+      const task = await getFinishedTask(id, get().abortControllers[id].signal);
+
+      get().updateTask(id, getTryOnTaskFromTask(task));
+
+      useUserStore.getState().getUserSelf();
+    } catch (e: any) {
+      get().updateTask(id, { error: e.message, status: TaskStatus.failed });
+    }
   },
 }));

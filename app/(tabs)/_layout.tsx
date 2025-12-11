@@ -1,67 +1,135 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { FC } from 'react';
 import { Platform } from 'react-native';
+import AntDesignIcons from '@expo/vector-icons/AntDesign';
 
 import { HapticTab } from '@/components/HapticTab';
-import { type IconSymbolName, IconSymbol } from '@/components/ui/IconSymbol';
+import { type TIconSymbolProps, IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 
 import { useUserStore } from '@/hooks/useUserStore';
 import { useWardrobeAutoSync } from '@/hooks/useWardrobeStore';
+import { useAuthStore } from '@/hooks/useAuthStore';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
+
+const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
+  isLoading,
+  color,
+}) => {
+  const rotation = useSharedValue(0);
+
+  React.useEffect(() => {
+    if (isLoading) {
+      rotation.value = withRepeat(
+        withTiming(360, {
+          duration: 900,
+          easing: Easing.linear,
+        }),
+        -1,
+        false,
+      );
+    } else {
+      rotation.value = 0;
+    }
+  }, [isLoading, rotation]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  if (!isLoading) {
+    return <AntDesignIcons size={28} name="google" color={color} />;
+  }
+
+  return (
+    <Animated.View style={style}>
+      <AntDesignIcons size={28} name="loading1" color={color} />
+    </Animated.View>
+  );
+};
 
 const getTabs = (): {
   hidden?: boolean;
   name: string;
   title: string;
   withLogin?: boolean;
-  icon: IconSymbolName;
+  icon:
+    | TIconSymbolProps['name']
+    | ((color: string, isLoading: boolean) => React.ReactNode);
 }[] => {
   return [
     {
       name: 'try-on',
       title: 'Try on',
-      icon: 'tshirt.fill',
+      icon: 'checkroom',
     },
     {
       name: 'garment',
       title: 'Garment',
-      icon: 'bag.fill',
+      icon: 'local-mall',
     },
     {
       name: 'tasks-list',
       title: 'List',
-      icon: 'clock.fill',
+      icon: 'schedule',
     },
     {
       name: 'wardrobe/index',
       title: 'Wardrobe',
-      icon: 'square.grid.2x2.fill',
+      icon: 'grid-view',
       withLogin: true,
     },
     {
       name: 'profile',
       title: 'User',
-      icon: 'person.fill',
+      icon: 'person',
       withLogin: true,
     },
     {
       name: 'login',
       title: 'User',
-      icon: 'person.crop.circle',
+      icon: (color: string, isLoading: boolean) => {
+        return <LoginIcon color={color} isLoading={isLoading} />;
+      },
       withLogin: false,
     },
     {
       name: 'wardrobe/[id]',
       title: 'wardrobe_id',
-      icon: 'person.crop.circle',
+      icon: 'account-circle',
       hidden: true,
     },
   ];
 };
 
+const MenuIcon = ({
+  color,
+  icon,
+  isLoading,
+}: {
+  color: string;
+  isLoading: boolean;
+  icon:
+    | TIconSymbolProps['name']
+    | ((color: string, isLoading: boolean) => React.ReactNode);
+}) => {
+  return typeof icon === 'string' ? (
+    <IconSymbol size={28} name={icon as any} color={color} />
+  ) : (
+    icon(color, isLoading)
+  );
+};
+
 export default function TabLayout() {
   const { user } = useUserStore();
+  const { signInWithGoogle, isLoading } = useAuthStore();
 
   useWardrobeAutoSync();
 
@@ -80,6 +148,8 @@ export default function TabLayout() {
       }}
     >
       {getTabs().map(({ name, title, icon, withLogin, hidden }) => {
+        const isLoginTab = name === 'login';
+
         let href = null;
         if (withLogin === false && !user) {
           href = undefined;
@@ -99,9 +169,19 @@ export default function TabLayout() {
               title,
               href,
               tabBarIcon: ({ color }) => (
-                <IconSymbol size={28} name={icon as any} color={color} />
+                <MenuIcon color={color} icon={icon} isLoading={isLoading} />
               ),
             }}
+            listeners={
+              isLoginTab
+                ? {
+                    tabPress: (e) => {
+                      e.preventDefault();
+                      signInWithGoogle();
+                    },
+                  }
+                : undefined
+            }
           />
         );
       })}

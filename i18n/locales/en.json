@@ -4,6 +4,10 @@
     "path": "Path",
     "goHome": "Go main screen"
   },
+  "interactions": {
+    "saved": "Saved",
+    "saveLook": "Save look"
+  },
   "tabs": {
     "tryOn": "Try on",
     "garnet": "Garnet",

@@ -4,6 +4,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { storage } from '@/utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
+import { deviceId } from '@/utils/hash';
 
 const buildParams = (
   params?: Record<string, string | number | string[]>,
@@ -31,7 +32,10 @@ export const baseQuery = async ({
   ...config
 }: AxiosRequestConfig & { silentError?: boolean }) => {
   try {
-    const token = await storage.get('token');
+    const [token, dvId] = await Promise.all([
+      storage.get('token'),
+      deviceId.get(),
+    ]);
 
     const authHeader: AxiosRequestConfig['headers'] = {};
     if (token) {
@@ -42,6 +46,7 @@ export const baseQuery = async ({
       headers: {
         ...authHeader,
         ...headers,
+        ['x-device-id']: dvId,
       },
       baseURL: Constants.expoConfig?.extra?.API_BASE_URL,
       params: buildParams(params),
@@ -50,8 +55,8 @@ export const baseQuery = async ({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    console.log(JSON.stringify(e, null, 2));
-    if (!silentError && e.response?.status !== 403) {
+    console.log({ e });
+    if (!silentError) {
       Analytics.event('error', { place: 'tryon_poll', message: e?.message });
 
       Toast.show({

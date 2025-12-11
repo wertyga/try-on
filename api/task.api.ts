@@ -1,15 +1,10 @@
 import { TryOnPayload } from '@/hooks/useTryOnStore';
 import { baseQuery } from '@/api/base-query';
 import { Categories } from '@/types';
+import { TTask } from '@/types/task';
 
 export async function createTask(data: TryOnPayload): Promise<{
-  id: string;
-  assets: {
-    model: string;
-    dress: string;
-    upper: string;
-    lower: string;
-  };
+  task: TTask;
   imagesCategories: Categories[];
 }> {
   const { data: create } = await baseQuery({
@@ -18,29 +13,28 @@ export async function createTask(data: TryOnPayload): Promise<{
     data,
   });
 
-  const id: string | undefined =
-    create?.task?.data?.task_id ?? create?.data?.task_id;
-
-  if (!id) throw new Error('task_id не получен');
-
   return {
-    id,
-    assets: create.assets,
+    task: create.task,
     imagesCategories: create.imagesCategories,
   };
 }
 
-export async function getTask(taskId: string): Promise<{
-  status: string;
-  image: string;
-  id: string;
-  error: {
-    code: number;
-    raw_message: string;
-    message: string;
-    detail: string | null;
+export const retryTaskCreate = async (data: TryOnPayload, taskId: string) => {
+  const { data: create } = await baseQuery({
+    method: 'post',
+    url: '/tryon',
+    data: {
+      ...data,
+      taskId,
+    },
+  });
+
+  return {
+    task: create.task,
   };
-}> {
+};
+
+export async function getTask(taskId: string): Promise<TTask> {
   const { data: task } = await baseQuery({
     method: 'get',
     url: `/tryon/${taskId}`,
@@ -48,3 +42,23 @@ export async function getTask(taskId: string): Promise<{
 
   return task;
 }
+
+export const getFinishedTask = async (
+  taskId: string,
+  abortSignal?: AbortSignal,
+): Promise<TTask> => {
+  const { data: task } = await baseQuery({
+    method: 'get',
+    url: `/tryon/${taskId}/finished`,
+    signal: abortSignal,
+  });
+
+  return task;
+};
+
+export const removeTask = async (taskId: string) => {
+  await baseQuery({
+    method: 'delete',
+    url: `/tryon/${taskId}`,
+  });
+};

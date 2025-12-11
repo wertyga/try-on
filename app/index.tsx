@@ -4,11 +4,11 @@ import { useUserStore } from '@/hooks/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function Boot() {
-  const { status, user, init } = useUserStore();
+  const { status, user, getUserSelf } = useUserStore();
 
   useEffect(() => {
-    init();
-  }, [init]);
+    getUserSelf();
+  }, [getUserSelf]);
 
   useEffect(() => {
     if (status !== 'ready') return;

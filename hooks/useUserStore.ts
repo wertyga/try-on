@@ -1,8 +1,10 @@
 import { create } from 'zustand';
-import { storage } from '@/utils';
+import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { Categories, TUser } from '@/types';
 import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useTryOnStore } from '@/hooks/useTryOnStore';
+import { useUsageStore } from '@/hooks/useUsageStore';
 
 type Status = 'idle' | 'loading' | 'ready';
 
@@ -11,10 +13,11 @@ type UserStore = {
   user: TUser | null;
   error: string | null;
 
-  init: () => Promise<void>;
   setUser: (u: TUser | null) => void;
   dropUser: () => void; // logout: очищает storage и user
   updateUserCategories: (categories?: Categories[]) => void; // logout: очищает storage и user
+
+  getUserSelf: () => Promise<void>;
 };
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -57,28 +60,33 @@ export const useUserStore = create<UserStore>((set, get) => ({
     useWardrobeStore.getState().clear();
   },
 
-  init: async () => {
+  getUserSelf: async () => {
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });
 
     try {
-      const token = (await storage.get?.('token')) as string | null;
+      const { user, usage } = await fetchSelfUser();
 
-      if (!token) {
-        set({ user: null, status: 'ready' });
-        return;
+      set({ user, status: 'ready' });
+
+      useUsageStore.getState().update(usage);
+
+      if (user) {
+        useTryOnStore
+          .getState()
+          .addTasksList(user.tasks.map((t) => getTryOnTaskFromTask(t, t._id)));
+        get().updateUserCategories();
       }
-
-      const me = await fetchSelfUser();
-
-      set({ user: me, status: 'ready' });
     } catch (e: any) {
       const status = e?.status || e?.response?.status;
       if (status === 401 || status === 404) {
         storage.delete?.('token');
       }
+
       set({ user: null, status: 'ready', error: e?.message ?? 'Auth failed' });
+    } finally {
+      await useTryOnStore.getState().init();
     }
   },
 }));

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +89,6 @@ function Row({
 }) {
   return (
     <View style={s.row}>
-      {/* <IconSymbol name={icon} size={18} color="#6B7280" /> */}
       <Text style={s.rowLabel}>{label}</Text>
       <View style={{ flex: 1 }} />
       <Text numberOfLines={1} style={s.rowValue}>
@@ -97,7 +96,7 @@ function Row({
       </Text>
       {copy && (
         <Pressable onPress={() => {}} style={{ marginLeft: 8 }}>
-          <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+          <IconSymbol name="chevron-right" size={18} color="#9CA3AF" />
         </Pressable>
       )}
     </View>

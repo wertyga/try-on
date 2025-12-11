@@ -126,13 +126,7 @@ export default function Welcome() {
         base64: true,
       });
 
-      setUserPhoto({
-        uri: manip.uri,
-        base64: `data:image/jpeg;base64,${manip.base64}`,
-        width,
-        height,
-        source: 'gallery',
-      });
+      setUserPhoto({ uri: manip.uri, base64: manip.base64 ?? '' });
     } finally {
       setBusy(false);
     }

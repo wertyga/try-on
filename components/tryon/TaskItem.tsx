@@ -1,19 +1,21 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
   ActivityIndicator,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import StatusBadge from './StatusBadge';
+import { StatusBadge } from './StatusBadge';
 import { TryOnTask } from '@/hooks/useTryOnStore';
 import { useUserStore } from '@/hooks/useUserStore';
 import { Button } from '@/components/ui/button';
 import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useTranslation } from 'react-i18next';
+import { TaskStatus } from '@/types/task';
 
-export default function TaskItem({
+export function TaskItem({
   task,
   onRetry,
   onRemove,
@@ -26,7 +28,13 @@ export default function TaskItem({
   const { add: saveWardrobe, isLoading: isWardrobeLoading } =
     useWardrobeStore();
 
-  const isInProcess = task.status === 'queued' || task.status === 'running';
+  const { t } = useTranslation();
+
+  const isInProcess =
+    task.status === TaskStatus.queued || task.status === TaskStatus.running;
+  const isCompleted =
+    task.status === TaskStatus.completed && !!task.resultImageUrl;
+  const isError = task.status === TaskStatus.failed;
 
   return (
     <View style={s.item}>
@@ -34,15 +42,15 @@ export default function TaskItem({
         <StatusBadge status={task.status} />
       </View>
 
-      {task.status === 'completed' && task.resultUrl ? (
+      {isCompleted ? (
         <Image
-          source={{ uri: task.resultUrl }}
+          source={{ uri: task.resultImageUrl }}
           style={s.result}
           resizeMode="contain"
         />
       ) : (
         <View style={s.placeholder}>
-          {task.status === 'failed' ? (
+          {isError ? (
             <Text style={{ color: '#991B1B' }}>{task.error || 'Error'}</Text>
           ) : (
             <ActivityIndicator />
@@ -51,7 +59,7 @@ export default function TaskItem({
       )}
 
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        {task.status === 'failed' && (
+        {isError && (
           <Pressable style={s.btnPrimary} onPress={() => onRetry(task)}>
             <Text style={s.btnPrimaryText}>Try more</Text>
           </Pressable>
@@ -66,7 +74,9 @@ export default function TaskItem({
                 style={s.btnPrimary}
                 isLoading={isWardrobeLoading}
               >
-                {task.isSaved ? 'Saved' : 'Save look'}
+                {t(
+                  task.isSaved ? 'interactions.saved' : 'interactions.saveLook',
+                )}
               </Button>
             </>
           )}

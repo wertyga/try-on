@@ -9,6 +9,10 @@ import { useEffect } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
+import { useUserStore } from '@/hooks/useUserStore';
+import { deviceId } from '@/utils/hash';
+import { storage } from '@/utils';
+import { useUsageStore } from '@/hooks';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,6 +21,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  const usage = useUsageStore();
 
   useEffect(() => {
     if (loaded) {
@@ -38,6 +44,18 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
+      {/*<View style={{ position: 'absolute', bottom: 50, width: 200 }}>*/}
+      {/*  <Text>generationsLeft - {usage.count}</Text>*/}
+      {/*  <Text>deviceId - {usage.deviceId ?? ''}</Text>*/}
+      {/*  <Pressable*/}
+      {/*    style={{ padding: 10, backgroundColor: 'white' }}*/}
+      {/*    onPress={() => {*/}
+      {/*      storage.set('device_id', 'sdasd');*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <Text>Clear device id</Text>*/}
+      {/*  </Pressable>*/}
+      {/*</View>*/}
       <Toast />
       <UpdateBanner />
     </>
