@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function Boot() {

@@ -1,21 +1,21 @@
 import { baseQuery } from './base-query';
 
 import { TUser } from '@/types/user';
-import { Categories, TUsage } from '@/types';
+import { Categories } from '@/types';
 
 export const fetchSelfUser = async (): Promise<{
   user: TUser | null;
-  usage: TUsage;
+  deviceId: string;
 }> => {
   const {
-    data: { user, usage },
+    data: { user, deviceId },
   } = await baseQuery({
     method: 'get',
     url: '/users/self',
     silentError: true,
   });
 
-  return { user, usage };
+  return { user, deviceId };
 };
 
 export const updateUserCategories = async (

@@ -8,9 +8,9 @@ import { type TIconSymbolProps, IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 
-import { useUserStore } from '@/hooks/useUserStore';
-import { useWardrobeAutoSync } from '@/hooks/useWardrobeStore';
-import { useAuthStore } from '@/hooks/useAuthStore';
+import { useUserStore } from '@/stores/useUserStore';
+import { useWardrobeAutoSync } from '@/stores/useWardrobeStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

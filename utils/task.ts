@@ -1,5 +1,5 @@
 import { TTask } from '@/types/task';
-import { TryOnTask } from '@/hooks/useTryOnStore';
+import { TryOnTask } from '@/stores/useTryOnStore';
 
 export const getTryOnTaskFromTask = (
   task: TTask,

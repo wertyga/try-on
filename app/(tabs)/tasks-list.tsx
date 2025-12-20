@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { TaskItem } from '@/components/tryon';
-import { TryOnTask, useTryOnStore } from '@/hooks/useTryOnStore';
+import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 import { retryTaskCreate } from '@/api';
 import SaveLooksGate from '@/components/SaveLooksGate';
 import { Container } from '@/components/ui/Container';

@@ -1,6 +1,6 @@
 import Toast from 'react-native-toast-message';
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { storage } from '@/utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
@@ -25,12 +25,12 @@ const buildParams = (
   return result;
 };
 
-export const baseQuery = async ({
+export const baseQuery = async <R = any>({
   headers,
   silentError,
   params,
   ...config
-}: AxiosRequestConfig & { silentError?: boolean }) => {
+}: AxiosRequestConfig & { silentError?: boolean }): Promise<{ data: R }> => {
   try {
     const [token, dvId] = await Promise.all([
       storage.get('token'),
@@ -55,7 +55,6 @@ export const baseQuery = async ({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    console.log({ e });
     if (!silentError) {
       Analytics.event('error', { place: 'tryon_poll', message: e?.message });
 

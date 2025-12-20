@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { Button } from '@/components/ui/button';
 import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';

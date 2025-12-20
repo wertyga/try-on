@@ -14,7 +14,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
 
 import { Container } from '@/components/ui/Container';
-import { useTryOnStore } from '@/hooks/useTryOnStore';
+import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 

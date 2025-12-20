@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import { oauthGoogleRegister } from '@/api/auth.api';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { TUser } from '@/types';
@@ -10,8 +10,8 @@ import { router } from 'expo-router';
 import { sendLogs } from '@/api';
 import Toast from 'react-native-toast-message';
 import { storage } from '@/utils';
-import { useTryOnStore } from '@/hooks/useTryOnStore';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useTryOnStore } from '@/stores/useTryOnStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
 
 type TAuthStore = {
   isLoading: boolean;
@@ -63,23 +63,19 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   registerWithGoogle: async (
     ...data: Parameters<typeof oauthGoogleRegister>
   ) => {
-    try {
-      const { user } = await oauthGoogleRegister(...data);
+    const { user } = await oauthGoogleRegister(...data);
 
-      await storage.set('token', user.token);
+    await storage.set('token', user.token);
 
-      await useUserStore.getState().getUserSelf();
+    await useUserStore.getState().getUserSelf();
 
-      await Analytics.event('login_google_success');
-      await Analytics.userId(user._id);
-      await Analytics.userProp('auth', 'user');
+    await Analytics.event('login_google_success');
+    await Analytics.userId(user._id);
+    await Analytics.userProp('auth', 'user');
 
-      set({ isLoading: false });
+    set({ isLoading: false });
 
-      return user;
-    } catch (e) {
-      throw e;
-    }
+    return user;
   },
 
   logout: () => {

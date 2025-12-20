@@ -7,11 +7,10 @@ import {
   ViewStyle,
   ActivityIndicator,
 } from 'react-native';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useUserStore, useAuthStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Button } from '@/components/ui/button';
 import { Analytics } from '@/analytics';
-import { useAuthStore } from '@/hooks/useAuthStore';
 import { useTranslation } from 'react-i18next';
 
 type Props = {

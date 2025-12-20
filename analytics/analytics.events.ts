@@ -1,5 +1,5 @@
 import { Analytics } from '@/analytics/analytics';
-import { TryOnTask } from '@/hooks/useTryOnStore';
+import { TryOnTask } from '@/stores/useTryOnStore';
 
 export const trackTaskCreateEvent = ({
   user,

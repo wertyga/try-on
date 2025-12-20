@@ -1,14 +1,19 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
+import useCreditsStore from '@/stores/useCreditsStore';
+import PaywallContent from '@/components/billing/PaywallContent';
+import { useFocus } from '@/hooks';
 
 export default function UserScreen() {
   const { t } = useTranslation();
+
   const { user, dropUser } = useUserStore();
+  const { load: loadCredits } = useCreditsStore();
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -32,6 +37,10 @@ export default function UserScreen() {
       },
     ]);
   }, [dropUser, t]);
+
+  useFocus(() => {
+    loadCredits();
+  }, []);
 
   if (!user) return <Redirect href="/login" />;
 
@@ -65,6 +74,8 @@ export default function UserScreen() {
           />
         )}
       </View>
+
+      <PaywallContent />
 
       {/* Actions */}
       <View style={s.actions}>

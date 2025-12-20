@@ -1,5 +1,5 @@
 import { TUser } from '@/types/user';
-import { GarmentMode } from '@/hooks/useTryOnStore';
+import { GarmentMode } from '@/stores/useTryOnStore';
 
 export enum TaskStatus {
   'completed' = 'completed',

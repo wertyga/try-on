@@ -2,9 +2,10 @@ import { create } from 'zustand';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { Categories, TUser } from '@/types';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
-import { useTryOnStore } from '@/hooks/useTryOnStore';
-import { useUsageStore } from '@/hooks/useUsageStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
+import { useTryOnStore } from '@/stores/useTryOnStore';
+import useCreditsStore from '@/stores/useCreditsStore';
+import { deviceId } from '@/utils/hash';
 
 type Status = 'idle' | 'loading' | 'ready';
 
@@ -18,12 +19,24 @@ type UserStore = {
   updateUserCategories: (categories?: Categories[]) => void; // logout: очищает storage и user
 
   getUserSelf: () => Promise<void>;
+
+  deviceId: string;
+
+  updateUserTasks: () => void;
+  updateDeviceId: (deviceId: string) => void;
 };
 
 export const useUserStore = create<UserStore>((set, get) => ({
   status: 'idle',
   user: null,
   error: null,
+
+  deviceId: '',
+
+  updateDeviceId: (deviceIdKey: string) => {
+    deviceId.set(deviceIdKey);
+    set({ deviceId: deviceIdKey });
+  },
 
   setUser: (user) => {
     if (user?.token) {
@@ -60,24 +73,36 @@ export const useUserStore = create<UserStore>((set, get) => ({
     useWardrobeStore.getState().clear();
   },
 
+  updateUserTasks: () => {
+    const user = get().user;
+
+    if (!user) return;
+
+    useTryOnStore
+      .getState()
+      .addTasksList(user.tasks.map((t) => getTryOnTaskFromTask(t, t._id)));
+  },
+
   getUserSelf: async () => {
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });
 
     try {
-      const { user, usage } = await fetchSelfUser();
+      const { user, deviceId } = await fetchSelfUser();
 
-      set({ user, status: 'ready' });
+      set({ user });
 
-      useUsageStore.getState().update(usage);
+      get().updateDeviceId(deviceId);
 
       if (user) {
-        useTryOnStore
-          .getState()
-          .addTasksList(user.tasks.map((t) => getTryOnTaskFromTask(t, t._id)));
+        get().updateUserTasks();
         get().updateUserCategories();
       }
+
+      await useCreditsStore.getState().load();
+
+      set({ user, status: 'ready' });
     } catch (e: any) {
       const status = e?.status || e?.response?.status;
       if (status === 401 || status === 404) {

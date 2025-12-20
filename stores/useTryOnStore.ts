@@ -3,7 +3,7 @@ import { Analytics } from '@/analytics';
 import { TaskStatus, TTask } from '@/types/task';
 import { getFinishedTask, removeTask } from '@/api';
 import { getTryOnTaskFromTask, storage } from '@/utils';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 type Source = 'camera' | 'gallery';
 

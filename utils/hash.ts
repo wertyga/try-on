@@ -1,5 +1,5 @@
 import 'react-native-get-random-values';
-import { TryOnPayload } from '@/hooks/useTryOnStore';
+import { TryOnPayload } from '@/stores/useTryOnStore';
 import { storage } from '@/utils/storage';
 
 export function hash(s: string) {

@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { Container } from '@/components/ui/Container';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';

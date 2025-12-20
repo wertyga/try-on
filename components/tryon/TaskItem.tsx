@@ -8,10 +8,10 @@ import {
   View,
 } from 'react-native';
 import { StatusBadge } from './StatusBadge';
-import { TryOnTask } from '@/hooks/useTryOnStore';
-import { useUserStore } from '@/hooks/useUserStore';
+import { TryOnTask } from '@/stores/useTryOnStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { Button } from '@/components/ui/button';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
 

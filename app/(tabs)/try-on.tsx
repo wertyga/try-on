@@ -1,14 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { TryOnPayload, useTryOnStore } from '@/hooks/useTryOnStore';
+import { TryOnPayload, useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { GenerateTaskButton } from '@/components/tryon';
+import useCreditsStore from '@/stores/useCreditsStore';
+import { CreditsBadge } from '@/components/CreditsBadge';
 
 export default function TryOn() {
+  const credits = useCreditsStore();
+
   const { t } = useTranslation();
 
   const { userPhoto, mode, dress, upper, lower } = useTryOnStore();
@@ -37,6 +41,10 @@ export default function TryOn() {
   function goGarnet() {
     router.push('/(tabs)/garment');
   }
+
+  useEffect(() => {
+    credits.load();
+  }, []);
 
   return (
     <Container.WithTabBar
@@ -128,6 +136,10 @@ export default function TryOn() {
             {hasGarment ? t('common.change') : t('common.select')}
           </Text>
         </Pressable>
+      </View>
+
+      <View style={{ alignItems: 'flex-end', marginBottom: 8 }}>
+        <CreditsBadge />
       </View>
 
       {/* Generate */}

@@ -7,8 +7,8 @@ import {
   addWardrobeItem,
   removeWardrobeItem,
 } from '@/api/wardrobe';
-import { useUserStore } from '@/hooks/useUserStore';
-import { TryOnTask, useTryOnStore } from '@/hooks/useTryOnStore';
+import { useUserStore } from '@/stores/useUserStore';
+import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 
 type WardrobeState = {
   items: WardrobeItem[];

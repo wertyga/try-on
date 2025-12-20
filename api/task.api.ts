@@ -1,4 +1,4 @@
-import { TryOnPayload } from '@/hooks/useTryOnStore';
+import { TryOnPayload } from '@/stores/useTryOnStore';
 import { baseQuery } from '@/api/base-query';
 import { Categories } from '@/types';
 import { TTask } from '@/types/task';

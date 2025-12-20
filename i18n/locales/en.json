@@ -157,5 +157,30 @@
       "ios": "Open Settings → Privacy → Camera and allow access.",
       "android": "Go to app settings → Permissions → Camera."
     }
+  },
+  "credits": {
+    "errors": {
+      "loadFailed": "Failed to load credits data",
+      "noGenerations": "No generations available",
+      "packNotFound": "Pack not found",
+      "purchaseFailed": "Failed to purchase pack"
+    },
+    "labels": {
+      "paidCreditsLeft": "{{count}} paid credit left",
+      "paidCreditsLeft_plural": "{{count}} paid credits left",
+      "freeToday": "{{count}} free today",
+      "freeToday_plural": "{{count}} free today",
+      "guestFreeGeneration": "{{count}} guest free generation",
+      "guestFreeGeneration_plural": "{{count}} guest free generations",
+      "noneLeft": "No generations left",
+      "getMoreGenerations": "Get more generations"
+    }
+  },
+  "pack": {
+    "listTitle": "Credit pack",
+    "noPackAvailable": "No packs available right now.",
+    "bestValue": "Best value",
+    "generationPrice": "{{credits}} generations · {{priceLabel}}",
+    "buy": "Buy"
   }
 }
