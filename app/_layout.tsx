@@ -9,6 +9,8 @@ import { useEffect } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
+import { useForceUpdateStore } from '@/hooks/useForceUpdateStore';
+import ForceUpdateScreen from '@/components/ForceUpdateScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,6 +19,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  const required = useForceUpdateStore((s) => s.required);
 
   useEffect(() => {
     if (loaded) {
@@ -29,6 +33,10 @@ export default function RootLayout() {
   }, [pathname]);
 
   if (!loaded) return null;
+
+  if (required) {
+    return <ForceUpdateScreen />;
+  }
 
   return (
     <>
