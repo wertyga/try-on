@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useUserStore } from '@/stores';
+import { useAuthStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
 import useCreditsStore from '@/stores/useCreditsStore';
@@ -12,8 +12,10 @@ import { useFocus } from '@/hooks';
 export default function UserScreen() {
   const { t } = useTranslation();
 
-  const { user, dropUser } = useUserStore();
+  const { user } = useUserStore();
   const { load: loadCredits } = useCreditsStore();
+  const { logout } = useAuthStore();
+  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -31,12 +33,12 @@ export default function UserScreen() {
         text: t('profile.logout'),
         style: 'destructive',
         onPress: () => {
-          dropUser();
+          logout();
           router.replace('/welcome');
         },
       },
     ]);
-  }, [dropUser, t]);
+  }, []);
 
   useFocus(() => {
     loadCredits();
@@ -45,7 +47,7 @@ export default function UserScreen() {
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <Container.WithTabBar>
+    <Container isLoading={isBuying}>
       {/* Header */}
       <View style={s.header}>
         {avatarUrl ? (
@@ -83,7 +85,7 @@ export default function UserScreen() {
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
       </View>
-    </Container.WithTabBar>
+    </Container>
   );
 }
 

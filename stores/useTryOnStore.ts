@@ -73,7 +73,7 @@ type TryOnState = {
 
   addTasksList: (tasks: TryOnTask[]) => void;
   updateTasksState: (tasks: TryOnTask[]) => void;
-  removeTask: (id: string) => void;
+  removeTask: (id: string) => Promise<void>;
   addTask: (t: TryOnTask) => void;
   addBunchTasks: (t: TryOnTask[]) => void;
   updateTask: (id: string, patch: Partial<TryOnTask>) => void;
@@ -162,17 +162,17 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     get().updateTasksState(updatedTaskList);
   },
 
-  removeTask: (id) => {
+  removeTask: async (id) => {
     Analytics.event('tryon_task_remove', { task_id: id });
 
     const user = useUserStore.getState().user;
-    const updatedTaskList = get().tasks.filter((x) => x.id !== id);
-
-    get().updateTasksState(updatedTaskList);
 
     if (user) {
-      removeTask(id);
+      await removeTask(id);
     }
+
+    const updatedTaskList = get().tasks.filter((x) => x.id !== id);
+    get().updateTasksState(updatedTaskList);
   },
 
   updateTasksState: (tasks: TryOnTask[]) => {
@@ -195,10 +195,13 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   clear: () => {
+    console.log('clear');
     set({ tasks: [] });
     get().resetInputs();
 
     storage.set('tasks', []);
+
+    console.log(get().tasks);
   },
 
   clearFinished: () => {

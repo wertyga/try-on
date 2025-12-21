@@ -63,7 +63,7 @@ export const SaveLooksGate: React.FC<Props> = ({
 
       {isAuthLoading && <ActivityIndicator />}
       {!isAuthLoading && (
-        <Button onPress={goLogin} style={s.cta}>
+        <Button onPress={goLogin} style={s.cta} dark>
           {t('auth.signIn')}
         </Button>
       )}

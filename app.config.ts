@@ -23,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
   version: '1.2.0',
+  runtimeVersion: '1.2.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
@@ -67,6 +68,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     [
+      '@stripe/stripe-react-native',
+      {
+        merchantIdentifier: 'com.test.test',
+        enableGooglePay: false,
+      },
+    ],
+    [
       'expo-updates',
       {
         username: 'wertyga13',
@@ -93,9 +101,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       assetPatternsToBeBundled: ['**/*'],
     },
     ...ENVS,
-  },
-  runtimeVersion: {
-    policy: 'appVersion',
   },
   updates: {
     url: 'https://u.expo.dev/fb5b533f-70bc-4b73-a453-a0028be64c33',

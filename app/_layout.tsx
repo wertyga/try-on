@@ -3,16 +3,17 @@ import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import 'react-native-reanimated';
-import '@/i18n';
-import { useEffect } from 'react';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { useEffect, useState } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
-import { useUserStore } from '@/hooks/useUserStore';
-import { deviceId } from '@/utils/hash';
-import { storage } from '@/utils';
-import { useUsageStore } from '@/hooks';
+import { useForceUpdateStore } from '@/stores';
+import ForceUpdateScreen from '@/components/ForceUpdateScreen';
+
+import 'react-native-reanimated';
+import '@/i18n';
+import { fetchStripeConfig } from '@/api';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,8 +22,17 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const [stripeKey, setStripeKey] = useState<string | null>(null);
 
-  const usage = useUsageStore();
+  const { required, handleUpdateRequireError } = useForceUpdateStore();
+
+  useEffect(() => {
+    fetchStripeConfig()
+      .then((cfg) => setStripeKey(cfg.publishableKey))
+      .catch((e) => {
+        handleUpdateRequireError(e);
+      });
+  }, []);
 
   useEffect(() => {
     if (loaded) {
@@ -34,31 +44,23 @@ export default function RootLayout() {
     Analytics.screen(pathname);
   }, [pathname]);
 
-  if (!loaded) return null;
+  if (required) {
+    return <ForceUpdateScreen />;
+  }
+
+  if (!loaded || !stripeKey) return null;
 
   return (
-    <>
+    <StripeProvider publishableKey={stripeKey}>
       <Stack initialRouteName="index">
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
-      {/*<View style={{ position: 'absolute', bottom: 50, width: 200 }}>*/}
-      {/*  <Text>generationsLeft - {usage.count}</Text>*/}
-      {/*  <Text>deviceId - {usage.deviceId ?? ''}</Text>*/}
-      {/*  <Pressable*/}
-      {/*    style={{ padding: 10, backgroundColor: 'white' }}*/}
-      {/*    onPress={() => {*/}
-      {/*      storage.set('device_id', 'sdasd');*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    <Text>Clear device id</Text>*/}
-      {/*  </Pressable>*/}
-      {/*</View>*/}
       <Toast />
       <UpdateBanner />
-    </>
+    </StripeProvider>
   );
 }
 

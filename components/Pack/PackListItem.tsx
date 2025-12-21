@@ -1,10 +1,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import React, { FC } from 'react';
-import { useUserStore } from '@/stores';
+import { useAuthStore, useUserStore } from '@/stores';
 import { Colors } from '@/constants/Colors';
 import { useTranslation } from 'react-i18next';
 import useCreditsStore from '@/stores/useCreditsStore';
-import { router } from 'expo-router';
 import { TCreditPack } from '@/types';
 
 export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
@@ -12,11 +11,12 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
 
   const user = useUserStore((s) => s.user);
   const isBuying = useCreditsStore((s) => s.isBuyingPackId === pack.id);
-  const buyPack = useCreditsStore((s) => s.buyPack);
+  const { buyPack } = useCreditsStore();
+  const { signInWithGoogle } = useAuthStore();
 
   const onBuy = async () => {
     if (!user) {
-      router.push('/login');
+      signInWithGoogle();
       return;
     }
 
@@ -35,9 +35,9 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
           ) : null}
         </View>
 
-        {/*{!!pack.title && (*/}
-        {/*  <Text style={s.packDesc}>{pack.title}</Text>*/}
-        {/*)}*/}
+        {!!pack.description && (
+          <Text style={s.packDesc}>{pack.description}</Text>
+        )}
 
         <Text style={s.packMeta}>
           {t('pack.generationPrice', {
@@ -45,6 +45,10 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
             priceLabel: pack.priceLabel,
           })}
         </Text>
+
+        {pack.marketFeatures?.map(({ name }) => (
+          <Text style={s.packDesc} key={name}>{`- ${name}`}</Text>
+        ))}
       </View>
 
       <Pressable

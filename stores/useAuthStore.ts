@@ -78,12 +78,12 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     return user;
   },
 
-  logout: () => {
+  logout: async () => {
     Analytics.event('logout');
 
-    useUserStore.getState().dropUser();
-    get().googleLogout();
+    await get().googleLogout();
 
+    useUserStore.getState().dropUser();
     useTryOnStore.getState().clear();
     useWardrobeStore.getState().clear();
   },

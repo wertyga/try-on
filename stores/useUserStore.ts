@@ -69,8 +69,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
     storage.delete?.('token');
 
     set({ user: null, error: null, status: 'ready' });
-
-    useWardrobeStore.getState().clear();
   },
 
   updateUserTasks: () => {

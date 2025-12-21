@@ -14,15 +14,18 @@ import { Button } from '@/components/ui/button';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
+import { ImageZoom } from '@/components/ImageZoom';
 
 export function TaskItem({
   task,
   onRetry,
   onRemove,
+  isLoading,
 }: {
   task: TryOnTask;
   onRetry: (t: TryOnTask) => void;
   onRemove: (id: string) => void;
+  isLoading: boolean;
 }) {
   const { user } = useUserStore();
   const { add: saveWardrobe, isLoading: isWardrobeLoading } =
@@ -36,6 +39,8 @@ export function TaskItem({
     task.status === TaskStatus.completed && !!task.resultImageUrl;
   const isError = task.status === TaskStatus.failed;
 
+  const areCtasLoading = isWardrobeLoading || isLoading;
+
   return (
     <View style={s.item}>
       <View style={s.header}>
@@ -43,11 +48,7 @@ export function TaskItem({
       </View>
 
       {isCompleted ? (
-        <Image
-          source={{ uri: task.resultImageUrl }}
-          style={s.result}
-          resizeMode="contain"
-        />
+        <ImageZoom source={{ uri: task.resultImageUrl }} style={s.result} />
       ) : (
         <View style={s.placeholder}>
           {isError ? (
@@ -70,9 +71,10 @@ export function TaskItem({
           task.status !== 'failed' && (
             <>
               <Button
+                dark
                 onPress={() => saveWardrobe(task)}
                 style={s.btnPrimary}
-                isLoading={isWardrobeLoading}
+                isLoading={areCtasLoading}
               >
                 {t(
                   task.isSaved ? 'interactions.saved' : 'interactions.saveLook',
@@ -81,9 +83,13 @@ export function TaskItem({
             </>
           )}
         {!isInProcess && (
-          <Pressable style={s.btnLight} onPress={() => onRemove(task.id)}>
-            <Text style={s.btnLightText}>Delete</Text>
-          </Pressable>
+          <Button
+            style={s.btnLight}
+            onPress={() => onRemove(task.id)}
+            isLoading={areCtasLoading}
+          >
+            {t('common.delete')}
+          </Button>
         )}
       </View>
     </View>
@@ -113,10 +119,10 @@ const s = StyleSheet.create({
   },
   result: {
     width: '100%',
-    height: 360,
     borderRadius: 12,
     marginTop: 8,
     backgroundColor: '#E5E7EB',
+    aspectRatio: 3 / 4,
   },
   meta: { marginTop: 6, color: '#6B7280', fontSize: 12 },
   btnPrimary: {

@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { TCreditPack, TSettings } from '@/types';
-import { fetchBillingState } from '@/api';
+import { fetchBillingState, fetchPayment, PaymentStatus } from '@/api';
 
 import {
   initPaymentSheet,
   presentPaymentSheet,
 } from '@stripe/stripe-react-native';
 import { createPaymentSheet } from '@/api/billing.api';
+import { buildError } from '@/utils';
 
 type CreditsState = {
   settings: TSettings | null;
@@ -26,7 +27,6 @@ type CreditsState = {
   autoRefillEnabled: boolean;
 
   isLoading: boolean;
-  isBuying: boolean;
   error: string | null;
 
   isBuyingPackId: string | null;
@@ -39,6 +39,7 @@ type CreditsActions = {
   onGenerationSuccess: () => Promise<void>;
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
+  waitPayment: (paymentId: string, timeoutMs?: number) => Promise<boolean>;
 };
 
 export type UseCreditsStore = CreditsState & CreditsActions;
@@ -58,7 +59,6 @@ const initialState: CreditsState = {
   autoRefillEnabled: false,
 
   isLoading: false,
-  isBuying: false,
   error: null,
 
   isBuyingPackId: null,
@@ -67,8 +67,29 @@ const initialState: CreditsState = {
 const useCreditsStore = create<UseCreditsStore>((set, get) => ({
   ...initialState,
 
+  waitPayment: async (paymentId: string, timeoutMs = 25000) => {
+    const started = Date.now();
+
+    while (Date.now() - started < timeoutMs) {
+      const res = await fetchPayment(paymentId);
+
+      if (res.status === PaymentStatus.succeeded) {
+        return true;
+      }
+
+      if (res.status === PaymentStatus.failed) {
+        throw new Error('Payment failed');
+      }
+
+      await new Promise((r) => setTimeout(r, 1200));
+    }
+
+    throw new Error('Payment confirmation timeout');
+  },
+
   buyPack: async (priceId: string) => {
     set({ isBuyingPackId: priceId, error: null });
+
     try {
       const ps = await createPaymentSheet(priceId);
 
@@ -78,19 +99,25 @@ const useCreditsStore = create<UseCreditsStore>((set, get) => ({
         customerEphemeralKeySecret: ps.ephemeralKeySecret,
         paymentIntentClientSecret: ps.paymentIntentClientSecret,
         allowsDelayedPaymentMethods: false,
-        // returnURL: 'tryon://paywall', // если используешь deep links
       });
 
-      if (init.error) throw new Error(init.error.message);
+      if (init.error) {
+        throw new Error(init.error.message);
+      }
 
       const present = await presentPaymentSheet();
-      if (present.error) throw new Error(present.error.message);
 
-      // Оплата прошла в SDK, но кредиты начислятся webhook'ом.
-      // Чтобы UI обновился — просто reload:
+      if (present.error) {
+        throw new Error(present.error.message);
+      }
+
+      await get().waitPayment(ps.paymentId);
+
       await get().load();
     } catch (e: any) {
-      set({ error: e?.message || 'Payment failed' });
+      set({
+        error: buildError(e).message || 'Payment failed',
+      });
       throw e;
     } finally {
       set({ isBuyingPackId: null });

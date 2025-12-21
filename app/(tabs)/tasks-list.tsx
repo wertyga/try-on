@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { TaskItem } from '@/components/tryon';
 import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
@@ -12,6 +12,8 @@ import { getTryOnTaskFromTask } from '@/utils';
 
 export default function TryOnQueueScreen() {
   const { t } = useTranslation();
+
+  const [taskLoading, setTaskLoading] = useState('');
 
   const { tasks, updateTask, removeTask, clearFinished, fetchFinishedTask } =
     useTryOnStore();
@@ -71,6 +73,17 @@ export default function TryOnQueueScreen() {
     }
   }
 
+  const handleRemoveTask = async (id: string) => {
+    setTaskLoading(id);
+
+    try {
+      await removeTask(id);
+    } catch (e) {
+    } finally {
+      setTaskLoading('');
+    }
+  };
+
   const empty = useMemo(
     () => (
       <View style={{ alignItems: 'center', marginTop: 24 }}>
@@ -103,8 +116,9 @@ export default function TryOnQueueScreen() {
         <TaskItem
           key={item.id}
           task={item}
+          isLoading={taskLoading === item.id}
           onRetry={retryTask}
-          onRemove={removeTask}
+          onRemove={handleRemoveTask}
         />
       ))}
     </Container.WithTabBar>

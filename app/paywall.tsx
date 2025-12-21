@@ -1,52 +1,26 @@
 import React, { useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import { router } from 'expo-router';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { router, Stack } from 'expo-router';
 import useCreditsStore from '@/stores/useCreditsStore';
 import { Container } from '@/components/ui/Container';
 import { Colors } from '@/constants/Colors';
 import { PackList } from '@/components/Pack';
-
-// простой helper: "Resets in 5h 12m"
-function formatTimeLeft(resetsAt: string | null) {
-  if (!resetsAt) return null;
-
-  const end = new Date(resetsAt).getTime();
-  const now = Date.now();
-  const diff = end - now;
-
-  if (Number.isNaN(end) || diff <= 0) return 'Resets soon';
-
-  const totalMin = Math.floor(diff / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-
-  if (h <= 0) return `Resets in ${m}m`;
-  return `Resets in ${h}h ${m}m`;
-}
+import { formatTimeLeft } from '@/utils';
 
 export default function PaywallScreen() {
   const {
     packs,
     freeDailyLeft,
-    freeDailyUsed,
     credits,
     guestFreeLeft,
     guestFreeUsed,
     resetsAt,
     isLoading,
-    isBuying,
     error,
     load,
-    // buyPack, // если у тебя пока нет — убери кнопку "Buy"
     clearError,
   } = useCreditsStore();
+  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
 
   useEffect(() => {
     load();
@@ -55,59 +29,66 @@ export default function PaywallScreen() {
   const timeLeft = useMemo(() => formatTimeLeft(resetsAt), [resetsAt]);
 
   return (
-    <Container title="Get more generations">
-      <ScrollView contentContainerStyle={s.wrap}>
-        {/* Header */}
-        <View style={s.headerRow}>
-          <Pressable onPress={() => router.back()} style={s.backBtn}>
-            <Text style={s.backText}>Back</Text>
-          </Pressable>
-          {!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}
-        </View>
-
-        {/* Status card */}
-        <View style={s.card}>
-          <Text style={s.title}>Your balance</Text>
-
-          <View style={s.line}>
-            <Text style={s.label}>Free today</Text>
-            <Text style={s.value}>{freeDailyLeft ?? 0}</Text>
-          </View>
-
-          <View style={s.line}>
-            <Text style={s.label}>Credits</Text>
-            <Text style={s.value}>{credits ?? 0}</Text>
-          </View>
-
-          {(guestFreeLeft ?? 0) > 0 || (guestFreeUsed ?? 0) > 0 ? (
-            <View style={s.line}>
-              <Text style={s.label}>Guest free</Text>
-              <Text style={s.value}>{guestFreeLeft ?? 0}</Text>
-            </View>
-          ) : null}
-
-          <Text style={s.hint}>
-            Free generations reset daily. Credits never expire.
-          </Text>
-        </View>
-
-        {/* Packs */}
-        <PackList packs={packs} isLoading={isLoading} />
-
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Container title="Get more generations" isLoading={isBuying}>
         {/* Error */}
-        {error ? (
+        {error && (
           <Pressable onPress={clearError} style={s.errorBox}>
             <Text style={s.errorText}>{error}</Text>
             <Text style={s.errorHint}>Tap to dismiss</Text>
           </Pressable>
-        ) : null}
+        )}
 
-        {/* Footer */}
-        <Text style={s.footer}>
-          Prices and currency are finalized at checkout.
-        </Text>
-      </ScrollView>
-    </Container>
+        <ScrollView contentContainerStyle={s.wrap}>
+          {/* Header */}
+          <View style={s.headerRow}>
+            <Pressable onPress={() => router.back()} style={s.backBtn}>
+              <Text style={s.backText}>Back</Text>
+            </Pressable>
+            {!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}
+          </View>
+
+          {/* Status card */}
+          <View style={s.card}>
+            <Text style={s.title}>Your balance</Text>
+
+            <View style={s.line}>
+              <Text style={s.label}>Free today</Text>
+              <Text style={s.value}>{freeDailyLeft ?? 0}</Text>
+            </View>
+
+            <View style={s.line}>
+              <Text style={s.label}>Credits</Text>
+              <Text style={s.value}>{credits ?? 0}</Text>
+            </View>
+
+            {(guestFreeLeft ?? 0) > 0 || (guestFreeUsed ?? 0) > 0 ? (
+              <View style={s.line}>
+                <Text style={s.label}>Guest free</Text>
+                <Text style={s.value}>{guestFreeLeft ?? 0}</Text>
+              </View>
+            ) : null}
+
+            <Text style={s.hint}>
+              Free generations reset daily. Credits never expire.
+            </Text>
+          </View>
+
+          {/* Packs */}
+          <PackList packs={packs} isLoading={isLoading} />
+
+          {/* Footer */}
+          <Text style={s.footer}>
+            Prices and currency are finalized at checkout.
+          </Text>
+        </ScrollView>
+      </Container>
+    </>
   );
 }
 

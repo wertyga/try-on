@@ -1,10 +1,15 @@
+import { Platform } from 'react-native';
+
 import Toast from 'react-native-toast-message';
 
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { storage } from '@/utils';
+import axios, { AxiosRequestConfig } from 'axios';
+import { buildError, storage } from '@/utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
 import { deviceId } from '@/utils/hash';
+import { useForceUpdateStore } from '@/stores';
+
+const buildNumber = Constants.expoConfig?.android?.versionCode ?? 0;
 
 const buildParams = (
   params?: Record<string, string | number | string[]>,
@@ -46,7 +51,9 @@ export const baseQuery = async <R = any>({
       headers: {
         ...authHeader,
         ...headers,
-        ['x-device-id']: dvId,
+        'x-app-version': String(buildNumber),
+        'x-platform': Platform.OS,
+        'x-device-id': dvId,
       },
       baseURL: Constants.expoConfig?.extra?.API_BASE_URL,
       params: buildParams(params),
@@ -55,12 +62,16 @@ export const baseQuery = async <R = any>({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    if (!silentError) {
-      Analytics.event('error', { place: 'tryon_poll', message: e?.message });
+    const { message } = buildError(e);
+
+    useForceUpdateStore.getState().handleUpdateRequireError(e);
+
+    if (!silentError && e.response?.status !== 403) {
+      Analytics.event('error', { place: 'tryon_poll', message });
 
       Toast.show({
         type: 'error',
-        text1: e.response?.data?.error?.message || e.message,
+        text1: message,
       });
     }
 

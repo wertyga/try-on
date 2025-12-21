@@ -3,12 +3,10 @@ import {
   ScrollViewProps,
   StyleSheet,
   Text,
-  ActivityIndicator,
   View,
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -42,7 +40,9 @@ const ScrollContent = ({
       style={buildStyles(s.container, style)}
       contentContainerStyle={buildStyles(
         s.content,
-        { paddingTop: insets.top },
+        {
+          paddingTop: insets.top + 20,
+        },
         contentContainerStyle,
       )}
       showsVerticalScrollIndicator={false}
@@ -79,8 +79,6 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   contentContainerStyle,
   ...props
 }) => {
-  const tabBarHeight = useBottomTabBarHeight();
-
   return (
     <ScrollContent {...props} contentContainerStyle={{ paddingBottom: 16 }}>
       {children}
