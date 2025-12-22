@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { Categories, TUser } from '@/types';
-import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { useTryOnStore } from '@/stores/useTryOnStore';
 import useCreditsStore from '@/stores/useCreditsStore';
 import { deviceId } from '@/utils/hash';

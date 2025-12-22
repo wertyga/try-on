@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import axios, { AxiosRequestConfig } from 'axios';
-import { buildError, storage } from '@/utils';
+import { buildAPIError, storage } from '@/utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
 import { deviceId } from '@/utils/hash';
@@ -62,11 +62,11 @@ export const baseQuery = async <R = any>({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    const { message } = buildError(e);
+    const { message, status } = buildAPIError(e);
 
     useForceUpdateStore.getState().handleUpdateRequireError(e);
 
-    if (!silentError && e.response?.status !== 403) {
+    if (!silentError && status !== 403) {
       Analytics.event('error', { place: 'tryon_poll', message });
 
       Toast.show({

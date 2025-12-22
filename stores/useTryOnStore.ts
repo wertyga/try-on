@@ -195,13 +195,10 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   clear: () => {
-    console.log('clear');
     set({ tasks: [] });
     get().resetInputs();
 
     storage.set('tasks', []);
-
-    console.log(get().tasks);
   },
 
   clearFinished: () => {

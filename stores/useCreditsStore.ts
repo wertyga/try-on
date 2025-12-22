@@ -7,7 +7,8 @@ import {
   presentPaymentSheet,
 } from '@stripe/stripe-react-native';
 import { createPaymentSheet } from '@/api/billing.api';
-import { buildError } from '@/utils';
+import { buildAPIError } from '@/utils';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 type CreditsState = {
   settings: TSettings | null;
@@ -115,10 +116,16 @@ const useCreditsStore = create<UseCreditsStore>((set, get) => ({
 
       await get().load();
     } catch (e: any) {
-      set({
-        error: buildError(e).message || 'Payment failed',
-      });
-      throw e;
+      const { message = 'Payment failed', status } = buildAPIError(e);
+
+      if (status === 403) {
+        await useAuthStore.getState().logout();
+      } else {
+        set({
+          error: message,
+        });
+        throw e;
+      }
     } finally {
       set({ isBuyingPackId: null });
     }

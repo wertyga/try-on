@@ -1,4 +1,4 @@
-export const buildError = (e: any) => {
+export const buildAPIError = (e: any) => {
   const message =
     e.response?.data?.error?.message || e.response?.data?.message || e.message;
 
