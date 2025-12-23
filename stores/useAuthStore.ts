@@ -79,6 +79,8 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   },
 
   logout: async () => {
+    GoogleSignin.configure();
+
     Analytics.event('logout');
 
     await get().googleLogout();
@@ -89,7 +91,7 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   },
 
   googleLogout: async () => {
-    const googleUser = GoogleSignin.getCurrentUser();
+    const googleUser = await GoogleSignin.getCurrentUser();
 
     if (googleUser) {
       await GoogleSignin.revokeAccess();

@@ -26,6 +26,10 @@ export default function UserScreen() {
     return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
   }, [name]);
 
+  const onFeedback = useCallback(() => {
+    router.push('/feedback');
+  }, []);
+
   const onLogout = useCallback(() => {
     Alert.alert(t('profile.confirmLogout'), undefined, [
       { text: t('common.cancel'), style: 'cancel' },
@@ -81,6 +85,9 @@ export default function UserScreen() {
 
       {/* Actions */}
       <View style={s.actions}>
+        <Pressable style={s.primaryBtn} onPress={onFeedback}>
+          <Text style={s.btnText}>{t('profile.sendFeedback')}</Text>
+        </Pressable>
         <Pressable style={s.outlineBtn} onPress={onLogout}>
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
@@ -168,6 +175,12 @@ const s = StyleSheet.create({
 
   actions: { gap: 10, marginTop: 6, marginBottom: 10 },
   btnText: { color: '#fff', fontWeight: '700' },
+  primaryBtn: {
+    backgroundColor: '#111827',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
   outlineBtn: {
     backgroundColor: '#E5E7EB',
     paddingVertical: 12,

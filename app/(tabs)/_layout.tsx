@@ -87,6 +87,12 @@ const getTabs = (): {
       withLogin: true,
     },
     {
+      name: 'feedback',
+      title: 'Feedback',
+      icon: 'feedback',
+      hidden: true,
+    },
+    {
       name: 'profile',
       title: 'User',
       icon: 'person',
