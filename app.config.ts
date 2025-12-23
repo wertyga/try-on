@@ -19,11 +19,13 @@ const ENVS = {
   API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
+const VERSION = '2.0.0';
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
-  version: '1.2.0',
-  runtimeVersion: '1.2.0',
+  version: VERSION,
+  runtimeVersion: VERSION,
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
@@ -47,7 +49,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: {
-    versionCode: 4,
+    versionCode: 5,
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#0F172A',
