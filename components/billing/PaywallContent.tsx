@@ -10,12 +10,9 @@ export default function PaywallContent() {
     packs,
     freeDailyLeft,
     credits,
-    guestFreeLeft,
     resetsAt,
     isLoading,
-    isBuying,
     error,
-    // buyPack,
     clearError,
   } = useCreditsStore();
 

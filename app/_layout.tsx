@@ -48,7 +48,7 @@ export default function RootLayout() {
     return <ForceUpdateScreen />;
   }
 
-  if (!loaded || !stripeKey) return null;
+  if (!loaded) return null;
 
   return (
     <StripeProvider publishableKey={stripeKey}>

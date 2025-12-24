@@ -22,7 +22,7 @@ export const PackList: FC<{
         <Text style={s.muted}>{t('pack.noPackAvailable')}</Text>
       )}
 
-      {packs.length && (
+      {!!packs.length && (
         <View style={{ gap: 10 }}>
           {packs.map((p) => {
             return <PackListItem pack={p} key={p.id} />;

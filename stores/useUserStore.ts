@@ -87,7 +87,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
     try {
       const { user, deviceId } = await fetchSelfUser();
-
+      console.log({ user, deviceId });
       set({ user });
 
       get().updateDeviceId(deviceId);
@@ -101,6 +101,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
       set({ user, status: 'ready' });
     } catch (e: any) {
+      console.log({ e });
       const status = e?.status || e?.response?.status;
       if (status === 401 || status === 404) {
         storage.delete?.('token');

@@ -15,11 +15,12 @@ function getLocalIP() {
 }
 
 const ENVS = {
-  // API_BASE_URL: 'https://api.zws.ink',
-  API_BASE_URL: `http://${getLocalIP()}:3001`,
+  API_BASE_URL: 'https://api.zws.ink',
+  // API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 const VERSION = '2.0.0';
+const ANDRIOD_VERSION = 5;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
@@ -49,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: {
-    versionCode: 5,
+    versionCode: ANDRIOD_VERSION,
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#0F172A',

@@ -5,6 +5,7 @@ export async function fetchBillingState(): Promise<TBillingState> {
   const { data } = await baseQuery<TBillingState>({
     method: 'get',
     url: '/billing/state',
+    silentError: true,
   });
 
   return data;

@@ -158,7 +158,7 @@ export default function Welcome() {
   }
 
   return (
-    <Container>
+    <Container contentContainerStyle={{ paddingBottom: 60 }}>
       <Text style={styles.title}>{t('welcome.title')}</Text>
       <Text style={styles.subtitle}>{t('welcome.subtitle')}</Text>
 

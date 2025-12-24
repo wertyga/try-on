@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import { oauthGoogleRegister } from '@/api/auth.api';
 import { useUserStore } from '@/stores/useUserStore';
 
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { TUser } from '@/types';
+import {
+  GoogleSignin,
+  type User as TGoogle,
+} from '@react-native-google-signin/google-signin';
 import { Analytics } from '@/analytics';
 import { router } from 'expo-router';
 import { sendLogs } from '@/api';
@@ -15,9 +17,7 @@ import { useWardrobeStore } from '@/stores/useWardrobeStore';
 
 type TAuthStore = {
   isLoading: boolean;
-  registerWithGoogle: (
-    ...data: Parameters<typeof oauthGoogleRegister>
-  ) => Promise<TUser>;
+  getGoogleUser: () => Promise<TGoogle['user']>;
   googleLogout: () => Promise<void>;
   signInWithGoogle: (callback?: () => void) => Promise<void>;
   logout: () => void;
@@ -32,18 +32,26 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
 
       Analytics.event('login_google_start');
 
-      GoogleSignin.configure();
-      await GoogleSignin.hasPlayServices();
-      const { user: gUser } = await GoogleSignin.signIn();
+      const gUser = await get().getGoogleUser();
 
-      await get().registerWithGoogle({
+      const { user } = await oauthGoogleRegister({
         email: gUser.email,
         username: gUser.name ?? '',
       });
 
+      await storage.set('token', user.token);
+      console.log({ gUser, user });
+      await Analytics.event('login_google_success');
+      await Analytics.userId(user.email);
+      await Analytics.userProp('auth', 'user');
+
+      await useUserStore.getState().getUserSelf();
+
       router.replace('/try-on');
+
       callback?.();
     } catch (e: any) {
+      console.log({ e });
       Analytics.event('login_google_error', {
         code: e.code || 'unknown',
         message: e.message,
@@ -60,20 +68,11 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     }
   },
 
-  registerWithGoogle: async (
-    ...data: Parameters<typeof oauthGoogleRegister>
-  ) => {
-    const { user } = await oauthGoogleRegister(...data);
+  getGoogleUser: async () => {
+    GoogleSignin.configure();
+    await GoogleSignin.hasPlayServices();
 
-    await storage.set('token', user.token);
-
-    await useUserStore.getState().getUserSelf();
-
-    await Analytics.event('login_google_success');
-    await Analytics.userId(user._id);
-    await Analytics.userProp('auth', 'user');
-
-    set({ isLoading: false });
+    const { user } = await GoogleSignin.signIn();
 
     return user;
   },
