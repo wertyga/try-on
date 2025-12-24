@@ -3,8 +3,8 @@ import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { StripeProvider } from '@stripe/stripe-react-native';
-import { useEffect, useState } from 'react';
+
+import { useEffect } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
@@ -13,7 +13,7 @@ import ForceUpdateScreen from '@/components/ForceUpdateScreen';
 
 import 'react-native-reanimated';
 import '@/i18n';
-import { fetchStripeConfig } from '@/api';
+import { StripeProvider } from '@/providers';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,17 +22,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-  const [stripeKey, setStripeKey] = useState<string | null>(null);
 
-  const { required, handleUpdateRequireError } = useForceUpdateStore();
-
-  useEffect(() => {
-    fetchStripeConfig()
-      .then((cfg) => setStripeKey(cfg.publishableKey))
-      .catch((e) => {
-        handleUpdateRequireError(e);
-      });
-  }, []);
+  const { required } = useForceUpdateStore();
 
   useEffect(() => {
     if (loaded) {
@@ -51,7 +42,7 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <StripeProvider publishableKey={stripeKey}>
+    <StripeProvider>
       <Stack initialRouteName="index">
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />

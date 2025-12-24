@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { TCreditPack, TSettings } from '@/types';
-import { fetchBillingState, fetchPayment, PaymentStatus } from '@/api';
+import {
+  fetchBillingState,
+  fetchPayment,
+  fetchStripeConfig,
+  PaymentStatus,
+} from '@/api';
 
 import {
   initPaymentSheet,
@@ -9,6 +14,7 @@ import {
 import { createPaymentSheet } from '@/api/billing.api';
 import { buildAPIError } from '@/utils';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useForceUpdateStore } from '@/stores/useForceUpdateStore';
 
 type CreditsState = {
   settings: TSettings | null;
@@ -31,6 +37,8 @@ type CreditsState = {
   error: string | null;
 
   isBuyingPackId: string | null;
+
+  publishableKey: string;
 };
 
 type CreditsActions = {
@@ -39,6 +47,7 @@ type CreditsActions = {
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
   clearError: () => void;
+  fetchStripeKey: () => Promise<void>;
   buyPack: (packId: string) => Promise<void>;
   waitPayment: (paymentId: string, timeoutMs?: number) => Promise<boolean>;
 };
@@ -48,6 +57,8 @@ export type UseCreditsStore = CreditsState & CreditsActions;
 const initialState: CreditsState = {
   settings: null,
   packs: [],
+
+  publishableKey: '',
 
   guestFreeUsed: 0,
   guestFreeLeft: 0,
@@ -133,10 +144,22 @@ const useCreditsStore = create<UseCreditsStore>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
+  fetchStripeKey: async () => {
+    try {
+      const cfg = await fetchStripeConfig();
+
+      set({ publishableKey: cfg.publishableKey });
+    } catch (e) {
+      useForceUpdateStore.getState().handleUpdateRequireError(e);
+    }
+  },
+
   load: async () => {
     set({ isLoading: true, error: null });
 
     try {
+      get().fetchStripeKey();
+
       const state = await fetchBillingState();
 
       set({

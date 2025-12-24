@@ -158,7 +158,7 @@ export default function Welcome() {
   }
 
   return (
-    <Container contentContainerStyle={{ paddingBottom: 60 }}>
+    <Container contentContainerStyle={{ paddingTop: 30 }}>
       <Text style={styles.title}>{t('welcome.title')}</Text>
       <Text style={styles.subtitle}>{t('welcome.subtitle')}</Text>
 
@@ -200,17 +200,13 @@ export default function Welcome() {
         <Text style={styles.hint}>{t('welcome.tips')}</Text>
       )}
 
-      <View style={styles.consentRow}>
-        <Checkbox
-          value={consent}
-          onValueChange={setConsent}
-          color={consent ? '#111827' : undefined}
-        />
+      <Pressable style={styles.consentRow} onPress={() => setConsent(!consent)}>
+        <Checkbox value={consent} color={consent ? '#111827' : undefined} />
         <Text style={styles.consentText}>
           {t('welcome.consentLabel')}{' '}
           <Text style={styles.link}>{t('welcome.policy')}</Text>
         </Text>
-      </View>
+      </Pressable>
 
       <Pressable
         style={[
@@ -227,7 +223,7 @@ export default function Welcome() {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 32, fontWeight: '800', marginTop: 24, marginBottom: 4 },
+  title: { fontSize: 28, fontWeight: '800', marginTop: 24, marginBottom: 4 },
   subtitle: {
     fontSize: 16,
     color: '#374151',
