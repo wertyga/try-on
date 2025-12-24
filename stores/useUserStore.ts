@@ -87,7 +87,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
     try {
       const { user, deviceId } = await fetchSelfUser();
-      console.log({ user, deviceId });
+
       set({ user });
 
       get().updateDeviceId(deviceId);
