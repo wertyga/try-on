@@ -1,14 +1,15 @@
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Colors } from '@/constants/Colors';
 
 export const LoaderOverlay = () => {
   const { t } = useTranslation();
 
   return (
     <View style={s.container}>
-      <View style={s.content}>
+      <View style={[s.content]}>
         <ActivityIndicator size="large" />
-        <Text style={{ marginTop: 8, color: '#000000' }}>
+        <Text style={{ marginTop: 8, color: Colors.light.text }}>
           {t('common.loading')}
         </Text>
       </View>
@@ -26,5 +27,6 @@ const s = StyleSheet.create({
   content: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 100,
   },
 });

@@ -3,14 +3,17 @@ import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import 'react-native-reanimated';
-import '@/i18n';
+
 import { useEffect } from 'react';
 import UpdateBanner from '@/components/UpdateBanner';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
-import { useForceUpdateStore } from '@/hooks/useForceUpdateStore';
+import { useForceUpdateStore } from '@/stores';
 import ForceUpdateScreen from '@/components/ForceUpdateScreen';
+
+import 'react-native-reanimated';
+import '@/i18n';
+import { StripeProvider } from '@/providers';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,7 +23,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  const required = useForceUpdateStore((s) => s.required);
+  const { required } = useForceUpdateStore();
 
   useEffect(() => {
     if (loaded) {
@@ -32,14 +35,14 @@ export default function RootLayout() {
     Analytics.screen(pathname);
   }, [pathname]);
 
-  if (!loaded) return null;
-
   if (required) {
     return <ForceUpdateScreen />;
   }
 
+  if (!loaded) return null;
+
   return (
-    <>
+    <StripeProvider>
       <Stack initialRouteName="index">
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
@@ -48,7 +51,7 @@ export default function RootLayout() {
       <StatusBar style="auto" />
       <Toast />
       <UpdateBanner />
-    </>
+    </StripeProvider>
   );
 }
 

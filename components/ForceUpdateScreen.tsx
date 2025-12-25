@@ -7,7 +7,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import { useForceUpdateStore } from '@/hooks/useForceUpdateStore';
+import { useForceUpdateStore } from '@/stores';
 
 const ANDROID_STORE_URL =
   'https://play.google.com/store/apps/details?id=com.wertyga.tryon';

@@ -1,4 +1,5 @@
 import { Categories } from '@/types/product';
+import { TTask } from '@/types/task';
 
 export enum USER_TAGS {
   User = 'User',
@@ -31,6 +32,7 @@ export type TUser = {
   token: string;
   avatar: string;
   categories: Categories[];
+  tasks: TTask[];
   status: USER_TYPES;
   languages: Language[];
 };

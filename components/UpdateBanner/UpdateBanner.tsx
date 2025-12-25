@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { watchUpdates } from './update.utils';
+
+const VISIBLE_TIMEOUT = 2000;
 
 export default function UpdateBanner() {
   const [visible, setVisible] = useState(false);
-  const [restart, setRestart] = useState<() => void>(() => () => {});
+  const restartRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    // Начинаем слушать обновления; когда скачано — покажем баннер
     const stop = watchUpdates({
-      prompt: (doRestart) => {
-        setRestart(() => doRestart);
+      onReady: (restart) => {
+        restartRef.current = restart;
         setVisible(true);
+
+        // ⏱ авто-обновление через 2 секунды
+        setTimeout(() => {
+          restartRef.current();
+        }, VISIBLE_TIMEOUT);
       },
     });
+
     return stop;
   }, []);
 
@@ -21,10 +28,7 @@ export default function UpdateBanner() {
 
   return (
     <View style={s.wrap}>
-      <Text style={s.text}>A new version is ready.</Text>
-      <Pressable style={s.btn} onPress={restart}>
-        <Text style={s.btnText}>Restart</Text>
-      </Pressable>
+      <Text style={s.text}>Updating application…</Text>
     </View>
   );
 }
@@ -38,16 +42,10 @@ const s = StyleSheet.create({
     backgroundColor: '#111827',
     borderRadius: 12,
     padding: 12,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  text: { color: 'white', fontWeight: '600' },
-  btn: {
-    backgroundColor: 'white',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
+  text: {
+    color: 'white',
+    fontWeight: '600',
   },
-  btnText: { color: '#111827', fontWeight: '700' },
 });

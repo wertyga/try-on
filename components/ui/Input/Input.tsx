@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {
   StyleSheet,
   Text,
@@ -7,21 +6,17 @@ import {
   TextInputProps,
   View,
   ViewStyle,
+  TextStyle,
 } from 'react-native';
 
 import { StyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import { Colors } from '@/constants/Colors';
 
-// import { CONSTANTS } from '@/styles/constants';
-
-export type TInputProps = Omit<
-  TextInputProps,
-  'error' | 'onChangeText' | 'onChange'
-> & {
+export type TInputProps = Omit<TextInputProps, 'onChangeText' | 'onChange'> & {
   onChange: (value: string) => void;
   error?: string;
-  style?: StyleProp<ViewStyle>;
-  inputStyle?: StyleProp<TextInputProps>;
+  style?: StyleProp<ViewStyle>; // внешний контейнер
+  inputStyle?: StyleProp<TextStyle>; // стиль именно TextInput
 };
 
 export const Input = ({
@@ -29,43 +24,59 @@ export const Input = ({
   error,
   style,
   inputStyle,
+  multiline,
   ...inputProps
 }: TInputProps) => {
   return (
-    <View style={[styles.container, style]}>
-      <TextInput
-        style={[styles.input, inputStyle]}
-        // placeholderTextColor={CONSTANTS.colors.bgDarkest}
-        onChangeText={onChange}
-        {...inputProps}
-      />
-      {!!error && (
-        <Text style={styles.error}>
-          {error}
-        </Text>
-      )}
+    <View style={style}>
+      <View style={[styles.field, error && styles.fieldError]}>
+        <TextInput
+          style={[
+            styles.inputBase,
+            multiline ? styles.inputMultiline : styles.inputSingle,
+            inputStyle,
+          ]}
+          multiline={multiline}
+          onChangeText={onChange}
+          {...inputProps}
+        />
+      </View>
+
+      {!!error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  field: {
     width: '100%',
     borderColor: Colors.light.text,
     borderWidth: 1,
     borderRadius: 8,
+    overflow: 'hidden',
   },
-  input: {
-    height: 42,
-    justifyContent: 'center',
+  fieldError: {
+    borderColor: '#D33', // можешь оставить Colors.light.text если не хочешь красный
+  },
+
+  inputBase: {
     paddingHorizontal: 10,
-    borderRadius: 10,
     backgroundColor: 'rgba(246, 245, 242, 0.40)',
     color: 'black',
   },
+  inputSingle: {
+    height: 42,
+    paddingVertical: 10,
+  },
+  inputMultiline: {
+    minHeight: 120,
+    paddingVertical: 10,
+    textAlignVertical: 'top',
+  },
+
   error: {
-    color: 'black',
+    color: '#D33',
     fontSize: 10,
-    marginTop: 3,
+    marginTop: 6,
   },
 });

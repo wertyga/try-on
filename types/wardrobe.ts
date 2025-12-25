@@ -1,4 +1,4 @@
-import { TryOnTaskAssets } from '@/hooks/useTryOnStore';
+import { TryOnTaskAssets } from '@/stores/useTryOnStore';
 
 export type WardrobeItem = {
   _id: string;

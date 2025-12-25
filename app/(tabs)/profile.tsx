@@ -1,14 +1,21 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useUserStore } from '@/hooks/useUserStore';
+import { useAuthStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
+import useCreditsStore from '@/stores/useCreditsStore';
+import PaywallContent from '@/components/billing/PaywallContent';
+import { useFocus } from '@/hooks';
 
 export default function UserScreen() {
   const { t } = useTranslation();
-  const { user, dropUser } = useUserStore();
+
+  const { user } = useUserStore();
+  const { load: loadCredits } = useCreditsStore();
+  const { logout } = useAuthStore();
+  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -19,6 +26,10 @@ export default function UserScreen() {
     return (parts[0]?.[0] || '') + (parts[1]?.[0] || '');
   }, [name]);
 
+  const onFeedback = useCallback(() => {
+    router.push('/feedback');
+  }, []);
+
   const onLogout = useCallback(() => {
     Alert.alert(t('profile.confirmLogout'), undefined, [
       { text: t('common.cancel'), style: 'cancel' },
@@ -26,17 +37,21 @@ export default function UserScreen() {
         text: t('profile.logout'),
         style: 'destructive',
         onPress: () => {
-          dropUser();
+          logout();
           router.replace('/welcome');
         },
       },
     ]);
-  }, [dropUser, t]);
+  }, []);
+
+  useFocus(() => {
+    loadCredits();
+  }, []);
 
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <Container.WithTabBar>
+    <Container isLoading={isBuying}>
       {/* Header */}
       <View style={s.header}>
         {avatarUrl ? (
@@ -66,13 +81,18 @@ export default function UserScreen() {
         )}
       </View>
 
+      <PaywallContent />
+
       {/* Actions */}
       <View style={s.actions}>
+        <Pressable style={s.primaryBtn} onPress={onFeedback}>
+          <Text style={s.btnText}>{t('profile.sendFeedback')}</Text>
+        </Pressable>
         <Pressable style={s.outlineBtn} onPress={onLogout}>
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
       </View>
-    </Container.WithTabBar>
+    </Container>
   );
 }
 
@@ -89,7 +109,6 @@ function Row({
 }) {
   return (
     <View style={s.row}>
-      {/* <IconSymbol name={icon} size={18} color="#6B7280" /> */}
       <Text style={s.rowLabel}>{label}</Text>
       <View style={{ flex: 1 }} />
       <Text numberOfLines={1} style={s.rowValue}>
@@ -97,7 +116,7 @@ function Row({
       </Text>
       {copy && (
         <Pressable onPress={() => {}} style={{ marginLeft: 8 }}>
-          <IconSymbol name="chevron.right" size={18} color="#9CA3AF" />
+          <IconSymbol name="chevron-right" size={18} color="#9CA3AF" />
         </Pressable>
       )}
     </View>
@@ -156,6 +175,12 @@ const s = StyleSheet.create({
 
   actions: { gap: 10, marginTop: 6, marginBottom: 10 },
   btnText: { color: '#fff', fontWeight: '700' },
+  primaryBtn: {
+    backgroundColor: '#111827',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
   outlineBtn: {
     backgroundColor: '#E5E7EB',
     paddingVertical: 12,

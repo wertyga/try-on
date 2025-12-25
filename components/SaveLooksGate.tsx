@@ -1,10 +1,17 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { router } from 'expo-router';
-import { useUserStore } from '@/hooks/useUserStore';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  ActivityIndicator,
+} from 'react-native';
+import { useUserStore, useAuthStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Button } from '@/components/ui/button';
 import { Analytics } from '@/analytics';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   /** Hide the banner when user is logged in (default: true) */
@@ -27,7 +34,10 @@ export const SaveLooksGate: React.FC<Props> = ({
   style,
   compact,
 }) => {
+  const { signInWithGoogle, isLoading: isAuthLoading } = useAuthStore();
   const user = useUserStore((s) => s.user);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     Analytics.event('save_gate_shown');
@@ -37,16 +47,13 @@ export const SaveLooksGate: React.FC<Props> = ({
 
   const goLogin = () => {
     Analytics.event('save_gate_cta');
-
-    if (onSignInPress) return onSignInPress();
-
-    router.push('/(tabs)/login');
+    signInWithGoogle();
   };
 
   return (
     <View style={[s.card, compact && s.cardCompact, style]}>
       <View style={s.iconWrap}>
-        <IconSymbol name="square.grid.2x2.fill" size={20} color="#111827" />
+        <IconSymbol name="grid-view" size={20} color="#111827" />
       </View>
 
       <View style={{ flex: 1 }}>
@@ -54,9 +61,12 @@ export const SaveLooksGate: React.FC<Props> = ({
         <Text style={s.subtitle}>{subtitle}</Text>
       </View>
 
-      <Button onPress={goLogin} style={s.cta} fullWidth={false}>
-        Sign in
-      </Button>
+      {isAuthLoading && <ActivityIndicator />}
+      {!isAuthLoading && (
+        <Button onPress={goLogin} style={s.cta} dark>
+          {t('auth.signIn')}
+        </Button>
+      )}
     </View>
   );
 };

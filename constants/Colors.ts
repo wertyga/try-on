@@ -9,6 +9,8 @@ const tintColorDark = '#fff';
 export const Colors = {
   light: {
     text: '#11181C',
+    textLight: '#ffffff',
+    textDisabled: '#6B7280',
     btnBg: '#111827',
     background: '#F7F8FA',
     cardBg: '#FFFFFF',

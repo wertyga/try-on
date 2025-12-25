@@ -19,11 +19,14 @@ const ENVS = {
   // API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
+const VERSION = '2.0.0';
+const ANDRIOD_VERSION = 5;
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
-  version: '1.2.0',
-  runtimeVersion: '1.2.0',
+  version: VERSION,
+  runtimeVersion: VERSION,
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'tryon',
@@ -47,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: {
-    versionCode: 4,
+    versionCode: ANDRIOD_VERSION,
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#0F172A',
@@ -67,6 +70,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.wertyga.tryon',
   },
   plugins: [
+    [
+      '@stripe/stripe-react-native',
+      {
+        merchantIdentifier: 'com.test.test',
+        enableGooglePay: false,
+      },
+    ],
     [
       'expo-updates',
       {

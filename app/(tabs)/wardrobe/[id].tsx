@@ -11,11 +11,12 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
-import { useWardrobeStore } from '@/hooks/useWardrobeStore';
+import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { Button } from '@/components/ui/button';
 import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
+import { ImageZoom } from '@/components/ImageZoom';
 
 type WardrobeItem = {
   _id: string;
@@ -40,7 +41,6 @@ export default function WardrobeDetailScreen() {
   const removeItem = useWardrobeStore((s) => s.remove);
   const [item, setItem] = useState<WardrobeItem | undefined>(undefined);
   const [loading, setLoading] = useState(!storeItem);
-  const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
     setItem(storeItem);
@@ -134,16 +134,17 @@ export default function WardrobeDetailScreen() {
       {item && (
         <>
           {/* Hero */}
-          <Pressable
-            onPress={() => setPreview(item.imageUrl)}
-            style={s.heroWrap}
-          >
-            <Image
-              source={{ uri: item.imageUrl }}
-              style={s.hero}
-              resizeMode="contain"
-            />
-          </Pressable>
+          <ImageZoom source={{ uri: item.imageUrl }} style={s.heroWrap} />
+          {/*<Pressable*/}
+          {/*  onPress={() => setPreview(item.imageUrl)}*/}
+          {/*  style={s.heroWrap}*/}
+          {/*>*/}
+          {/*  <Image*/}
+          {/*    source={{ uri: item.imageUrl }}*/}
+          {/*    style={s.hero}*/}
+          {/*    resizeMode="contain"*/}
+          {/*  />*/}
+          {/*</Pressable>*/}
           <Text style={s.muted}>
             {t('wardrobe.createdAt', { date: created })}
           </Text>
@@ -152,30 +153,20 @@ export default function WardrobeDetailScreen() {
           <View style={s.card}>
             <Text style={s.cardTitle}>{t('wardrobe.sources')}</Text>
             <View style={s.assetsRow}>
-              <AssetThumb
-                label={t('wardrobe.model')}
-                uri={item.assets.model}
-                onOpen={setPreview}
-              />
+              <AssetThumb label={t('wardrobe.model')} uri={item.assets.model} />
               {!!item.assets.dress && (
                 <AssetThumb
                   label={t('wardrobe.dress')}
                   uri={item.assets.dress}
-                  onOpen={setPreview}
                 />
               )}
               {!!item.assets.upper && (
-                <AssetThumb
-                  label={t('wardrobe.top')}
-                  uri={item.assets.upper}
-                  onOpen={setPreview}
-                />
+                <AssetThumb label={t('wardrobe.top')} uri={item.assets.upper} />
               )}
               {!!item.assets.lower && (
                 <AssetThumb
                   label={t('wardrobe.bottom')}
                   uri={item.assets.lower}
-                  onOpen={setPreview}
                 />
               )}
             </View>
@@ -183,7 +174,7 @@ export default function WardrobeDetailScreen() {
 
           {/* Actions */}
           <View style={s.actions}>
-            <Button fullWidth onPress={onShare}>
+            <Button fullWidth onPress={onShare} dark>
               {t('common.share')}
             </Button>
             <Button fullWidth transparent onPress={onDelete}>
@@ -194,54 +185,45 @@ export default function WardrobeDetailScreen() {
       )}
 
       {/* Preview modal */}
-      <Modal
-        visible={!!preview}
-        transparent
-        onRequestClose={() => setPreview(null)}
-      >
-        <Pressable style={s.modal} onPress={() => setPreview(null)}>
-          {!!preview && (
-            <Image
-              source={{ uri: preview }}
-              style={s.preview}
-              resizeMode="contain"
-            />
-          )}
-        </Pressable>
-      </Modal>
+      {/*<Modal*/}
+      {/*  visible={!!preview}*/}
+      {/*  transparent*/}
+      {/*  onRequestClose={() => setPreview(null)}*/}
+      {/*>*/}
+      {/*  <Pressable style={s.modal} onPress={() => setPreview(null)}>*/}
+      {/*    {!!preview && (*/}
+      {/*      <Image*/}
+      {/*        source={{ uri: preview }}*/}
+      {/*        style={s.preview}*/}
+      {/*        resizeMode="contain"*/}
+      {/*      />*/}
+      {/*    )}*/}
+      {/*  </Pressable>*/}
+      {/*</Modal>*/}
     </Container.WithTabBar>
   );
 }
 
-function AssetThumb({
-  label,
-  uri,
-  onOpen,
-}: {
-  label: string;
-  uri: string;
-  onOpen: (u: string) => void;
-}) {
+function AssetThumb({ label, uri }: { label: string; uri: string }) {
   return (
-    <Pressable style={s.asset} onPress={() => onOpen(uri)}>
-      <Image source={{ uri }} style={s.assetImg} />
+    <View style={s.asset}>
+      <ImageZoom
+        source={{ uri }}
+        imageStyle={s.assetImg}
+        style={{ borderRadius: 0 }}
+      />
       <Text numberOfLines={1} style={s.assetLabel}>
         {label}
       </Text>
-    </Pressable>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
   heroWrap: {
-    width: '100%',
     aspectRatio: 3 / 4,
-    borderRadius: 16,
-    overflow: 'hidden',
     backgroundColor: '#F3F4F6',
-    marginBottom: 8,
   },
-  hero: { width: '100%', height: '100%' },
 
   muted: { color: '#6B7280', marginBottom: 12 },
 
@@ -258,24 +240,17 @@ const s = StyleSheet.create({
     width: '31%',
     aspectRatio: 1,
     borderRadius: 12,
-    overflow: 'hidden',
     backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
   },
-  assetImg: { width: '100%', height: '80%' },
+  assetImg: { width: '100%', height: '90%', objectFit: 'cover' },
   assetLabel: {
     textAlign: 'center',
     fontSize: 12,
     paddingTop: 2,
+    paddingBottom: 5,
     color: '#111827',
   },
 
   actions: { gap: 10, marginTop: 4, marginBottom: 12 },
-
-  modal: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  preview: { width: '90%', height: '90%' },
 });

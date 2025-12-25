@@ -3,10 +3,11 @@ import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import axios, { AxiosRequestConfig } from 'axios';
-import { storage } from '@/utils';
+import { buildAPIError, storage } from '@/utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
-import { useForceUpdateStore } from '@/hooks/useForceUpdateStore';
+import { deviceId } from '@/utils/hash';
+import { useForceUpdateStore } from '@/stores';
 
 const buildNumber = Constants.expoConfig?.android?.versionCode ?? 0;
 
@@ -29,14 +30,17 @@ const buildParams = (
   return result;
 };
 
-export const baseQuery = async ({
+export const baseQuery = async <R = any>({
   headers,
   silentError,
   params,
   ...config
-}: AxiosRequestConfig & { silentError?: boolean }) => {
+}: AxiosRequestConfig & { silentError?: boolean }): Promise<{ data: R }> => {
   try {
-    const token = await storage.get('token');
+    const [token, dvId] = await Promise.all([
+      storage.get('token'),
+      deviceId.get(),
+    ]);
 
     const authHeader: AxiosRequestConfig['headers'] = {};
     if (token) {
@@ -49,6 +53,7 @@ export const baseQuery = async ({
         ...headers,
         'x-app-version': String(buildNumber),
         'x-platform': Platform.OS,
+        'x-device-id': dvId,
       },
       baseURL: Constants.expoConfig?.extra?.API_BASE_URL,
       params: buildParams(params),
@@ -57,19 +62,16 @@ export const baseQuery = async ({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    if (e.response?.status === 426) {
-      useForceUpdateStore.getState().setRequired({
-        minBuild: e.response?.minBuild,
-        message: e.response?.message || 'Please update the app to continue.',
-      });
-    }
+    const { message, status } = buildAPIError(e);
 
-    if (!silentError && e.response?.status !== 403) {
-      Analytics.event('error', { place: 'tryon_poll', message: e?.message });
+    useForceUpdateStore.getState().handleUpdateRequireError(e);
+
+    if (!silentError && status !== 403) {
+      Analytics.event('error', { place: 'tryon_poll', message });
 
       Toast.show({
         type: 'error',
-        text1: e.response?.data?.error?.message || e.message,
+        text1: message,
       });
     }
 

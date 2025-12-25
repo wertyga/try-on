@@ -1,39 +1,21 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { TryOnPayload, useTryOnStore } from '@/hooks/useTryOnStore';
+import { TryOnPayload, useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
-import { createTask } from '@/api';
-import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
-import { useUserStore } from '@/hooks/useUserStore';
-
-function hash(s: string) {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) h = (h * 33) ^ s.charCodeAt(i);
-  return (h >>> 0).toString(16);
-}
-
-function fingerprintFromPayload(p: TryOnPayload) {
-  const key = [
-    p.mode,
-    hash(p.userBase64 || ''),
-    hash(p.dressBase64 || ''),
-    hash(p.upperBase64 || ''),
-    hash(p.lowerBase64 || ''),
-  ].join('|');
-  return key;
-}
+import { GenerateTaskButton } from '@/components/tryon';
+import useCreditsStore from '@/stores/useCreditsStore';
+import { CreditsBadge } from '@/components/CreditsBadge';
 
 export default function TryOn() {
+  const credits = useCreditsStore();
+
   const { t } = useTranslation();
 
-  const { userPhoto, mode, dress, upper, lower, addTask } = useTryOnStore();
-  const { updateUserCategories } = useUserStore();
-
-  const [creating, setCreating] = useState(false);
+  const { userPhoto, mode, dress, upper, lower } = useTryOnStore();
 
   const hasGarment = mode === 'dress' ? !!dress : !!upper || !!lower;
 
@@ -52,51 +34,6 @@ export default function TryOn() {
     };
   }, [userPhoto, mode, dress, upper, lower]);
 
-  const currentFp = currentPayload
-    ? fingerprintFromPayload(currentPayload)
-    : null;
-
-  async function tryCreateTask(payload: TryOnPayload, fp: string) {
-    setCreating(true);
-    try {
-      Analytics.event('tryon_generate_click', {
-        has_photo: !!userPhoto,
-        mode,
-        has_dress: !!dress,
-        has_upper: !!upper,
-        has_lower: !!lower,
-      });
-
-      Analytics.event('tryon_task_create_start', {
-        fingerprint: fp,
-        mode: payload.mode,
-      });
-
-      const { id, assets, imagesCategories } = await createTask(payload);
-      updateUserCategories(imagesCategories);
-
-      addTask({
-        id,
-        status: 'queued',
-        fingerprint: fp,
-        payload,
-        createdAt: Date.now(),
-        resultUrl: null,
-        isSaved: false,
-        assets,
-      });
-
-      Analytics.event('tryon_task_create_success', {
-        task_id: id,
-        fingerprint: fp,
-      });
-
-      router.push('/(tabs)/tasks-list');
-    } finally {
-      setCreating(false);
-    }
-  }
-
   function goWelcome() {
     router.push('/welcome');
   }
@@ -104,6 +41,10 @@ export default function TryOn() {
   function goGarnet() {
     router.push('/(tabs)/garment');
   }
+
+  useEffect(() => {
+    credits.load();
+  }, []);
 
   return (
     <Container.WithTabBar
@@ -196,20 +137,13 @@ export default function TryOn() {
           </Text>
         </Pressable>
       </View>
+
+      <View style={{ alignItems: 'flex-end', marginBottom: 8 }}>
+        <CreditsBadge />
+      </View>
+
       {/* Generate */}
-      <Pressable
-        style={[s.primaryBtn, !currentPayload && s.btnDisabled]}
-        onPress={() =>
-          currentPayload &&
-          currentFp &&
-          tryCreateTask(currentPayload, currentFp)
-        }
-        disabled={!currentPayload || creating}
-      >
-        <Text style={s.primaryBtnText}>
-          {creating ? t('queue.creating') : t('home.generate')}
-        </Text>
-      </Pressable>
+      <GenerateTaskButton currentPayload={currentPayload} />
 
       <ReccomendationProducts />
     </Container.WithTabBar>
@@ -238,16 +172,6 @@ const s = StyleSheet.create({
     backgroundColor: '#EEF2FF',
   },
   linkBtnText: { color: '#111827', fontWeight: '700' },
-
-  primaryBtn: {
-    marginTop: 8,
-    backgroundColor: '#111827',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  btnDisabled: { opacity: 0.6 },
-  primaryBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
   previewFrame: {
     width: '100%',

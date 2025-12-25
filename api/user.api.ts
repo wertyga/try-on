@@ -3,14 +3,19 @@ import { baseQuery } from './base-query';
 import { TUser } from '@/types/user';
 import { Categories } from '@/types';
 
-export const fetchSelfUser = async (): Promise<TUser> => {
-  const { data } = await baseQuery({
+export const fetchSelfUser = async (): Promise<{
+  user: TUser | null;
+  deviceId: string;
+}> => {
+  const {
+    data: { user, deviceId },
+  } = await baseQuery({
     method: 'get',
     url: '/users/self',
     silentError: true,
   });
 
-  return data;
+  return { user, deviceId };
 };
 
 export const updateUserCategories = async (
@@ -26,4 +31,21 @@ export const updateUserCategories = async (
   });
 
   return data.user;
+};
+
+export const fetchDeviceId = async (): Promise<{
+  deviceId: string;
+  generationsLeft: number;
+}> => {
+  const { data } = await baseQuery({
+    method: 'get',
+    url: '/users/device-id',
+  });
+
+  const generations = Number(data.generationsLeft);
+
+  return {
+    deviceId: data.deviceId,
+    generationsLeft: Number.isNaN(generations) ? 1 : generations,
+  };
 };

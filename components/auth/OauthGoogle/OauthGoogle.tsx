@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import { FontAwesome } from '@expo/vector-icons';
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { useAuthStore } from '@/hooks/useAuthStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { Button } from '@/components/ui/button';
 import { router } from 'expo-router';
 import { Analytics } from '@/analytics';

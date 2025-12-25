@@ -4,6 +4,10 @@
     "path": "Path",
     "goHome": "Go main screen"
   },
+  "interactions": {
+    "saved": "Saved",
+    "saveLook": "Save look"
+  },
   "tabs": {
     "tryOn": "Try on",
     "garnet": "Garnet",
@@ -27,7 +31,25 @@
     "done": "Done",
     "select": "Select",
     "change": "Change",
-    "notSelected": "Not selected"
+    "notSelected": "Not selected",
+    "thanks": "Thanks",
+    "send": "Send"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "subtitle": "Tell us what you think or what went wrong. Your message helps us improve the app.",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Describe your experience…",
+    "emailLabel": "Contact email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send",
+    "successTitle": "Thanks for your feedback!",
+    "successMessage": "We read every message and will get back if needed.",
+    "validation": {
+      "messageRequired": "Please share a short description.",
+      "messageLength": "At least 10 characters, please.",
+      "email": "Enter a valid email"
+    }
   },
   "home": {
     "title": "Try on",
@@ -113,7 +135,8 @@
     "editProfile": "Edit profile",
     "logout": "Log out",
     "confirmLogout": "Sign out of your account?",
-    "appVersion": "App version: {{version}}"
+    "appVersion": "App version: {{version}}",
+    "sendFeedback": "Send feedback"
   },
   "auth": {
     "login": "Login",
@@ -141,7 +164,8 @@
     "pickImageTitle": "Image selection error",
     "pickImageFallback": "Could not select an image.",
     "cameraTitle": "Camera error",
-    "cameraFallback": "Could not take a photo."
+    "cameraFallback": "Could not take a photo.",
+    "emailInvalid": "Looks like an invalid email"
   },
   "permissions": {
     "required": "Permission required",
@@ -153,5 +177,30 @@
       "ios": "Open Settings → Privacy → Camera and allow access.",
       "android": "Go to app settings → Permissions → Camera."
     }
+  },
+  "credits": {
+    "errors": {
+      "loadFailed": "Failed to load credits data",
+      "noGenerations": "No generations available",
+      "packNotFound": "Pack not found",
+      "purchaseFailed": "Failed to purchase pack"
+    },
+    "labels": {
+      "paidCreditsLeft": "{{count}} paid credit left",
+      "paidCreditsLeft_plural": "{{count}} paid credits left",
+      "freeToday": "{{count}} free today",
+      "freeToday_plural": "{{count}} free today",
+      "guestFreeGeneration": "{{count}} guest free generation",
+      "guestFreeGeneration_plural": "{{count}} guest free generations",
+      "noneLeft": "No generations left",
+      "getMoreGenerations": "Get more generations"
+    }
+  },
+  "pack": {
+    "listTitle": "Credit pack",
+    "noPackAvailable": "No packs available right now.",
+    "bestValue": "Best value",
+    "generationPrice": "{{credits}} generations · {{priceLabel}}",
+    "buy": "Buy"
   }
 }
