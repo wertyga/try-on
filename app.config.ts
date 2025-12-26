@@ -15,8 +15,8 @@ function getLocalIP() {
 }
 
 const ENVS = {
-  API_BASE_URL: 'https://api.zws.ink',
-  // API_BASE_URL: `http://${getLocalIP()}:3001`,
+  // API_BASE_URL: 'https://api.zws.ink',
+  API_BASE_URL: `http://${getLocalIP()}:3001`,
 };
 
 const VERSION = '2.0.0';
@@ -60,9 +60,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     edgeToEdgeEnabled: true,
     permissions: [
       'CAMERA',
-      'READ_EXTERNAL_STORAGE',
-      'WRITE_EXTERNAL_STORAGE',
-      'CAMERA',
+      'READ_MEDIA_IMAGES',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
       'com.google.android.gms.permission.AD_ID',

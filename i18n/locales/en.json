@@ -18,6 +18,8 @@
     "login": "Login"
   },
   "common": {
+    "download": "Download",
+    "savedToPhotos": "Saved to Photos",
     "ok": "OK",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -155,6 +157,7 @@
     "deleteLookText": "This action cannot be undone."
   },
   "errors": {
+    "saveImageFailed": "Failed to save image",
     "failedToLoad": "Failed to load",
     "failedToDelete": "Failed to delete",
     "failedToCreate": "Failed to create task",

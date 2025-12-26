@@ -1,14 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Pressable,
-  Alert,
-  Share,
-  Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert, Share } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
@@ -134,17 +125,12 @@ export default function WardrobeDetailScreen() {
       {item && (
         <>
           {/* Hero */}
-          <ImageZoom source={{ uri: item.imageUrl }} style={s.heroWrap} />
-          {/*<Pressable*/}
-          {/*  onPress={() => setPreview(item.imageUrl)}*/}
-          {/*  style={s.heroWrap}*/}
-          {/*>*/}
-          {/*  <Image*/}
-          {/*    source={{ uri: item.imageUrl }}*/}
-          {/*    style={s.hero}*/}
-          {/*    resizeMode="contain"*/}
-          {/*  />*/}
-          {/*</Pressable>*/}
+          <ImageZoom
+            source={{ uri: item.imageUrl }}
+            style={s.heroWrap}
+            withDownload
+          />
+
           <Text style={s.muted}>
             {t('wardrobe.createdAt', { date: created })}
           </Text>
@@ -183,23 +169,6 @@ export default function WardrobeDetailScreen() {
           </View>
         </>
       )}
-
-      {/* Preview modal */}
-      {/*<Modal*/}
-      {/*  visible={!!preview}*/}
-      {/*  transparent*/}
-      {/*  onRequestClose={() => setPreview(null)}*/}
-      {/*>*/}
-      {/*  <Pressable style={s.modal} onPress={() => setPreview(null)}>*/}
-      {/*    {!!preview && (*/}
-      {/*      <Image*/}
-      {/*        source={{ uri: preview }}*/}
-      {/*        style={s.preview}*/}
-      {/*        resizeMode="contain"*/}
-      {/*      />*/}
-      {/*    )}*/}
-      {/*  </Pressable>*/}
-      {/*</Modal>*/}
     </Container.WithTabBar>
   );
 }

@@ -67,7 +67,8 @@
     "uuid": "^13.0.0",
     "yup": "^1.7.0",
     "zustand": "^5.0.7",
-    "@stripe/stripe-react-native": "0.45.0"
+    "@stripe/stripe-react-native": "0.45.0",
+    "expo-media-library": "~17.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
