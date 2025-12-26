@@ -39,9 +39,6 @@ export type TryOnTask = TTask & {
 };
 
 type TryOnState = {
-  //abort controllers
-  abortControllers: Record<string, AbortController>;
-
   // входы
   userPhoto: UserPhoto;
   mode: GarmentMode;
@@ -91,8 +88,6 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   lower: null,
 
   tasks: [],
-
-  abortControllers: {},
 
   consent: false,
 
@@ -216,12 +211,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
 
   fetchFinishedTask: async (id: string) => {
     try {
-      const abortController = get().abortControllers[id];
-      abortController?.abort();
-
-      get().abortControllers[id] = new AbortController();
-
-      const task = await getFinishedTask(id, get().abortControllers[id].signal);
+      const task = await getFinishedTask(id);
 
       get().updateTask(id, getTryOnTaskFromTask(task));
 
