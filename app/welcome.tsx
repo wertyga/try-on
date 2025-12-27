@@ -17,6 +17,7 @@ import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
+import { getCurrentBuildNumber } from '@/updates/update.utils';
 
 export default function Welcome() {
   const { t } = useTranslation();
@@ -218,6 +219,12 @@ export default function Welcome() {
       >
         <Text style={styles.continueBtnText}>{t('welcome.continue')}</Text>
       </Pressable>
+
+      <View
+        style={{ marginTop: 20, width: '100%', justifyContent: 'flex-end' }}
+      >
+        <Text>v. {getCurrentBuildNumber()}</Text>
+      </View>
     </Container>
   );
 }

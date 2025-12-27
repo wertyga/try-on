@@ -1,26 +1,7 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
-import * as os from 'os';
-
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const config of iface as any) {
-      if (config.family === 'IPv4' && !config.internal) {
-        return config.address;
-      }
-    }
-  }
-  return '0.0.0.0';
-}
-
-const ENVS = {
-  // API_BASE_URL: 'https://api.zws.ink',
-  API_BASE_URL: `http://${getLocalIP()}:3001`,
-};
-
 const VERSION = '2.0.0';
-const ANDRIOD_VERSION = 6;
+export const ANDRIOD_VERSION = 6;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
@@ -94,7 +75,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     updates: {
       assetPatternsToBeBundled: ['**/*'],
     },
-    ...ENVS,
   },
   updates: {
     url: 'https://u.expo.dev/fb5b533f-70bc-4b73-a453-a0028be64c33',

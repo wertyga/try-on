@@ -208,9 +208,15 @@
   },
   "updates": {
     "ota": "Updating application…",
+    "binary": {
+      "title": "A new version is available",
+      "subtitle": "Update the app to get the latest improvements",
+      "hintSwipe": "Swipe right to hide",
+      "button": "Update app"
+    },
     "critical": {
       "title": "Update required",
-      "subtitle": "Tap to update from the store"
+      "subtitle": "Please update the app to continue using it"
     }
   }
 }
