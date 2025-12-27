@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 import { CreateFeedbackRequest, TFeedback } from '@/types';
 
 const mapPlatform = (): 'ios' | 'android' | 'web' => {

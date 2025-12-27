@@ -20,7 +20,7 @@ const ENVS = {
 };
 
 const VERSION = '2.0.0';
-const ANDRIOD_VERSION = 7;
+const ANDRIOD_VERSION = 6;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
@@ -68,13 +68,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.wertyga.tryon',
   },
   plugins: [
-    [
-      '@stripe/stripe-react-native',
-      {
-        merchantIdentifier: 'com.test.test',
-        enableGooglePay: false,
-      },
-    ],
     [
       'expo-updates',
       {

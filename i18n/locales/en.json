@@ -205,5 +205,12 @@
     "bestValue": "Best value",
     "generationPrice": "{{credits}} generations · {{priceLabel}}",
     "buy": "Buy"
+  },
+  "updates": {
+    "ota": "Updating application…",
+    "critical": {
+      "title": "Update required",
+      "subtitle": "Tap to update from the store"
+    }
   }
 }

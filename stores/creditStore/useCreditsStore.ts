@@ -1,25 +1,14 @@
 import { create } from 'zustand';
-import { TCreditPack, TSettings } from '@/types';
-import {
-  fetchBillingState,
-  fetchPayment,
-  fetchStripeConfig,
-  PaymentStatus,
-} from '@/api';
 
-import {
-  initPaymentSheet,
-  presentPaymentSheet,
-} from '@stripe/stripe-react-native';
-import { createPaymentSheet } from '@/api/billing.api';
-import { buildAPIError } from '@/utils';
+import { TSettings } from '@/types';
+
+import { fetchBillingState } from './credit.api';
+import { buildAPIError } from '@/api/base';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useForceUpdateStore } from '@/stores/useForceUpdateStore';
+import { StripeSlice, TStripeSlice } from '@/stripe';
 
 type CreditsState = {
   settings: TSettings | null;
-
-  packs: TCreditPack[];
 
   // guest
   guestFreeUsed: number;
@@ -37,8 +26,6 @@ type CreditsState = {
   error: string | null;
 
   isBuyingPackId: string | null;
-
-  publishableKey: string;
 };
 
 type CreditsActions = {
@@ -47,18 +34,13 @@ type CreditsActions = {
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
   clearError: () => void;
-  fetchStripeKey: () => Promise<void>;
   buyPack: (packId: string) => Promise<void>;
-  waitPayment: (paymentId: string, timeoutMs?: number) => Promise<boolean>;
 };
 
-export type UseCreditsStore = CreditsState & CreditsActions;
+export type UseCreditsStore = CreditsState & CreditsActions & TStripeSlice;
 
 const initialState: CreditsState = {
   settings: null,
-  packs: [],
-
-  publishableKey: '',
 
   guestFreeUsed: 0,
   guestFreeLeft: 0,
@@ -76,54 +58,16 @@ const initialState: CreditsState = {
   isBuyingPackId: null,
 };
 
-const useCreditsStore = create<UseCreditsStore>((set, get) => ({
+export const useCreditsStore = create<UseCreditsStore>((set, get) => ({
   ...initialState,
 
-  waitPayment: async (paymentId: string, timeoutMs = 25000) => {
-    const started = Date.now();
-
-    while (Date.now() - started < timeoutMs) {
-      const res = await fetchPayment(paymentId);
-
-      if (res.status === PaymentStatus.succeeded) {
-        return true;
-      }
-
-      if (res.status === PaymentStatus.failed) {
-        throw new Error('Payment failed');
-      }
-
-      await new Promise((r) => setTimeout(r, 1200));
-    }
-
-    throw new Error('Payment confirmation timeout');
-  },
+  ...StripeSlice(set, get),
 
   buyPack: async (priceId: string) => {
     set({ isBuyingPackId: priceId, error: null });
 
     try {
-      const ps = await createPaymentSheet(priceId);
-
-      const init = await initPaymentSheet({
-        merchantDisplayName: 'TryOn',
-        customerId: ps.customerId,
-        customerEphemeralKeySecret: ps.ephemeralKeySecret,
-        paymentIntentClientSecret: ps.paymentIntentClientSecret,
-        allowsDelayedPaymentMethods: false,
-      });
-
-      if (init.error) {
-        throw new Error(init.error.message);
-      }
-
-      const present = await presentPaymentSheet();
-
-      if (present.error) {
-        throw new Error(present.error.message);
-      }
-
-      await get().waitPayment(ps.paymentId);
+      await get().buyStripeProduct(priceId);
 
       await get().load();
     } catch (e: any) {
@@ -144,27 +88,19 @@ const useCreditsStore = create<UseCreditsStore>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
-  fetchStripeKey: async () => {
-    try {
-      const cfg = await fetchStripeConfig();
-
-      set({ publishableKey: cfg.publishableKey });
-    } catch (e) {
-      useForceUpdateStore.getState().handleUpdateRequireError(e);
-    }
-  },
-
   load: async () => {
     set({ isLoading: true, error: null });
 
     try {
       get().fetchStripeKey();
 
-      const state = await fetchBillingState();
+      const [state] = await Promise.all([
+        fetchBillingState(),
+        get().fetchProductsPacks(),
+      ]);
 
       set({
         settings: state.settings ?? null,
-        packs: (state.packs ?? []).filter((p) => p.isActive !== false),
 
         guestFreeUsed: state.guestFreeUsed ?? 0,
         guestFreeLeft: state.guestFreeLeft ?? 0,
@@ -207,5 +143,3 @@ const useCreditsStore = create<UseCreditsStore>((set, get) => ({
     await get().load();
   },
 }));
-
-export default useCreditsStore;

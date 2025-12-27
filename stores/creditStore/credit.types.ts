@@ -1,16 +1,15 @@
 import { TSettings } from '@/types/settings';
 
-export type TCreditPack = {
-  id: string; // packId (metadata.packId)
-  priceId: string; // Stripe price id
-  title: string;
-  description: string;
-  credits: number;
-  priceLabel: string;
-  marketFeatures: { name: string }[];
-  bestValue?: boolean;
-  isActive?: boolean;
-};
+// export type TCreditPack = {
+//   id: string; // packId (metadata.packId)
+//   priceId: string; // Stripe price id
+//   title: string;
+//   description: string;
+//   credits: number;
+//   priceLabel: string;
+//   marketFeatures: { name: string }[];
+//   isActive?: boolean;
+// };
 
 export type TBillingState = {
   // settings
@@ -21,7 +20,7 @@ export type TBillingState = {
   defaultAutoRefillPackId: string | null;
 
   // packs
-  packs: TCreditPack[];
+  // packs: TCreditPack[];
 
   // guest state
   guestFreeUsed?: number;

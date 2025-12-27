@@ -1,8 +1,8 @@
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 import { SetLikeRequest, SetLikeResponse } from '@/types';
 
 export const setLike = async (
-  data: SetLikeRequest
+  data: SetLikeRequest,
 ): Promise<SetLikeResponse> => {
   const { data: response } = await baseQuery({
     method: 'post',

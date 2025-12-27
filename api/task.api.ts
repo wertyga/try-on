@@ -1,5 +1,5 @@
 import { TryOnPayload } from '@/stores/useTryOnStore';
-import { baseQuery } from '@/api/base-query';
+import { baseQuery } from './base';
 import { Categories } from '@/types';
 import { TTask } from '@/types/task';
 

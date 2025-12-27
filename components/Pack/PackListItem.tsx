@@ -3,8 +3,7 @@ import React, { FC } from 'react';
 import { useAuthStore, useUserStore } from '@/stores';
 import { Colors } from '@/constants/Colors';
 import { useTranslation } from 'react-i18next';
-import useCreditsStore from '@/stores/useCreditsStore';
-import { TCreditPack } from '@/types';
+import { useCreditsStore, type TCreditPack } from '@/stores/creditStore';
 
 export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
   const { t } = useTranslation();

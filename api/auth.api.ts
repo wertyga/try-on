@@ -1,4 +1,4 @@
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 
 import { UserResponse } from '@/types';
 

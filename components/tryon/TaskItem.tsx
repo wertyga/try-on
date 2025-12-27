@@ -14,7 +14,7 @@ import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
 import { ImageZoom } from '@/components/ImageZoom';
-import { DownloadImageButton } from '@/components/DownloadImageButton';
+import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 
 export function TaskItem({
   task,
@@ -52,6 +52,7 @@ export function TaskItem({
         <ImageZoom
           source={{ uri: task.resultImageUrl }}
           style={s.result}
+          imageStyle={{ objectFit: 'contain' }}
           withDownload={canDownload}
         />
       ) : (
@@ -89,13 +90,13 @@ export function TaskItem({
           )}
 
         {!isInProcess && (
-          <Button
+          <ButtonWithConfirm
             style={s.btnLight}
             onPress={() => onRemove(task.id)}
             isLoading={areCtasLoading}
           >
             {t('common.delete')}
-          </Button>
+          </ButtonWithConfirm>
         )}
       </View>
     </View>

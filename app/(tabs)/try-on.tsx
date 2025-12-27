@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { GenerateTaskButton } from '@/components/tryon';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { CreditsBadge } from '@/components/CreditsBadge';
 
 export default function TryOn() {

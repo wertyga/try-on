@@ -3,7 +3,7 @@ import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { Categories, TUser } from '@/types';
 import { useTryOnStore } from '@/stores/useTryOnStore';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { deviceId } from '@/utils/hash';
 
 type Status = 'idle' | 'loading' | 'ready';

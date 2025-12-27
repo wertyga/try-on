@@ -8,6 +8,7 @@ import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
 import { ImageZoom } from '@/components/ImageZoom';
+import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 
 type WardrobeItem = {
   _id: string;
@@ -72,35 +73,24 @@ export default function WardrobeDetailScreen() {
     }
   }, [item?.createdAt]);
 
-  const onDelete = useCallback(() => {
+  const onDelete = useCallback(async () => {
     if (!item) return;
-    Alert.alert(t('alerts.deleteLookTitle'), t('alerts.deleteLookText'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            Analytics.event('wardrobe_item_delete', {
-              item_hint: item._id.slice(-6),
-            });
 
-            await removeItem(item._id);
+    try {
+      Analytics.event('wardrobe_item_delete', {
+        item_hint: item._id.slice(-6),
+      });
 
-            Analytics.event('wardrobe_item_delete_success', {
-              item_id: item._id,
-            });
+      await removeItem(item._id);
 
-            router.replace('/(tabs)/wardrobe');
-          } catch (e: any) {
-            Alert.alert(
-              t('common.error'),
-              e?.message || t('errors.failedToDelete'),
-            );
-          }
-        },
-      },
-    ]);
+      Analytics.event('wardrobe_item_delete_success', {
+        item_id: item._id,
+      });
+
+      router.replace('/(tabs)/wardrobe');
+    } catch (e: any) {
+      Alert.alert(t('common.error'), e?.message || t('errors.failedToDelete'));
+    }
   }, [item, removeItem, t]);
 
   const onShare = useCallback(async () => {
@@ -163,9 +153,9 @@ export default function WardrobeDetailScreen() {
             <Button fullWidth onPress={onShare} dark>
               {t('common.share')}
             </Button>
-            <Button fullWidth transparent onPress={onDelete}>
+            <ButtonWithConfirm fullWidth transparent onPress={onDelete}>
               {t('common.delete')}
-            </Button>
+            </ButtonWithConfirm>
           </View>
         </>
       )}

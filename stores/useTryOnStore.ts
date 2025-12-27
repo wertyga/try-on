@@ -80,6 +80,13 @@ type TryOnState = {
   init: () => Promise<void>;
 };
 
+const sortTasks = (arr: TryOnTask[]) =>
+  [...arr].sort((a, b) => {
+    const da = new Date((a as any).createdAt ?? 0).getTime();
+    const db = new Date((b as any).createdAt ?? 0).getTime();
+    return db - da; // новые сверху
+  });
+
 export const useTryOnStore = create<TryOnState>((set, get) => ({
   userPhoto: null,
   mode: 'dress',
@@ -143,6 +150,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
 
   addTask: (t) => {
     const updatedTaskList = [t, ...get().tasks];
+
     storage.set('userPhoto', { uri: t.assets.model, base64: t.assets.model });
 
     get().updateTasksState(updatedTaskList);
@@ -179,14 +187,15 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   addTasksList: (tasks: TryOnTask[]) => {
     const map = new Map<string, TryOnTask>();
 
-    tasks.forEach((t) => map.set(t.id, t));
+    // чтобы данные “обновлялись”, но порядок был по времени — просто мержим и сортим
+    for (const t of get().tasks) map.set(t.id, t);
+    for (const t of tasks) map.set(t.id, { ...map.get(t.id), ...t });
 
-    get().tasks.forEach((t) => map.set(t.id, t));
+    const merged = Array.from(map.values());
+    const sorted = sortTasks(merged);
 
-    const updated = Array.from(map.values());
-
-    set({ tasks: updated });
-    storage.set('tasks', updated);
+    set({ tasks: sorted });
+    storage.set('tasks', sorted);
   },
 
   clear: () => {

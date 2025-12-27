@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { router, Stack } from 'expo-router';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { Container } from '@/components/ui/Container';
 import { Colors } from '@/constants/Colors';
 import { PackList } from '@/components/Pack';

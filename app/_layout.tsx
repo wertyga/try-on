@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 
 import { useEffect } from 'react';
-import UpdateBanner from '@/components/UpdateBanner';
+import { UpdateBanner } from '@/updates';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
 import { useForceUpdateStore } from '@/stores';
@@ -13,7 +13,7 @@ import ForceUpdateScreen from '@/components/ForceUpdateScreen';
 
 import 'react-native-reanimated';
 import '@/i18n';
-import { StripeProvider } from '@/providers';
+import { StripeProvider } from '@/stripe';
 
 SplashScreen.preventAutoHideAsync();
 

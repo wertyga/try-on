@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import PaywallContent from '@/components/billing/PaywallContent';
 import { useFocus } from '@/hooks';
 
