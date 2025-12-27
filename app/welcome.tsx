@@ -219,12 +219,6 @@ export default function Welcome() {
       >
         <Text style={styles.continueBtnText}>{t('welcome.continue')}</Text>
       </Pressable>
-
-      <View
-        style={{ marginTop: 20, width: '100%', justifyContent: 'flex-end' }}
-      >
-        <Text>v. {getCurrentBuildNumber()}</Text>
-      </View>
     </Container>
   );
 }
