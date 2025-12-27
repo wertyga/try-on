@@ -17,11 +17,13 @@ import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
+import { useTestStore } from '@/stores/useTestStore';
 
 export default function Welcome() {
   const { t } = useTranslation();
 
   const { setUserPhoto, userPhoto, consent, setConsent } = useTryOnStore();
+  const { messages } = useTestStore();
   const [busy, setBusy] = useState(false);
 
   async function pickFromGallery() {
@@ -218,6 +220,10 @@ export default function Welcome() {
       >
         <Text style={styles.continueBtnText}>{t('welcome.continue')}</Text>
       </Pressable>
+
+      {messages.map((m: any, i: number) => (
+        <Text key={i}>Message: {m}</Text>
+      ))}
     </Container>
   );
 }

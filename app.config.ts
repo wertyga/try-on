@@ -20,7 +20,7 @@ const ENVS = {
 };
 
 const VERSION = '2.0.0';
-const ANDRIOD_VERSION = 5;
+const ANDRIOD_VERSION = 7;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
@@ -42,6 +42,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         'Allow $(PRODUCT_NAME) to access your photo library.',
       NSPhotoLibraryAddUsageDescription:
         'Allow $(PRODUCT_NAME) to save photos.',
+      LSApplicationQueriesSchemes: ['itms-apps'],
     },
   },
   splash: {
@@ -62,7 +63,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'CAMERA',
       'READ_MEDIA_IMAGES',
       'READ_EXTERNAL_STORAGE',
-      'WRITE_EXTERNAL_STORAGE',
       'com.google.android.gms.permission.AD_ID',
     ],
     package: 'com.wertyga.tryon',
