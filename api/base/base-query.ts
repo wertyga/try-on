@@ -8,7 +8,6 @@ import { buildAPIError } from './base-query.utils';
 import Constants from 'expo-constants';
 import { Analytics } from '@/analytics';
 import { deviceId } from '@/utils/hash';
-import { useForceUpdateStore } from '@/stores';
 import { inAppConfig } from '@/config';
 
 const buildNumber = Constants.expoConfig?.android?.versionCode ?? 0;

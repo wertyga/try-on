@@ -1,10 +1,15 @@
 import * as Updates from 'expo-updates';
 import { AppState, AppStateStatus, Linking, Platform } from 'react-native';
 import Constants from 'expo-constants';
-import { inAppConfig } from '@/config';
-import { storage } from '@/utils';
 
-const DISMISSED_KEY = 'dismissed_binary_update_v'; // + версия recommended, см ниже
+import { storage } from '@/utils';
+import { fetchSettings } from '@/api/settings.api';
+import { TSettings } from '@/types';
+
+const SETTINGS_CACHE_KEY = 'app_settings_cache_v1';
+
+// dismiss привязываем к recommended версии, чтобы при новой рекомендованной версии баннер снова показался
+const DISMISSED_KEY_PREFIX = 'dismissed_binary_update_v_';
 
 // Android package / iOS app id
 const ANDROID_PACKAGE = 'com.wertyga.tryon';
@@ -25,70 +30,92 @@ export function getCurrentBuildNumber(): number {
   return Number(bn) || 0;
 }
 
-function getRecommendedBuild(): number {
-  return Platform.OS === 'android'
-    ? Number(inAppConfig.RECOMMENDED_ANDROID_VERSION_CODE ?? 0)
-    : Number(inAppConfig.RECOMMENDED_IOS_BUILD_NUMBER ?? 0);
+/** Берём настройки: сначала пробуем сеть, если не получилось — берём кеш */
+async function getSettings(): Promise<TSettings | null> {
+  try {
+    const s = await fetchSettings();
+    await storage.set(SETTINGS_CACHE_KEY, s);
+    return s;
+  } catch (e) {
+    return (await storage.get(SETTINGS_CACHE_KEY)) as TSettings | null;
+  }
 }
 
-function getMinBuild(): number {
+function getMinBuild(settings: TSettings | null): number {
+  if (!settings) return 0;
   return Platform.OS === 'android'
-    ? Number(inAppConfig.MIN_ANDROID_VERSION_CODE ?? 0)
-    : Number(inAppConfig.MIN_IOS_BUILD_NUMBER ?? 0);
+    ? Number(settings.minAndroidVersion ?? 0)
+    : Number(settings.minIosVersion ?? 0);
+}
+
+function getRecommendedBuild(settings: TSettings | null): number {
+  if (!settings) return 0;
+  return Platform.OS === 'android'
+    ? Number(settings.recommendedAndroidVersion ?? 0)
+    : Number(settings.recommendedIosVersion ?? 0);
 }
 
 export type BinaryUpdateStatus = 'none' | 'binary' | 'critical';
-export function getBinaryUpdateStatus(): BinaryUpdateStatus {
-  const current = getCurrentBuildNumber();
 
-  const min = getMinBuild();
-  const recommended = getRecommendedBuild();
+export function getBinaryUpdateStatusFromSettings(
+  settings: TSettings | null,
+): BinaryUpdateStatus {
+  const current = getCurrentBuildNumber();
+  const min = getMinBuild(settings);
+  const rec = getRecommendedBuild(settings);
 
   if (min > 0 && current < min) return 'critical';
-  if (recommended > 0 && current < recommended) return 'binary';
-
+  if (rec > 0 && current < rec) return 'binary';
   return 'none';
 }
 
-async function isBinaryDismissed(): Promise<boolean> {
-  // чтобы dismiss сбрасывался при повышении recommended версии
-  const v = getRecommendedBuild();
-  return !!(await storage.get(`${DISMISSED_KEY}_${v}`));
+/** Для удобства, если где-то нужно синхронно понять статус по кешу */
+export async function getBinaryUpdateStatus(): Promise<BinaryUpdateStatus> {
+  const settings = (await storage.get(SETTINGS_CACHE_KEY)) as TSettings | null;
+  return getBinaryUpdateStatusFromSettings(settings);
 }
 
-export async function dismissBinaryUpdate() {
-  const v = getRecommendedBuild();
-  await storage.set(`${DISMISSED_KEY}_${v}`, true);
+async function isBinaryDismissed(recommendedBuild: number): Promise<boolean> {
+  if (!recommendedBuild) return false;
+  return !!(await storage.get(`${DISMISSED_KEY_PREFIX}${recommendedBuild}`));
+}
+
+export async function dismissBinaryUpdate(recommendedBuild: number) {
+  if (!recommendedBuild) return;
+  await storage.set(`${DISMISSED_KEY_PREFIX}${recommendedBuild}`, true);
 }
 
 export type WatchUpdatesOpts = {
   onReady?: (restart: () => void) => void; // OTA ready
-  onBinary?: (p: { isCritical: boolean }) => void; // binary update banner
+  onBinary?: (p: { isCritical: boolean; recommendedBuild: number }) => void; // binary update banner
 };
 
 export async function checkAndApplyUpdate(opts: WatchUpdatesOpts = {}) {
   try {
-    if (Platform.OS !== 'web') {
-      const current = getCurrentBuildNumber();
-      const min = getMinBuild();
-      const rec = getRecommendedBuild();
+    const settings = await getSettings();
 
-      // 0) critical
-      if (min > 0 && current < min) {
-        opts.onBinary?.({ isCritical: true });
-        return { isCritical: true };
-      }
+    const current = getCurrentBuildNumber();
+    const min = getMinBuild(settings);
+    const rec = getRecommendedBuild(settings);
 
-      // 1) recommended (dismissable)
-      if (rec > 0 && current < rec) {
-        const dismissed = await isBinaryDismissed();
-        if (!dismissed) opts.onBinary?.({ isCritical: false });
+    // critical
+    if (min > 0 && current < min) {
+      opts.onBinary?.({ isCritical: true, recommendedBuild: rec });
+      return { isCritical: true };
+    }
+
+    // recommended (dismissable)
+    if (rec > 0 && current < rec) {
+      const dismissed = await isBinaryDismissed(rec);
+      if (!dismissed) {
+        opts.onBinary?.({ isCritical: false, recommendedBuild: rec });
       }
     }
 
-    // 2) OTA updates
-    if (!Updates.isEnabled || Platform.OS === 'web')
+    // 1) OTA updates
+    if (!Updates.isEnabled || Platform.OS === 'web') {
       return { isCritical: false };
+    }
 
     const result = await Updates.checkForUpdateAsync();
     if (!result.isAvailable) return { isCritical: false };

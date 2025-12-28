@@ -29,6 +29,9 @@ export function UpdateBanner() {
   const [mode, setMode] = useState<Mode>('hidden');
   const restartRef = useRef<() => void>(() => {});
 
+  // ✅ нужен, чтобы dismiss записывать на конкретную recommended версию
+  const recommendedBuildRef = useRef<number>(0);
+
   const translateX = useSharedValue(0);
 
   const isDismissable = mode === 'binary';
@@ -53,7 +56,10 @@ export function UpdateBanner() {
 
   const dismiss = async () => {
     if (!isDismissable) return;
-    await dismissBinaryUpdate();
+
+    // ✅ пишем dismiss именно для текущей recommended версии
+    await dismissBinaryUpdate(recommendedBuildRef.current);
+
     hide();
   };
 
@@ -64,7 +70,8 @@ export function UpdateBanner() {
 
   useEffect(() => {
     const stop = watchUpdates({
-      onBinary: ({ isCritical }) => {
+      onBinary: ({ isCritical, recommendedBuild }) => {
+        recommendedBuildRef.current = recommendedBuild ?? 0;
         setMode(isCritical ? 'critical' : 'binary');
       },
       onReady: (restart) => {
@@ -81,10 +88,10 @@ export function UpdateBanner() {
     transform: [{ translateX: translateX.value }],
   }));
 
-  // swipe right to dismiss (only for binary)
+  // ✅ swipe right to dismiss (only for binary)
   const flingRight = useMemo(() => {
     return Gesture.Fling()
-      .enabled(mode !== 'critical')
+      .enabled(isDismissable) // ✅ только binary
       .direction(Directions.RIGHT)
       .numberOfPointers(1)
       .onEnd(() => {
@@ -103,6 +110,7 @@ export function UpdateBanner() {
           <Pressable
             style={s.card}
             onPress={() => {
+              // critical/binary → store
               if (!isClickable) return;
               openStorePage();
             }}
