@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, { FC, useState } from 'react';
-// import { DownloadImageButton } from '@/components/DownloadImageButton';
+import { DownloadImageButton } from '@/components/DownloadImageButton';
 
 export const ImageZoom: FC<
   ImageProps & { imageStyle?: ImageProps['style']; withDownload?: boolean }
@@ -19,12 +19,12 @@ export const ImageZoom: FC<
     <>
       <Pressable onPress={() => setPreview(true)} style={[s.heroWrap, style]}>
         <Image style={[s.hero, imageStyle]} {...props} />
-        {/*{isWithDownload && (*/}
-        {/*  <DownloadImageButton*/}
-        {/*    imageUrl={(props.source as any).uri}*/}
-        {/*    style={s.dwnload}*/}
-        {/*  />*/}
-        {/*)}*/}
+        {isWithDownload && (
+          <DownloadImageButton
+            imageUrl={(props.source as any).uri}
+            style={s.dwnload}
+          />
+        )}
       </Pressable>
 
       {preview && (
