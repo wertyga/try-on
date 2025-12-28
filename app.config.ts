@@ -1,7 +1,7 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
-const VERSION = '2.0.0';
-export const ANDRIOD_VERSION = 6;
+const VERSION = '2.1.0';
+export const ANDRIOD_VERSION = 10;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
