@@ -17,6 +17,7 @@ import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
+import { getCurrentBuildNumber } from '@/updates/update.utils';
 
 export default function Welcome() {
   const { t } = useTranslation();

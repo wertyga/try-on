@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { Colors } from '@/constants/Colors';
 import { PackList } from '@/components/Pack';
 import { UserBalance } from '@/components/billing/UserBalance';

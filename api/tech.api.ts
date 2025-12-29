@@ -1,4 +1,4 @@
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 
 import { SendHelpMessageReq, SuccessResponse } from '@/types';
 
@@ -12,7 +12,7 @@ export const fetchEnvs = async () => {
 };
 
 export const sendHelpMessage = async (
-  data: SendHelpMessageReq
+  data: SendHelpMessageReq,
 ): Promise<SuccessResponse> => {
   const { data: response } = await baseQuery({
     method: 'post',

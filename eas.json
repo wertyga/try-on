@@ -21,7 +21,7 @@
         "NODE_ENV": "production"
       }
     },
-    "preview:local": {
+    "preview:apk": {
       "distribution": "internal",
       "channel": "preview",
       "android": {

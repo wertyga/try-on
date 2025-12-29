@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { GenerateTaskButton } from '@/components/tryon';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { CreditsBadge } from '@/components/CreditsBadge';
 
 export default function TryOn() {
@@ -51,7 +51,7 @@ export default function TryOn() {
       keyboardShouldPersistTaps="handled"
       title={t('home.title')}
     >
-      {/* Your photo */}
+      {/*/!* Your photo *!/*/}
       <View style={s.card}>
         <Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>
         {userPhoto ? (
@@ -71,7 +71,7 @@ export default function TryOn() {
           </Text>
         </Pressable>
       </View>
-      {/* Garments */}
+      {/*/!* Garments *!/*/}
       <View style={s.card}>
         <View style={s.rowBetween}>
           <Text style={s.cardTitle}>{t('home.garment')}</Text>
@@ -145,7 +145,7 @@ export default function TryOn() {
       {/* Generate */}
       <GenerateTaskButton currentPayload={currentPayload} />
 
-      <ReccomendationProducts />
+      {/*<ReccomendationProducts />*/}
     </Container.WithTabBar>
   );
 }

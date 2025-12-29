@@ -1,5 +1,5 @@
 import { TSettings } from '@/types';
-import { baseQuery } from '@/api/base-query';
+import { baseQuery } from './base';
 
 export async function fetchSettings(): Promise<TSettings> {
   const { data } = await baseQuery<TSettings>({

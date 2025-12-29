@@ -6,4 +6,8 @@ export type TSettings = {
   defaultAutoRefillPackId: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+  minIosVersion: number;
+  minAndroidVersion: number;
+  recommendedAndroidVersion: number;
+  recommendedIosVersion: number;
 };

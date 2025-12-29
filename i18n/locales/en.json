@@ -18,6 +18,8 @@
     "login": "Login"
   },
   "common": {
+    "download": "Download",
+    "savedToPhotos": "Saved to Photos",
     "ok": "OK",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -155,6 +157,7 @@
     "deleteLookText": "This action cannot be undone."
   },
   "errors": {
+    "saveImageFailed": "Failed to save image",
     "failedToLoad": "Failed to load",
     "failedToDelete": "Failed to delete",
     "failedToCreate": "Failed to create task",
@@ -202,5 +205,18 @@
     "bestValue": "Best value",
     "generationPrice": "{{credits}} generations · {{priceLabel}}",
     "buy": "Buy"
+  },
+  "updates": {
+    "ota": "Updating application…",
+    "binary": {
+      "title": "A new version is available",
+      "subtitle": "Update the app to get the latest improvements",
+      "hintSwipe": "Swipe right to hide",
+      "button": "Update app"
+    },
+    "critical": {
+      "title": "Update required",
+      "subtitle": "Please update the app to continue using it"
+    }
   }
 }

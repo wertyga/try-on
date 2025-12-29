@@ -1,4 +1,4 @@
-import { baseQuery } from '@/api/base-query';
+import { baseQuery } from './base';
 import { TProduct } from '@/types';
 
 export type TPreferredProductsRequest = {

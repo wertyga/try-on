@@ -9,7 +9,7 @@ import { createTask } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
 import { fingerprintFromPayload } from '@/utils/hash';
 
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { TaskStatus } from '@/types/task';
 
 export type TGenerateTaskButtonProps = {

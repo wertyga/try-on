@@ -1,14 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Pressable,
-  Alert,
-  Share,
-  Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert, Share } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
@@ -17,6 +8,7 @@ import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
 import { ImageZoom } from '@/components/ImageZoom';
+import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 
 type WardrobeItem = {
   _id: string;
@@ -81,35 +73,24 @@ export default function WardrobeDetailScreen() {
     }
   }, [item?.createdAt]);
 
-  const onDelete = useCallback(() => {
+  const onDelete = useCallback(async () => {
     if (!item) return;
-    Alert.alert(t('alerts.deleteLookTitle'), t('alerts.deleteLookText'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('common.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            Analytics.event('wardrobe_item_delete', {
-              item_hint: item._id.slice(-6),
-            });
 
-            await removeItem(item._id);
+    try {
+      Analytics.event('wardrobe_item_delete', {
+        item_hint: item._id.slice(-6),
+      });
 
-            Analytics.event('wardrobe_item_delete_success', {
-              item_id: item._id,
-            });
+      await removeItem(item._id);
 
-            router.replace('/(tabs)/wardrobe');
-          } catch (e: any) {
-            Alert.alert(
-              t('common.error'),
-              e?.message || t('errors.failedToDelete'),
-            );
-          }
-        },
-      },
-    ]);
+      Analytics.event('wardrobe_item_delete_success', {
+        item_id: item._id,
+      });
+
+      router.replace('/(tabs)/wardrobe');
+    } catch (e: any) {
+      Alert.alert(t('common.error'), e?.message || t('errors.failedToDelete'));
+    }
   }, [item, removeItem, t]);
 
   const onShare = useCallback(async () => {
@@ -134,17 +115,12 @@ export default function WardrobeDetailScreen() {
       {item && (
         <>
           {/* Hero */}
-          <ImageZoom source={{ uri: item.imageUrl }} style={s.heroWrap} />
-          {/*<Pressable*/}
-          {/*  onPress={() => setPreview(item.imageUrl)}*/}
-          {/*  style={s.heroWrap}*/}
-          {/*>*/}
-          {/*  <Image*/}
-          {/*    source={{ uri: item.imageUrl }}*/}
-          {/*    style={s.hero}*/}
-          {/*    resizeMode="contain"*/}
-          {/*  />*/}
-          {/*</Pressable>*/}
+          <ImageZoom
+            source={{ uri: item.imageUrl }}
+            style={s.heroWrap}
+            withDownload
+          />
+
           <Text style={s.muted}>
             {t('wardrobe.createdAt', { date: created })}
           </Text>
@@ -177,29 +153,12 @@ export default function WardrobeDetailScreen() {
             <Button fullWidth onPress={onShare} dark>
               {t('common.share')}
             </Button>
-            <Button fullWidth transparent onPress={onDelete}>
+            <ButtonWithConfirm fullWidth transparent onPress={onDelete}>
               {t('common.delete')}
-            </Button>
+            </ButtonWithConfirm>
           </View>
         </>
       )}
-
-      {/* Preview modal */}
-      {/*<Modal*/}
-      {/*  visible={!!preview}*/}
-      {/*  transparent*/}
-      {/*  onRequestClose={() => setPreview(null)}*/}
-      {/*>*/}
-      {/*  <Pressable style={s.modal} onPress={() => setPreview(null)}>*/}
-      {/*    {!!preview && (*/}
-      {/*      <Image*/}
-      {/*        source={{ uri: preview }}*/}
-      {/*        style={s.preview}*/}
-      {/*        resizeMode="contain"*/}
-      {/*      />*/}
-      {/*    )}*/}
-      {/*  </Pressable>*/}
-      {/*</Modal>*/}
     </Container.WithTabBar>
   );
 }

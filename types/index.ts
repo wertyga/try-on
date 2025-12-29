@@ -10,5 +10,4 @@ export * from './wardrobe';
 export * from './product';
 export * from './usage';
 export * from './settings';
-export * from './billing';
 export * from './feedback';

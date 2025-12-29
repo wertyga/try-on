@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -15,6 +14,7 @@ import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
 import { ImageZoom } from '@/components/ImageZoom';
+import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 
 export function TaskItem({
   task,
@@ -40,6 +40,7 @@ export function TaskItem({
   const isError = task.status === TaskStatus.failed;
 
   const areCtasLoading = isWardrobeLoading || isLoading;
+  const canDownload = isCompleted && !!task.resultImageUrl;
 
   return (
     <View style={s.item}>
@@ -48,7 +49,12 @@ export function TaskItem({
       </View>
 
       {isCompleted ? (
-        <ImageZoom source={{ uri: task.resultImageUrl }} style={s.result} />
+        <ImageZoom
+          source={{ uri: task.resultImageUrl }}
+          style={s.result}
+          imageStyle={{ objectFit: 'contain' }}
+          withDownload={canDownload}
+        />
       ) : (
         <View style={s.placeholder}>
           {isError ? (
@@ -82,14 +88,15 @@ export function TaskItem({
               </Button>
             </>
           )}
+
         {!isInProcess && (
-          <Button
+          <ButtonWithConfirm
             style={s.btnLight}
             onPress={() => onRemove(task.id)}
             isLoading={areCtasLoading}
           >
             {t('common.delete')}
-          </Button>
+          </ButtonWithConfirm>
         )}
       </View>
     </View>

@@ -1,4 +1,4 @@
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 
 export const sendLogs = async (data: any): Promise<void> => {
   try {

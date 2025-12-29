@@ -1,4 +1,4 @@
-import { baseQuery } from './base-query';
+import { baseQuery } from './base';
 
 import { TUser } from '@/types/user';
 import { Categories } from '@/types';

@@ -1,26 +1,7 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
-import * as os from 'os';
-
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const config of iface as any) {
-      if (config.family === 'IPv4' && !config.internal) {
-        return config.address;
-      }
-    }
-  }
-  return '0.0.0.0';
-}
-
-const ENVS = {
-  API_BASE_URL: 'https://api.zws.ink',
-  // API_BASE_URL: `http://${getLocalIP()}:3001`,
-};
-
-const VERSION = '2.0.0';
-const ANDRIOD_VERSION = 5;
+const VERSION = '2.1.0';
+export const ANDRIOD_VERSION = 10;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
@@ -42,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         'Allow $(PRODUCT_NAME) to access your photo library.',
       NSPhotoLibraryAddUsageDescription:
         'Allow $(PRODUCT_NAME) to save photos.',
+      LSApplicationQueriesSchemes: ['itms-apps'],
     },
   },
   splash: {
@@ -60,23 +42,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     edgeToEdgeEnabled: true,
     permissions: [
       'CAMERA',
+      'READ_MEDIA_IMAGES',
       'READ_EXTERNAL_STORAGE',
-      'WRITE_EXTERNAL_STORAGE',
-      'CAMERA',
-      'READ_EXTERNAL_STORAGE',
-      'WRITE_EXTERNAL_STORAGE',
       'com.google.android.gms.permission.AD_ID',
     ],
     package: 'com.wertyga.tryon',
   },
   plugins: [
-    [
-      '@stripe/stripe-react-native',
-      {
-        merchantIdentifier: 'com.test.test',
-        enableGooglePay: false,
-      },
-    ],
     [
       'expo-updates',
       {
@@ -103,7 +75,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     updates: {
       assetPatternsToBeBundled: ['**/*'],
     },
-    ...ENVS,
   },
   updates: {
     url: 'https://u.expo.dev/fb5b533f-70bc-4b73-a453-a0028be64c33',

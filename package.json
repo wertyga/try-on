@@ -10,10 +10,10 @@
     "build:android:production:local": "eas build -p android --profile production --local",
     "build:android:production": "eas build -p android --profile production",
     "build:android:development": "eas build -p android --profile development",
+    "build:android:preview:apk": "eas build -p android --profile preview:apk",
+    "build:android:preview": "eas build --platform android --profile preview",
     "build:ios:development": "eas build -p ios --profile development",
-    "build:ios:development:local": "eas build -p ios --profile development --local",
-    "build:android:preview:local": "eas build -p android --profile preview:local",
-    "build:android:preview": "eas build --platform android --profile preview"
+    "build:ios:development:local": "eas build -p ios --profile development --local"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -25,7 +25,9 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "@stripe/stripe-react-native": "0.45.0",
     "axios": "^1.11.0",
+    "babel-plugin-module-resolver": "^5.0.2",
     "expo": "~53.0.20",
     "expo-blur": "~14.1.5",
     "expo-camera": "~16.1.11",
@@ -40,6 +42,7 @@
     "expo-image-picker": "~16.1.4",
     "expo-linking": "~7.1.7",
     "expo-localization": "~16.1.6",
+    "expo-media-library": "~17.1.7",
     "expo-router": "~5.1.7",
     "expo-secure-store": "~14.2.4",
     "expo-splash-screen": "~0.30.10",
@@ -64,10 +67,10 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
+    "sp-react-native-in-app-updates": "^1.5.0",
     "uuid": "^13.0.0",
     "yup": "^1.7.0",
-    "zustand": "^5.0.7",
-    "@stripe/stripe-react-native": "0.45.0"
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

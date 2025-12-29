@@ -3,7 +3,7 @@ import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { Categories, TUser } from '@/types';
 import { useTryOnStore } from '@/stores/useTryOnStore';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import { deviceId } from '@/utils/hash';
 
 type Status = 'idle' | 'loading' | 'ready';
@@ -101,7 +101,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
       set({ user, status: 'ready' });
     } catch (e: any) {
-      console.log({ e });
       const status = e?.status || e?.response?.status;
       if (status === 401 || status === 404) {
         storage.delete?.('token');

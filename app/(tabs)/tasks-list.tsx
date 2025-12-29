@@ -18,18 +18,18 @@ export default function TryOnQueueScreen() {
   const { tasks, updateTask, removeTask, clearFinished, fetchFinishedTask } =
     useTryOnStore();
 
-  const fetchUnCompletedTasks = () => {
-    tasks
-      .filter(
-        (t) =>
-          t.status === TaskStatus.running || t.status === TaskStatus.queued,
-      )
-      .forEach((task) => {
-        fetchFinishedTask(task.id);
-      });
-  };
-
   useEffect(() => {
+    const fetchUnCompletedTasks = () => {
+      tasks
+        .filter(
+          (t) =>
+            t.status === TaskStatus.running || t.status === TaskStatus.queued,
+        )
+        .forEach((task) => {
+          fetchFinishedTask(task.id);
+        });
+    };
+
     fetchUnCompletedTasks();
   }, [tasks]);
 

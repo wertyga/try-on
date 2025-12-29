@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
-import useCreditsStore from '@/stores/useCreditsStore';
+import { useCreditsStore } from '@/stores/creditStore';
 import PaywallContent from '@/components/billing/PaywallContent';
 import { useFocus } from '@/hooks';
+import { BinaryUpdateButton } from '@/updates/BinaryUpdateButton';
 
 export default function UserScreen() {
   const { t } = useTranslation();
@@ -91,6 +92,8 @@ export default function UserScreen() {
         <Pressable style={s.outlineBtn} onPress={onLogout}>
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
+
+        <BinaryUpdateButton style={{ marginTop: 100 }} />
       </View>
     </Container>
   );
