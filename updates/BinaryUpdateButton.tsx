@@ -13,11 +13,10 @@ export const BinaryUpdateButton: FC<{ style?: ViewStyle }> = ({ style }) => {
   const [status, setStatus] = useState<BinaryUpdateStatus>('none');
 
   useEffect(() => {
-    const s = getBinaryUpdateStatus();
-
-    setStatus(s);
+    getBinaryUpdateStatus().then((s) => setStatus(s));
   }, []);
 
+  // ❌ нет апдейта — не показываем
   if (status === 'none') return null;
 
   return (

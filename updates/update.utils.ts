@@ -72,6 +72,7 @@ export function getBinaryUpdateStatusFromSettings(
 /** Для удобства, если где-то нужно синхронно понять статус по кешу */
 export async function getBinaryUpdateStatus(): Promise<BinaryUpdateStatus> {
   const settings = (await storage.get(SETTINGS_CACHE_KEY)) as TSettings | null;
+
   return getBinaryUpdateStatusFromSettings(settings);
 }
 
@@ -95,6 +96,7 @@ export async function checkAndApplyUpdate(opts: WatchUpdatesOpts = {}) {
     const settings = await getSettings();
 
     const current = getCurrentBuildNumber();
+
     const min = getMinBuild(settings);
     const rec = getRecommendedBuild(settings);
 

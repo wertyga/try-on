@@ -6,14 +6,7 @@ enum Channels {
   Preview = 'preview',
 }
 
-const commonConfig = {
-  ANDROID_PACKAGE: 'com.wertyga.tryon',
-  IOS_APP_ID: 'YOUR_APP_ID',
-  MIN_ANDROID_VERSION_CODE: 6,
-  MIN_IOS_BUILD_NUMBER: 6,
-  RECOMMENDED_ANDROID_VERSION_CODE: 10,
-  RECOMMENDED_IOS_BUILD_NUMBER: 10,
-};
+const commonConfig = {};
 
 const inAppConfigMap = {
   [Channels.Production]: {
