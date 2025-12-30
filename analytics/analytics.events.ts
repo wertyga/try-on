@@ -1,5 +1,6 @@
 import { Analytics } from '@/analytics/analytics';
 import { TryOnTask } from '@/stores/useTryOnStore';
+import { sendLogs } from '@/api';
 
 export const trackTaskCreateEvent = ({
   user,
@@ -35,4 +36,11 @@ export const trackTaskSucceededEvent = (id: string, fp: string) => {
 
 export const trackRetryTask = (task: TryOnTask) => {
   Analytics.event('task_retry', { task_hint: task.id.slice(-6) });
+};
+
+export const trackTaskErrorEvent = (task: TryOnTask) => {
+  sendLogs({
+    errorTitle: 'task_generation_error',
+    ...task,
+  });
 };

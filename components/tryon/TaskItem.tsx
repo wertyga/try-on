@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
+import { trackTaskErrorEvent } from '@/analytics';
 
 export function TaskItem({
   task,
@@ -32,6 +33,12 @@ export function TaskItem({
     useWardrobeStore();
 
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!task.error) return;
+
+    trackTaskErrorEvent(task);
+  }, [task.error]);
 
   const isInProcess =
     task.status === TaskStatus.queued || task.status === TaskStatus.running;
