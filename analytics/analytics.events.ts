@@ -38,7 +38,9 @@ export const trackRetryTask = (task: TryOnTask) => {
   Analytics.event('task_retry', { task_hint: task.id.slice(-6) });
 };
 
-export const trackTaskErrorEvent = (task: TryOnTask) => {
+export const trackTaskErrorEvent = (
+  task: TryOnTask & { errorMessage: string },
+) => {
   sendLogs({
     errorTitle: 'task_generation_error',
     ...task,

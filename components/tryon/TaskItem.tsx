@@ -16,6 +16,7 @@ import { TaskStatus } from '@/types/task';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 import { trackTaskErrorEvent } from '@/analytics';
+import { useErrorMessage } from '@/utils/errors';
 
 export function TaskItem({
   task,
@@ -34,11 +35,13 @@ export function TaskItem({
 
   const { t } = useTranslation();
 
-  useEffect(() => {
-    if (!task.error) return;
+  const errorMessage = useErrorMessage(task.error);
 
-    trackTaskErrorEvent(task);
-  }, [task.error]);
+  useEffect(() => {
+    if (!errorMessage) return;
+
+    trackTaskErrorEvent({ ...task, errorMessage });
+  }, [errorMessage]);
 
   const isInProcess =
     task.status === TaskStatus.queued || task.status === TaskStatus.running;
@@ -65,7 +68,9 @@ export function TaskItem({
       ) : (
         <View style={s.placeholder}>
           {isError ? (
-            <Text style={{ color: '#991B1B' }}>{task.error || 'Error'}</Text>
+            <Text style={{ color: '#991B1B', marginHorizontal: 10 }}>
+              {errorMessage}
+            </Text>
           ) : (
             <ActivityIndicator />
           )}

@@ -1,4 +1,5 @@
 import { sendLogs } from '@/api';
+import { useTranslation } from 'react-i18next';
 
 export function installGlobalErrorHandlers() {
   // RN глобальная ошибка
@@ -43,3 +44,49 @@ export function installGlobalErrorHandlers() {
     });
   }
 }
+
+type ErrorKey =
+  | 'noPerson'
+  | 'wrongModelImage'
+  | 'wrongClothImage'
+  | 'inappropriateImage'
+  | 'unsupportedImage'
+  | 'default';
+
+const ERROR_REASON_MAP: Array<{
+  match: (reason: string) => boolean;
+  key: ErrorKey;
+}> = [
+  {
+    match: (r) => r.includes('NO_PERSON'),
+    key: 'noPerson',
+  },
+  {
+    match: (r) => r.includes('model image upload failed'),
+    key: 'wrongModelImage',
+  },
+  {
+    match: (r) => r.includes('clothes image upload failed'),
+    key: 'wrongClothImage',
+  },
+  {
+    match: (r) => r.includes('inappropriate image detected'),
+    key: 'inappropriateImage',
+  },
+  {
+    match: (r) => r.includes('IMAGE_SAFETY') || r.includes('IMAGE_OTHER'),
+    key: 'unsupportedImage',
+  },
+];
+
+export const useErrorMessage = (reason?: string) => {
+  const { t } = useTranslation();
+
+  if (!reason) return '';
+
+  const matched = ERROR_REASON_MAP.find(({ match }) => match(reason));
+
+  const key = matched?.key ?? 'default';
+
+  return t(`errors.${key}`);
+};

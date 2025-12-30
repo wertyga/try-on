@@ -168,7 +168,13 @@
     "pickImageFallback": "Could not select an image.",
     "cameraTitle": "Camera error",
     "cameraFallback": "Could not take a photo.",
-    "emailInvalid": "Looks like an invalid email"
+    "emailInvalid": "Looks like an invalid email",
+    "noPerson": "The image must contain a person.",
+    "wrongModelImage": "Please upload another photo of yourself.",
+    "wrongClothImage": "Please upload another clothing image.",
+    "inappropriateImage": "This image cannot be used. Please choose another one.",
+    "unsupportedImage": "We can’t generate a result with this image.\nPlease choose a different clothing photo.",
+    "default": "We couldn’t generate a result. Please try another image."
   },
   "permissions": {
     "required": "Permission required",
