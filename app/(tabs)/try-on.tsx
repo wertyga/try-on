@@ -145,7 +145,7 @@ export default function TryOn() {
       {/* Generate */}
       <GenerateTaskButton currentPayload={currentPayload} />
 
-      {/*<ReccomendationProducts />*/}
+      <ReccomendationProducts />
     </Container.WithTabBar>
   );
 }

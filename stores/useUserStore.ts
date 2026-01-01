@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
-import { Categories, TUser } from '@/types';
+import { TUser } from '@/types';
 import { useTryOnStore } from '@/stores/useTryOnStore';
 import { useCreditsStore } from '@/stores/creditStore';
 import { deviceId } from '@/utils/hash';
@@ -12,10 +12,11 @@ type UserStore = {
   status: Status; // когда status === 'ready' — init завершён
   user: TUser | null;
   error: string | null;
+  preferredProductCategories: string[];
 
   setUser: (u: TUser | null) => void;
   dropUser: () => void; // logout: очищает storage и user
-  updateUserCategories: (categories?: Categories[]) => void; // logout: очищает storage и user
+  updateUserCategories: (categories?: string[]) => void; // logout: очищает storage и user
 
   getUserSelf: () => Promise<void>;
 
@@ -29,6 +30,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
   status: 'idle',
   user: null,
   error: null,
+  preferredProductCategories: [],
 
   deviceId: '',
 
@@ -45,19 +47,21 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set({ user, error: null });
   },
 
-  updateUserCategories: async (categories: Categories[] = []) => {
+  updateUserCategories: async (categories: string[] = []) => {
     const storedCategories = await storage.preferredProductCategories;
     const user = get().user;
 
-    const allCategories: Categories[] = Array.from(
+    const allCategories: string[] = Array.from(
       new Set([
         ...(storedCategories ?? []),
         ...(user?.categories ?? []),
         ...categories,
       ]),
-    ) as Categories[];
+    ) as string[];
 
     storage.preferredProductCategories = allCategories;
+
+    set({ preferredProductCategories: allCategories });
 
     if (user) {
       await updateUserCategories(allCategories);

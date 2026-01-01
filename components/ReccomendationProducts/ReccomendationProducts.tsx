@@ -1,39 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
-import * as Localization from 'expo-localization';
-import { fetchPreferredProducts, sendLogs } from '@/api';
-import { storage } from '@/utils';
-import { TProduct } from '@/types';
 import { useFocus } from '@/hooks';
 import { ProductCard } from '@/components/ReccomendationProducts/ProductCard';
+import { useProductsStore } from '@/stores';
 
 export const ReccomendationProducts = () => {
-  const [products, setProducts] = useState<TProduct[]>([]);
-
-  const getProducts = async () => {
-    const categories = await storage.preferredProductCategories;
-
-    if (!categories?.length) return;
-
-    const zone = Localization.getLocales()?.[0]?.regionCode ?? 'US';
-
-    try {
-      const products = await fetchPreferredProducts({
-        categories,
-        zone,
-        limit: 30,
-      });
-      setProducts(products);
-    } catch (e) {
-      sendLogs({ place: 'ReccomendationProducts.getProducts', e });
-    }
-  };
+  const { fetchProductsByInnerCategories, recommendedProducts } =
+    useProductsStore();
 
   useFocus(() => {
-    getProducts();
+    fetchProductsByInnerCategories();
   }, []);
 
-  if (!products.length) return null;
+  if (!recommendedProducts.length) return null;
 
   return (
     <View style={styles.section}>
@@ -44,7 +23,7 @@ export const ReccomendationProducts = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {products.map((p) => (
+        {recommendedProducts.map((p) => (
           <View key={p._id} style={styles.cardWrapper}>
             <ProductCard product={p} />
           </View>

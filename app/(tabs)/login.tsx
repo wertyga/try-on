@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
 
-import { OauthGoogle } from '@/components/auth';
 import { Container } from '@/components/ui/Container';
+import { useAuthStore } from '@/stores';
 
 export default function Login() {
+  const { signInWithGoogle } = useAuthStore();
+
+  useEffect(() => {
+    signInWithGoogle();
+  }, []);
+
   return (
     <Container.WithTabBar
       title={'Login'}
@@ -14,10 +20,6 @@ export default function Login() {
         flex: 1,
       }}
     >
-      <View style={styles.oauth}>
-        <OauthGoogle />
-      </View>
-
       <View
         style={{
           flex: 1,

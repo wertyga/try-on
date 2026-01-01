@@ -3,7 +3,12 @@ import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { TryOnPayload, useTryOnStore, useUserStore } from '@/stores';
+import {
+  TryOnPayload,
+  useProductsStore,
+  useTryOnStore,
+  useUserStore,
+} from '@/stores';
 import { trackTaskCreateEvent, trackTaskSucceededEvent } from '@/analytics';
 import { createTask } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
@@ -20,7 +25,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   currentPayload,
 }) => {
   const { addTask, tasks } = useTryOnStore();
-  const { updateUserCategories } = useUserStore();
+  const { fetchCategoriesForImages } = useProductsStore();
 
   const credits = useCreditsStore();
   const [creating, setCreating] = useState(false);
@@ -55,9 +60,14 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
         user: payload.userBase64,
       });
 
-      const { task, imagesCategories } = await createTask(payload);
+      const { task } = await createTask(payload);
 
-      updateUserCategories(imagesCategories);
+      fetchCategoriesForImages({
+        upperBase64: payload.upperBase64,
+        dressBase64: payload.dressBase64,
+        lowerBase64: payload.lowerBase64,
+      });
+
       addTask(getTryOnTaskFromTask(task, fp, false));
 
       trackTaskSucceededEvent(task._id, fp);

@@ -15,7 +15,25 @@ export async function fetchPreferredProducts(
     method: 'get',
     url: '/product/list',
     params,
+    silentError: true,
   });
 
   return products;
+}
+
+export async function fetchDefineImagesToCategories(data: {
+  dressBase64?: string;
+  upperBase64?: string;
+  lowerBase64?: string;
+}): Promise<string[]> {
+  const {
+    data: { categories },
+  } = await baseQuery({
+    method: 'post',
+    url: '/product/image-category',
+    data,
+    silentError: true,
+  });
+
+  return categories;
 }

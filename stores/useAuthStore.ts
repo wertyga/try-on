@@ -51,7 +51,6 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
 
       callback?.();
     } catch (e: any) {
-      console.log({ e });
       Analytics.event('login_google_error', {
         code: e.code || 'unknown',
         message: e.message,
