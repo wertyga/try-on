@@ -1,11 +1,9 @@
 import { Tabs } from 'expo-router';
 import React, { FC } from 'react';
-import { Platform } from 'react-native';
 import AntDesignIcons from '@expo/vector-icons/AntDesign';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { HapticTab } from '@/components/HapticTab';
-import { type TIconSymbolProps, IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 
 import { useUserStore } from '@/stores/useUserStore';
@@ -18,6 +16,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import { Platform } from 'react-native';
 
 const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
   isLoading,
@@ -60,42 +59,52 @@ const getTabs = (): {
   name: string;
   title: string;
   withLogin?: boolean;
-  icon:
-    | TIconSymbolProps['name']
-    | ((color: string, isLoading: boolean) => React.ReactNode);
+  icon: (color: string, isLoading: boolean) => React.ReactNode;
 }[] => {
   return [
     {
       name: 'try-on',
       title: 'Try on',
-      icon: 'checkroom',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="checkroom" color={color} />;
+      },
     },
     {
       name: 'garment',
       title: 'Garment',
-      icon: 'local-mall',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="local-mall" color={color} />;
+      },
     },
     {
       name: 'tasks-list',
       title: 'List',
-      icon: 'schedule',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="schedule" color={color} />;
+      },
     },
     {
       name: 'wardrobe/index',
       title: 'Wardrobe',
-      icon: 'grid-view',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="grid-view" color={color} />;
+      },
       withLogin: true,
     },
     {
       name: 'feedback',
       title: 'Feedback',
-      icon: 'feedback',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="feedback" color={color} />;
+      },
       hidden: true,
     },
     {
       name: 'profile',
       title: 'User',
-      icon: 'person',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="person" color={color} />;
+      },
       withLogin: true,
     },
     {
@@ -109,28 +118,12 @@ const getTabs = (): {
     {
       name: 'wardrobe/[id]',
       title: 'wardrobe_id',
-      icon: 'account-circle',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="account-circle" color={color} />;
+      },
       hidden: true,
     },
   ];
-};
-
-const MenuIcon = ({
-  color,
-  icon,
-  isLoading,
-}: {
-  color: string;
-  isLoading: boolean;
-  icon:
-    | TIconSymbolProps['name']
-    | ((color: string, isLoading: boolean) => React.ReactNode);
-}) => {
-  return typeof icon === 'string' ? (
-    <IconSymbol size={28} name={icon as any} color={color} />
-  ) : (
-    icon(color, isLoading)
-  );
 };
 
 export default function TabLayout() {
@@ -145,12 +138,14 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.light.tint,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: 'absolute',
-          },
-        }),
+        tabBarStyle: {
+          paddingTop: 5,
+          ...Platform.select({
+            android: {
+              minHeight: 80,
+            },
+          }),
+        },
       }}
     >
       {getTabs().map(({ name, title, icon, withLogin, hidden }) => {
@@ -174,9 +169,7 @@ export default function TabLayout() {
             options={{
               title,
               href,
-              tabBarIcon: ({ color }) => (
-                <MenuIcon color={color} icon={icon} isLoading={isLoading} />
-              ),
+              tabBarIcon: ({ color }) => icon(color, isLoading),
             }}
             listeners={
               isLoginTab

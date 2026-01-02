@@ -1,4 +1,5 @@
 import { View, Text, Pressable } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -13,6 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import 'react-native-reanimated';
 import '@/i18n';
+import { Colors } from '@/constants/Colors';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,19 +41,27 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <StripeProvider>
-      <GestureHandlerRootView>
-        <Stack initialRouteName="index">
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          flex: 1,
+        }}
+      >
+        <StripeProvider>
+          <GestureHandlerRootView>
+            <Stack initialRouteName="index">
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="welcome" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
 
-        <StatusBar style="auto" />
-        <Toast />
-        <UpdateBanner />
-      </GestureHandlerRootView>
-    </StripeProvider>
+            <StatusBar style="auto" />
+            <Toast />
+            <UpdateBanner />
+          </GestureHandlerRootView>
+        </StripeProvider>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

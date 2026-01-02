@@ -6,6 +6,7 @@ node_modules/
 # Expo
 .expo/
 dist/
+ios/
 web-build/
 expo-env.d.ts
 
@@ -19,6 +20,7 @@ expo-env.d.ts
 *.mobileprovision
 *.apk
 *.aab
+*.tar.gz
 
 # Metro
 .metro-health-check*

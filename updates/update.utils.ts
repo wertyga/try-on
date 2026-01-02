@@ -93,6 +93,8 @@ export type WatchUpdatesOpts = {
 
 export async function checkAndApplyUpdate(opts: WatchUpdatesOpts = {}) {
   try {
+    if (__DEV__) return;
+
     const settings = await getSettings();
 
     const current = getCurrentBuildNumber();

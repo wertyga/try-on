@@ -3,6 +3,22 @@ import { ConfigContext, ExpoConfig } from 'expo/config';
 const VERSION = '2.1.0';
 export const ANDRIOD_VERSION = 10;
 
+// import * as os from 'os';
+//
+// function getLocalIP() {
+//   const interfaces = os.networkInterfaces();
+//   for (const iface of Object.values(interfaces)) {
+//     for (const config of iface as any) {
+//       if (config.family === 'IPv4' && !config.internal) {
+//         return config.address;
+//       }
+//     }
+//   }
+//   return '0.0.0.0';
+// }
+//
+// console.log(getLocalIP());
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
@@ -16,6 +32,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: 'com.wertyga.tryon',
     supportsTablet: true,
+    buildNumber: VERSION.toString(),
+    googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       NSCameraUsageDescription:
         'Allow $(PRODUCT_NAME) to use the camera to take your photo.',
@@ -49,6 +67,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.wertyga.tryon',
   },
   plugins: [
+    ['@react-native-firebase/app'],
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          useFrameworks: 'static',
+          extraPods: [
+            { name: 'GoogleUtilities', modular_headers: true },
+            { name: 'FirebaseCoreInternal', modular_headers: true },
+          ],
+        },
+      },
+    ],
     [
       'expo-updates',
       {

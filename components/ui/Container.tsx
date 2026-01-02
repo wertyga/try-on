@@ -6,6 +6,7 @@ import {
   View,
   StyleProp,
   ViewStyle,
+  Platform,
 } from 'react-native';
 import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
@@ -33,18 +34,10 @@ const ScrollContent = ({
   childrenStyle,
   ...scrollViewProps
 }: TContainerProps) => {
-  const insets = useSafeAreaInsets();
-
   return (
     <ScrollView
       style={buildStyles(s.container, style)}
-      contentContainerStyle={buildStyles(
-        s.content,
-        {
-          paddingTop: insets.top + 20,
-        },
-        contentContainerStyle,
-      )}
+      contentContainerStyle={buildStyles(s.content, contentContainerStyle)}
       showsVerticalScrollIndicator={false}
       {...scrollViewProps}
     >
@@ -79,8 +72,19 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   contentContainerStyle,
   ...props
 }) => {
+  const insets = useSafeAreaInsets();
   return (
-    <ScrollContent {...props} contentContainerStyle={{ paddingBottom: 16 }}>
+    <ScrollContent
+      {...props}
+      contentContainerStyle={Platform.select({
+        android: {
+          paddingBottom: insets.bottom + 16,
+        },
+        ios: {
+          paddingBottom: 16,
+        },
+      })}
+    >
       {children}
     </ScrollContent>
   );
@@ -90,8 +94,10 @@ Container.WithTabBar = ScrollableContainerWithTabs;
 
 const s = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '800', marginBottom: 16 },
-  content: { padding: 16, flexGrow: 1 },
+  content: { paddingHorizontal: 16, flexGrow: 1 },
   container: {
+    paddingTop: 16,
+    paddingHorizontal: 8,
     flex: 1,
     backgroundColor: Colors.light.background,
   },

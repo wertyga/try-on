@@ -8,10 +8,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useUserStore, useAuthStore } from '@/stores';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Button } from '@/components/ui/button';
 import { Analytics } from '@/analytics';
 import { useTranslation } from 'react-i18next';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 type Props = {
   /** Hide the banner when user is logged in (default: true) */
@@ -53,7 +53,7 @@ export const SaveLooksGate: React.FC<Props> = ({
   return (
     <View style={[s.card, compact && s.cardCompact, style]}>
       <View style={s.iconWrap}>
-        <IconSymbol name="grid-view" size={20} color="#111827" />
+        <MaterialIcons name="grid-view" size={20} color="#111827" />
       </View>
 
       <View style={{ flex: 1 }}>

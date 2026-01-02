@@ -17,19 +17,22 @@ import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
-import { getCurrentBuildNumber } from '@/updates/update.utils';
+import { Button } from '@/components/ui/button';
 
 export default function Welcome() {
   const { t } = useTranslation();
 
   const { setUserPhoto, userPhoto, consent, setConsent } = useTryOnStore();
   const [busy, setBusy] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function pickFromGallery() {
+    setIsLoading(true);
     try {
       await Analytics.event('photo_pick_start', { source: 'gallery' });
 
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
       if (perm.status !== 'granted') {
         Alert.alert(
           t('permissions.required'),
@@ -63,10 +66,14 @@ export default function Welcome() {
         t('errors.pickImageTitle'),
         e?.message || t('errors.pickImageFallback'),
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function takeFromCamera() {
+    setIsLoading(true);
+
     try {
       await Analytics.event('photo_pick_start', { source: 'camera' });
 
@@ -101,6 +108,8 @@ export default function Welcome() {
         t('errors.cameraTitle'),
         e?.message || t('errors.cameraFallback'),
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -155,31 +164,33 @@ export default function Welcome() {
         t('welcome.needConsentText'),
       );
     }
+
     router.replace('/(tabs)/try-on');
   }
 
   return (
-    <Container contentContainerStyle={{ paddingTop: 30 }}>
+    <Container>
       <Text style={styles.title}>{t('welcome.title')}</Text>
       <Text style={styles.subtitle}>{t('welcome.subtitle')}</Text>
 
       <View style={styles.actions}>
-        <Pressable
+        <Button
           style={styles.primaryBtn}
           onPress={takeFromCamera}
           disabled={busy}
+          isLoading={isLoading}
+          dark
         >
-          <Text style={styles.primaryBtnText}>{t('welcome.takePhoto')}</Text>
-        </Pressable>
-        <Pressable
+          {t('welcome.takePhoto')}
+        </Button>
+        <Button
           style={styles.secondaryBtn}
           onPress={pickFromGallery}
           disabled={busy}
+          isLoading={isLoading}
         >
-          <Text style={styles.secondaryBtnText}>
-            {t('welcome.pickFromGallery')}
-          </Text>
-        </Pressable>
+          {t('welcome.pickFromGallery')}
+        </Button>
       </View>
 
       {busy && <ActivityIndicator size="large" />}
