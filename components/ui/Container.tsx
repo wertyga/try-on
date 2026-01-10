@@ -72,13 +72,12 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   contentContainerStyle,
   ...props
 }) => {
-  const insets = useSafeAreaInsets();
   return (
     <ScrollContent
       {...props}
       contentContainerStyle={Platform.select({
         android: {
-          paddingBottom: insets.bottom + 16,
+          paddingBottom: 32,
         },
         ios: {
           paddingBottom: 16,

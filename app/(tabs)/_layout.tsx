@@ -16,7 +16,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
   isLoading,
@@ -127,6 +127,8 @@ const getTabs = (): {
 };
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   const { user } = useUserStore();
   const { signInWithGoogle, isLoading } = useAuthStore();
 
@@ -139,12 +141,9 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          paddingTop: 5,
-          ...Platform.select({
-            android: {
-              minHeight: 80,
-            },
-          }),
+          paddingTop: 8,
+          paddingBottom: 0,
+          height: insets.bottom > 30 ? 60 : 80,
         },
       }}
     >

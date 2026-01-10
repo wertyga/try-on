@@ -31,7 +31,7 @@ export default function WardrobeScreen() {
 
   const { width } = useWindowDimensions();
   const gap = 12;
-  const horizontalPadding = 16;
+  const horizontalPadding = 24;
   const cols = 2;
   const card = Math.floor(
     (width - horizontalPadding * 2 - gap * (cols - 1)) / cols,

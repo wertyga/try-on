@@ -1,101 +1,31 @@
-import { ConfigContext, ExpoConfig } from 'expo/config';
+import { ExpoConfig } from 'expo/config';
+import {
+  androidConfig,
+  iosConfig,
+  pluginsConfig,
+} from './config/app.config.js';
 
 const VERSION = '2.1.0';
 export const ANDRIOD_VERSION = 10;
 
-// import * as os from 'os';
-//
-// function getLocalIP() {
-//   const interfaces = os.networkInterfaces();
-//   for (const iface of Object.values(interfaces)) {
-//     for (const config of iface as any) {
-//       if (config.family === 'IPv4' && !config.internal) {
-//         return config.address;
-//       }
-//     }
-//   }
-//   return '0.0.0.0';
-// }
-//
-// console.log(getLocalIP());
-
-export default ({ config }: ConfigContext): ExpoConfig => ({
+export default (): ExpoConfig => ({
   name: 'try-on',
   slug: 'try-on',
   version: VERSION,
   runtimeVersion: VERSION,
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: './assets/icon_black_bg.png',
   scheme: 'tryon',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  ios: {
-    bundleIdentifier: 'com.wertyga.tryon',
-    supportsTablet: true,
-    buildNumber: VERSION.toString(),
-    googleServicesFile: './GoogleService-Info.plist',
-    infoPlist: {
-      NSCameraUsageDescription:
-        'Allow $(PRODUCT_NAME) to use the camera to take your photo.',
-      NSPhotoLibraryUsageDescription:
-        'Allow $(PRODUCT_NAME) to access your photo library.',
-      NSPhotoLibraryAddUsageDescription:
-        'Allow $(PRODUCT_NAME) to save photos.',
-      LSApplicationQueriesSchemes: ['itms-apps'],
-    },
-  },
+  ios: iosConfig(VERSION),
   splash: {
     image: './assets/splash_t.png',
     resizeMode: 'contain',
     backgroundColor: '#0F172A',
   },
-  android: {
-    versionCode: ANDRIOD_VERSION,
-    adaptiveIcon: {
-      foregroundImage: './assets/icon.png',
-      backgroundColor: '#0F172A',
-      monochromeImage: './assets/icon.png',
-    },
-    googleServicesFile: './google-services.json',
-    edgeToEdgeEnabled: true,
-    permissions: [
-      'CAMERA',
-      'READ_MEDIA_IMAGES',
-      'READ_EXTERNAL_STORAGE',
-      'com.google.android.gms.permission.AD_ID',
-    ],
-    package: 'com.wertyga.tryon',
-  },
-  plugins: [
-    ['@react-native-firebase/app'],
-    [
-      'expo-build-properties',
-      {
-        ios: {
-          useFrameworks: 'static',
-          extraPods: [
-            { name: 'GoogleUtilities', modular_headers: true },
-            { name: 'FirebaseCoreInternal', modular_headers: true },
-          ],
-        },
-      },
-    ],
-    [
-      'expo-updates',
-      {
-        username: 'wertyga13',
-      },
-    ],
-    'expo-localization',
-    'expo-router',
-    [
-      '@react-native-google-signin/google-signin',
-      {
-        iosUrlScheme:
-          'com.googleusercontent.apps.876705886550-69onectr8996dlrdjko1s1o8hjaovlj1',
-      },
-    ],
-  ],
+  android: androidConfig(ANDRIOD_VERSION),
+  plugins: pluginsConfig,
   experiments: {
     typedRoutes: true,
   },
