@@ -5,8 +5,8 @@ import {
   pluginsConfig,
 } from './config/app.config.js';
 
-const VERSION = '2.1.0';
-export const ANDRIOD_VERSION = 10;
+const VERSION = '2.1.1';
+export const BUILD_VERSION = 11;
 
 export default (): ExpoConfig => ({
   name: 'try-on',
@@ -18,18 +18,19 @@ export default (): ExpoConfig => ({
   scheme: 'tryon',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  ios: iosConfig(VERSION),
+  ios: iosConfig(BUILD_VERSION),
   splash: {
     image: './assets/splash_t.png',
     resizeMode: 'contain',
     backgroundColor: '#0F172A',
   },
-  android: androidConfig(ANDRIOD_VERSION),
+  android: androidConfig(BUILD_VERSION),
   plugins: pluginsConfig,
   experiments: {
     typedRoutes: true,
   },
   extra: {
+    buildNumber: BUILD_VERSION,
     eas: {
       projectId: 'fb5b533f-70bc-4b73-a453-a0028be64c33',
     },

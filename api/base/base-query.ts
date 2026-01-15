@@ -10,7 +10,7 @@ import { Analytics } from '@/analytics';
 import { deviceId } from '@/utils/hash';
 import { inAppConfig } from '@/config';
 
-const buildNumber = Constants.expoConfig?.android?.versionCode ?? 0;
+const buildNumber = Constants.expoConfig?.extra?.buildNumber;
 
 const buildParams = (
   params?: Record<string, string | number | string[]>,
