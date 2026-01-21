@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { router } from 'expo-router';
 import { TryOnPayload, useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
@@ -71,71 +78,104 @@ export default function TryOn() {
           </Text>
         </Pressable>
       </View>
-      {/*/!* Garments *!/*/}
+      {/*/!* Try-on items *!/*/}
       <View style={s.card}>
-        <View style={s.rowBetween}>
-          <Text style={s.cardTitle}>{t('home.garment')}</Text>
-          <View style={[s.chip, mode === 'dress' ? s.chipDark : s.chipLight]}>
-            <Text style={mode === 'dress' ? s.chipTextDark : s.chipTextLight}>
-              {mode === 'dress'
-                ? t('garnet.modeDress')
-                : t('garnet.modeSeparate')}
+        <Text style={s.cardTitle}>Try-on items</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.itemsRow}
+        >
+          <Pressable style={s.itemCard} onPress={goGarnet}>
+            <View style={s.rowBetween}>
+              <Text style={s.itemTitle}>{t('home.garment')}</Text>
+              <View
+                style={[s.chip, mode === 'dress' ? s.chipDark : s.chipLight]}
+              >
+                <Text
+                  style={mode === 'dress' ? s.chipTextDark : s.chipTextLight}
+                >
+                  {mode === 'dress'
+                    ? t('garnet.modeDress')
+                    : t('garnet.modeSeparate')}
+                </Text>
+              </View>
+            </View>
+
+            {mode === 'dress' ? (
+              dress ? (
+                <View style={s.previewFrameWide}>
+                  <Image
+                    source={{ uri: dress.uri }}
+                    style={s.preview}
+                    resizeMode="contain"
+                  />
+                </View>
+              ) : (
+                <Text style={s.muted}>{t('home.noGarment')}</Text>
+              )
+            ) : (
+              <View style={s.separateWrap}>
+                <View style={s.separateCard}>
+                  <Text style={s.separateTitle}>{t('wardrobe.top')}</Text>
+                  {upper ? (
+                    <View style={s.previewFrameSmall}>
+                      <Image
+                        source={{ uri: upper.uri }}
+                        style={s.preview}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  ) : (
+                    <Text style={s.mutedSmall}>{t('common.notSelected')}</Text>
+                  )}
+                </View>
+                <View style={s.separateCard}>
+                  <Text style={s.separateTitle}>{t('wardrobe.bottom')}</Text>
+                  {lower ? (
+                    <View style={s.previewFrameSmall}>
+                      <Image
+                        source={{ uri: lower.uri }}
+                        style={s.preview}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  ) : (
+                    <Text style={s.mutedSmall}>{t('common.notSelected')}</Text>
+                  )}
+                </View>
+              </View>
+            )}
+
+            <Text style={s.linkBtnTextInline}>
+              {hasGarment ? t('common.change') : t('common.select')}
             </Text>
-          </View>
-        </View>
+          </Pressable>
 
-        {mode === 'dress' ? (
-          dress ? (
-            <View style={s.previewFrame}>
-              <Image
-                source={{ uri: dress.uri }}
-                style={s.preview}
-                resizeMode="contain"
-              />
+          <View style={s.itemCard}>
+            <Text style={s.itemTitle}>Glasses</Text>
+            <View style={s.previewFrameWide}>
+              <Text style={s.muted}>No glasses selected</Text>
             </View>
-          ) : (
-            <Text style={s.muted}>{t('home.noGarment')}</Text>
-          )
-        ) : (
-          <View style={s.separateWrap}>
-            {/* Top */}
-            <View style={s.separateCard}>
-              <Text style={s.separateTitle}>{t('wardrobe.top')}</Text>
-              {upper ? (
-                <View style={s.previewFrameSmall}>
-                  <Image
-                    source={{ uri: upper.uri }}
-                    style={s.preview}
-                    resizeMode="contain"
-                  />
-                </View>
-              ) : (
-                <Text style={s.mutedSmall}>{t('common.notSelected')}</Text>
-              )}
-            </View>
-            {/* Bottom */}
-            <View style={s.separateCard}>
-              <Text style={s.separateTitle}>{t('wardrobe.bottom')}</Text>
-              {lower ? (
-                <View style={s.previewFrameSmall}>
-                  <Image
-                    source={{ uri: lower.uri }}
-                    style={s.preview}
-                    resizeMode="contain"
-                  />
-                </View>
-              ) : (
-                <Text style={s.mutedSmall}>{t('common.notSelected')}</Text>
-              )}
-            </View>
+            <Text style={s.linkBtnTextInline}>Select</Text>
           </View>
-        )}
 
-        <Pressable style={s.linkBtn} onPress={goGarnet}>
-          <Text style={s.linkBtnText}>
-            {hasGarment ? t('common.change') : t('common.select')}
-          </Text>
-        </Pressable>
+          <View style={s.itemCard}>
+            <Text style={s.itemTitle}>Hairstyle</Text>
+            <View style={s.previewFrameWide}>
+              <Text style={s.muted}>No hairstyle selected</Text>
+            </View>
+            <Text style={s.linkBtnTextInline}>Select</Text>
+          </View>
+
+          <View style={s.itemCard}>
+            <Text style={s.itemTitle}>Accessories</Text>
+            <View style={s.previewFrameWide}>
+              <Text style={s.muted}>No accessories selected</Text>
+            </View>
+            <Text style={s.linkBtnTextInline}>Select</Text>
+          </View>
+        </ScrollView>
       </View>
 
       <View style={{ alignItems: 'flex-end', marginBottom: 8 }}>
@@ -180,6 +220,15 @@ const s = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     overflow: 'hidden',
   },
+  previewFrameWide: {
+    width: '100%',
+    height: 160,
+    borderRadius: 12,
+    backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   previewFrameSmall: {
     width: '100%',
     height: 220,
@@ -204,4 +253,15 @@ const s = StyleSheet.create({
   separateWrap: { flexDirection: 'row', gap: 12 },
   separateCard: { flex: 1 },
   separateTitle: { fontWeight: '700', marginBottom: 6 },
+  itemsRow: { gap: 12, paddingRight: 6 },
+  itemCard: {
+    width: 260,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+  },
+  itemTitle: { fontSize: 15, fontWeight: '700', marginBottom: 8 },
+  linkBtnTextInline: { marginTop: 8, color: '#111827', fontWeight: '700' },
 });
