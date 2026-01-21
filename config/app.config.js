@@ -5,10 +5,11 @@ export const iosConfig = (version) => ({
   googleServicesFile: './GoogleService-Info.plist',
   infoPlist: {
     NSCameraUsageDescription:
-      'Allow $(PRODUCT_NAME) to use the camera to take your photo.',
+      'We use the camera to take your photo so you can try on outfits and see how clothes look on you in real time.',
     NSPhotoLibraryUsageDescription:
-      'Allow $(PRODUCT_NAME) to access your photo library.',
-    NSPhotoLibraryAddUsageDescription: 'Allow $(PRODUCT_NAME) to save photos.',
+      'We use your photo library so you can choose a photo of yourself to apply virtual outfits and preview try-on results.',
+    NSPhotoLibraryAddUsageDescription:
+      'We save your try-on results (generated outfit images) to your photo library when you tap Save.',
     LSApplicationQueriesSchemes: ['itms-apps'],
   },
 });
