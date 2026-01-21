@@ -88,11 +88,12 @@
     "cardDress": "Dress (full-body)",
     "cardTop": "Top (upper)",
     "cardBottom": "Bottom (lower)",
-    "noImage": "No image selected",
-    "upload": "Upload",
-    "replace": "Replace",
     "clear": "Clear",
-    "tip": "Tip: upload front-facing PNG/JPEG on a light background. For “Dress”, do not use top/bottom at the same time."
+    "tip": "Tip: upload front-facing PNG/JPEG on a light background. For “Dress”, do not use top/bottom at the same time.",
+    "cardGlasses": "Glasses",
+    "cardHairstyle": "Hairstyle",
+    "cardAccessories": "Accessories",
+    "clickUpload": "Click and upload"
   },
   "queue": {
     "title": "Try-on queue",

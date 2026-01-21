@@ -5,8 +5,6 @@ import { getFinishedTask, removeTask } from '@/api';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { useUserStore } from '@/stores/useUserStore';
 
-type Source = 'camera' | 'gallery';
-
 export type UserPhoto = {
   uri: string;
   base64: string;
@@ -19,6 +17,10 @@ export type TryOnPayload = {
   dressBase64?: string;
   upperBase64?: string;
   lowerBase64?: string;
+  glassesBase64?: string;
+  accessoriesBase64?: string;
+  hairstyleBase64?: string;
+
   mode: GarmentMode;
   userBase64: string;
 };
@@ -38,20 +40,25 @@ export type TryOnTask = TTask & {
   mode: GarmentMode;
 };
 
-type TryOnState = {
+export type TTryOnImagesKeys =
+  | 'dress'
+  | 'upper'
+  | 'lower'
+  | 'glasses'
+  | 'hairstyle'
+  | 'accessories';
+export type TTryOnImages = Record<TTryOnImagesKeys, GarmentImage | null>;
+
+type TryOnState = TTryOnImages & {
   // входы
   userPhoto: UserPhoto;
   mode: GarmentMode;
-  dress: GarmentImage;
-  upper: GarmentImage;
-  lower: GarmentImage;
 
   consent: boolean;
   setConsent: (consent: boolean) => void;
 
-  clearDress: () => void;
-  clearUpper: () => void;
-  clearLower: () => void;
+  clearImage: (slot: TTryOnImagesKeys) => void;
+  setImage: (slot: TTryOnImagesKeys, image: GarmentImage) => void;
 
   // задачи
   tasks: TryOnTask[];
@@ -59,9 +66,6 @@ type TryOnState = {
   // setters / helpers
   setUserPhoto: (p: UserPhoto) => void;
   setMode: (m: GarmentMode) => void;
-  setDress: (g: GarmentImage) => void;
-  setUpper: (g: GarmentImage) => void;
-  setLower: (g: GarmentImage) => void;
   resetInputs: () => void;
 
   clearFinished: () => void;
@@ -90,9 +94,13 @@ const sortTasks = (arr: TryOnTask[]) =>
 export const useTryOnStore = create<TryOnState>((set, get) => ({
   userPhoto: null,
   mode: 'dress',
+
   dress: null,
   upper: null,
   lower: null,
+  hairstyle: null,
+  glasses: null,
+  accessories: null,
 
   tasks: [],
 
@@ -110,20 +118,14 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     set({ consent });
   },
 
-  clearDress: () => {
-    Analytics.event('garment_clear', { slot: 'dress' });
+  clearImage: (slot: TTryOnImagesKeys) => {
+    Analytics.event('garment_clear', { slot });
 
-    set({ dress: null });
+    set({ [slot]: null });
   },
-  clearUpper: () => {
-    Analytics.event('garment_clear', { slot: 'upper' });
 
-    set({ upper: null });
-  },
-  clearLower: () => {
-    Analytics.event('garment_clear', { slot: 'lower' });
-
-    set({ lower: null });
+  setImage: (slot: TTryOnImagesKeys, image: GarmentImage) => {
+    set({ [slot]: image });
   },
 
   setUserPhoto: (userPhoto: UserPhoto) => {
@@ -142,11 +144,17 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     await Analytics.event('garment_mode_set', { mode });
     Analytics.userProp('tryon_mode', mode);
   },
-  setDress: (dress) => set({ dress }),
-  setUpper: (upper) => set({ upper }),
-  setLower: (lower) => set({ lower }),
-  resetInputs: () =>
-    set({ dress: null, upper: null, lower: null /* userPhoto оставим */ }),
+
+  resetInputs: () => {
+    set({
+      dress: null,
+      upper: null,
+      lower: null,
+      glasses: null,
+      hairstyle: null,
+      accessories: null,
+    });
+  },
 
   addTask: (t) => {
     const updatedTaskList = [t, ...get().tasks];

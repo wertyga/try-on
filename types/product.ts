@@ -11,3 +11,5 @@ export type TProduct = {
   awId: string;
   zone: string;
 };
+
+export type Categories = string;

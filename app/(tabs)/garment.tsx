@@ -14,9 +14,10 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
 
 import { Container } from '@/components/ui/Container';
-import { useTryOnStore } from '@/stores/useTryOnStore';
+import { TTryOnImagesKeys, useTryOnStore } from '@/stores/useTryOnStore';
 import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
+import { UploadItem } from '@/components/UploadItem';
 
 export default function Garment() {
   const { t } = useTranslation();
@@ -27,25 +28,21 @@ export default function Garment() {
     dress,
     upper,
     lower,
-    setDress,
-    setUpper,
-    setLower,
-    clearDress,
-    clearUpper,
-    clearLower,
+    glasses,
+    hairstyle,
+    accessories,
+    setImage,
+    clearImage,
   } = useTryOnStore();
 
   const [busy, setBusy] = useState(false);
 
-  const clear = (slot: 'dress' | 'upper' | 'lower', setter: () => void) => {
+  const clear = (slot: TTryOnImagesKeys) => {
     Analytics.event('garment_clear', { slot });
-    setter();
+    clearImage(slot);
   };
 
-  async function pick(
-    slot: 'dress' | 'upper' | 'lower',
-    setter: (x: { uri: string; base64: string } | null) => void,
-  ) {
+  async function pick(slot: TTryOnImagesKeys) {
     try {
       Analytics.event('garment_pick_start', { slot });
 
@@ -75,7 +72,8 @@ export default function Garment() {
         format: ImageManipulator.SaveFormat.JPEG,
         base64: true,
       });
-      setter({
+
+      setImage(slot, {
         uri: manip.uri,
         base64: `data:image/jpeg;base64,${manip.base64!}`,
       });
@@ -120,28 +118,47 @@ export default function Garment() {
       </View>
 
       {mode === 'dress' ? (
-        <Card
+        <UploadItem
           title={t('garnet.cardDress')}
           imageUri={dress?.uri}
-          onPick={() => pick('dress', setDress)}
-          onClear={() => clear('dress', clearDress)}
+          onPick={() => pick('dress')}
+          onClear={() => clear('dress')}
         />
       ) : (
         <>
-          <Card
+          <UploadItem
             title={t('garnet.cardTop')}
             imageUri={upper?.uri}
-            onPick={() => pick('upper', setUpper)}
-            onClear={() => clear('upper', clearUpper)}
+            onPick={() => pick('upper')}
+            onClear={() => clear('upper')}
           />
-          <Card
+          <UploadItem
             title={t('garnet.cardBottom')}
             imageUri={lower?.uri}
-            onPick={() => pick('lower', setLower)}
-            onClear={() => clear('lower', clearLower)}
+            onPick={() => pick('lower')}
+            onClear={() => clear('lower')}
           />
         </>
       )}
+
+      <UploadItem
+        title={t('garnet.cardGlasses')}
+        imageUri={glasses?.uri}
+        onPick={() => pick('glasses')}
+        onClear={() => clear('glasses')}
+      />
+      <UploadItem
+        title={t('garnet.cardHairstyle')}
+        imageUri={hairstyle?.uri}
+        onPick={() => pick('hairstyle')}
+        onClear={() => clear('hairstyle')}
+      />
+      <UploadItem
+        title={t('garnet.cardAccessories')}
+        imageUri={accessories?.uri}
+        onPick={() => pick('accessories')}
+        onClear={() => clear('accessories')}
+      />
 
       {busy && <ActivityIndicator size="large" style={{ marginTop: 8 }} />}
 
