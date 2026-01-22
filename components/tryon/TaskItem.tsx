@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { StatusBadge } from './StatusBadge';
-import { TryOnTask } from '@/stores/useTryOnStore';
+import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { Button } from '@/components/ui/button';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
@@ -32,6 +32,7 @@ export function TaskItem({
   const { user } = useUserStore();
   const { add: saveWardrobe, isLoading: isWardrobeLoading } =
     useWardrobeStore();
+  const { removeTask } = useTryOnStore();
 
   const { t } = useTranslation();
 
@@ -101,15 +102,14 @@ export function TaskItem({
             </>
           )}
 
-        {!isInProcess && (
-          <ButtonWithConfirm
-            style={s.btnLight}
-            onPress={() => onRemove(task.id)}
-            isLoading={areCtasLoading}
-          >
-            {t('common.delete')}
-          </ButtonWithConfirm>
-        )}
+        <ButtonWithConfirm
+          style={s.btnLight}
+          onPress={() => onRemove(task.id)}
+          isLoading={areCtasLoading}
+          alertText={t('alerts.cancelTaskTitle')}
+        >
+          {t('common.delete')}
+        </ButtonWithConfirm>
       </View>
     </View>
   );

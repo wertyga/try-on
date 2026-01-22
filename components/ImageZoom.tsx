@@ -45,7 +45,7 @@ const s = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
-  hero: { width: '100%', height: '100%' },
+  hero: { height: '100%', width: '100%' },
 
   modal: {
     flex: 1,

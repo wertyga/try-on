@@ -3,12 +3,7 @@ import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import {
-  TryOnPayload,
-  useProductsStore,
-  useTryOnStore,
-  useUserStore,
-} from '@/stores';
+import { TryOnPayload, useProductsStore, useTryOnStore } from '@/stores';
 import { trackTaskCreateEvent, trackTaskSucceededEvent } from '@/analytics';
 import { createTask } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
@@ -17,14 +12,19 @@ import { fingerprintFromPayload } from '@/utils/hash';
 import { useCreditsStore } from '@/stores/creditStore';
 import { TaskStatus } from '@/types/task';
 
-export type TGenerateTaskButtonProps = {
-  currentPayload: TryOnPayload | null;
-};
-
-export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
-  currentPayload,
-}) => {
-  const { addTask, tasks } = useTryOnStore();
+export const GenerateTaskButton: FC = () => {
+  const {
+    addTask,
+    tasks,
+    userPhoto,
+    mode,
+    dress,
+    upper,
+    lower,
+    glasses,
+    hairstyle,
+    accessories,
+  } = useTryOnStore();
   const { fetchCategoriesForImages } = useProductsStore();
 
   const credits = useCreditsStore();
@@ -36,8 +36,32 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
     (t) => t.status === TaskStatus.running || t.status === TaskStatus.queued,
   );
 
-  async function tryCreateTask(payload: TryOnPayload, fp: string) {
-    if (creating) return;
+  const payload = useMemo<TryOnPayload | null>(() => {
+    if (!userPhoto?.base64) return null;
+
+    const hasAnyGarment =
+      dress || upper || lower || glasses || hairstyle || accessories;
+
+    if (!hasAnyGarment) return null;
+
+    return {
+      mode,
+      userBase64: userPhoto.base64,
+      ...(mode === 'dress'
+        ? { dressBase64: dress?.base64 }
+        : { upperBase64: upper?.base64, lowerBase64: lower?.base64 }),
+      ...{
+        glassesBase64: glasses?.base64,
+        hairstyleBase64: hairstyle?.base64,
+        accessoriesBase64: accessories?.base64,
+      },
+    };
+  }, [userPhoto, mode, dress, upper, lower, glasses, hairstyle, accessories]);
+
+  const currentFp = payload ? fingerprintFromPayload(payload) : null;
+
+  async function tryCreateTask() {
+    if (creating || !payload || !currentFp) return;
 
     // 1) Обновим billing state перед проверкой (чтобы не было "устаревших" значений)
     await credits.load();
@@ -56,7 +80,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
         mode: payload.mode,
         dress: payload.dressBase64,
         lower: payload.lowerBase64,
-        fp,
+        fp: currentFp,
         user: payload.userBase64,
       });
 
@@ -68,9 +92,9 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
         lowerBase64: payload.lowerBase64,
       });
 
-      addTask(getTryOnTaskFromTask(task, fp, false));
+      addTask(getTryOnTaskFromTask(task, currentFp, false));
 
-      trackTaskSucceededEvent(task._id, fp);
+      trackTaskSucceededEvent(task._id, currentFp);
 
       // 3) После успеха — обновляем billing state (бек должен списать free/credits)
       await credits.onGenerationSuccess();
@@ -96,18 +120,12 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
     return creating ? t('queue.creating') : t('home.generate');
   }, [creating]);
 
-  const currentFp = currentPayload
-    ? fingerprintFromPayload(currentPayload)
-    : null;
-
-  const isDisabled = !currentPayload || creating || hasPendingTask;
+  const isDisabled = !payload || creating || hasPendingTask;
 
   return (
     <Pressable
       style={[s.primaryBtn, isDisabled && s.btnDisabled]}
-      onPress={() =>
-        currentPayload && currentFp && tryCreateTask(currentPayload, currentFp)
-      }
+      onPress={() => tryCreateTask()}
       disabled={isDisabled}
     >
       <Text style={s.primaryBtnText}>{ctaLabel}</Text>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert, Share } from 'react-native';
+import { View, Text, StyleSheet, Alert, Share, Dimensions } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Analytics } from '@/analytics';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
+import { Colors } from '@/constants/Colors';
 
 type WardrobeItem = {
   _id: string;
@@ -118,6 +119,7 @@ export default function WardrobeDetailScreen() {
           <ImageZoom
             source={{ uri: item.imageUrl }}
             style={s.heroWrap}
+            imageStyle={s.heroImage}
             withDownload
           />
 
@@ -153,7 +155,12 @@ export default function WardrobeDetailScreen() {
             <Button fullWidth onPress={onShare} dark>
               {t('common.share')}
             </Button>
-            <ButtonWithConfirm fullWidth transparent onPress={onDelete}>
+            <ButtonWithConfirm
+              fullWidth
+              transparent
+              onPress={onDelete}
+              alertText={t('alerts.deleteLookTitle')}
+            >
               {t('common.delete')}
             </ButtonWithConfirm>
           </View>
@@ -181,7 +188,11 @@ function AssetThumb({ label, uri }: { label: string; uri: string }) {
 const s = StyleSheet.create({
   heroWrap: {
     aspectRatio: 3 / 4,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Colors.light.disabledBg,
+    width: '100%',
+  },
+  heroImage: {
+    objectFit: 'contain',
   },
 
   muted: { color: '#6B7280', marginBottom: 12 },
@@ -202,7 +213,7 @@ const s = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     overflow: 'hidden',
   },
-  assetImg: { width: '100%', height: '90%', objectFit: 'cover' },
+  assetImg: { width: '100%', height: '100%', objectFit: 'cover' },
   assetLabel: {
     textAlign: 'center',
     fontSize: 12,
@@ -211,5 +222,5 @@ const s = StyleSheet.create({
     color: '#111827',
   },
 
-  actions: { gap: 10, marginTop: 4, marginBottom: 12 },
+  actions: { gap: 10, marginTop: 24, marginBottom: 12 },
 });

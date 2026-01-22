@@ -15,6 +15,7 @@ export const Colors = {
     background: '#F7F8FA',
     cardBg: '#FFFFFF',
     border: '#E5E7EB',
+    disabledBg: '#E5E7EB',
     tint: tintColorLight,
     icon: '#687076',
     tabIconDefault: '#687076',

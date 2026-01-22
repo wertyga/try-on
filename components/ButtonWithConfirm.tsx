@@ -6,16 +6,18 @@ import { TButtonProps } from '@/components/ui/button/button';
 
 export type TButtonWithConfirmProps = TButtonProps & {
   onPress: () => void | Promise<void>;
+  alertText: string;
 };
 
 export const ButtonWithConfirm: FC<TButtonWithConfirmProps> = ({
   onPress,
+  alertText,
   ...buttonProps
 }) => {
   const { t } = useTranslation();
 
   const handleClick = useCallback(() => {
-    Alert.alert(t('alerts.deleteLookTitle'), t('alerts.deleteLookText'), [
+    Alert.alert(alertText, t('alerts.deleteLookText'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
         text: t('common.delete'),

@@ -112,6 +112,7 @@ export default function TryOnQueueScreen() {
       )}
 
       {!tasks.length && empty}
+
       {tasks.map((item) => (
         <TaskItem
           key={item.id}

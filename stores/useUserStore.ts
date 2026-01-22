@@ -85,6 +85,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
 
   getUserSelf: async () => {
+    // MOCK
+    // storage.set?.(
+    //   'token',
+    //   '5816903e471f1ac60fe63768c05d7ac93682c8c26553cf6cea655e775510b03d.88969e138042cf8ae1a4c62ce59859de4da0273c811f5ec2c257491d4b186528',
+    // );
+    //
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });

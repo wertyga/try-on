@@ -155,7 +155,8 @@
   },
   "alerts": {
     "deleteLookTitle": "Delete the look?",
-    "deleteLookText": "This action cannot be undone."
+    "deleteLookText": "This action cannot be undone.",
+    "cancelTaskTitle": "Delete the task?"
   },
   "errors": {
     "saveImageFailed": "Failed to save image",

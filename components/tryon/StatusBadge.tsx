@@ -2,7 +2,10 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { TaskStatus } from '@/types/task';
 
-const MAP: Record<TaskStatus, { bg: string; color: string; text: string }> = {
+const MAP: Record<
+  TaskStatus | 'cancel',
+  { bg: string; color: string; text: string }
+> = {
   [TaskStatus.queued]: { bg: '#E5E7EB', color: '#374151', text: 'In queue' },
   [TaskStatus.running]: {
     bg: '#DBEAFE',
@@ -11,9 +14,10 @@ const MAP: Record<TaskStatus, { bg: string; color: string; text: string }> = {
   },
   [TaskStatus.completed]: { bg: '#DCFCE7', color: '#166534', text: 'Ready' },
   [TaskStatus.failed]: { bg: '#FEE2E2', color: '#991B1B', text: 'Error' },
+  cancel: { bg: '#FEE2E2', color: '#991B1B', text: 'Cancel' },
 };
 
-export function StatusBadge({ status }: { status: TaskStatus }) {
+export function StatusBadge({ status }: { status: keyof typeof MAP }) {
   const s = MAP[status];
 
   return (
