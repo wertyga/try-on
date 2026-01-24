@@ -15,7 +15,7 @@ const inAppConfigMap = {
     ...commonConfig,
   },
   [Channels.Development]: {
-    API_URL: `http://192.168.18.5:3001`,
+    API_URL: `http://192.168.18.4:3001`,
     ...commonConfig,
   },
   [Channels.Preview]: {

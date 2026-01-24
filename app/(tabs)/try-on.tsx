@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
-import { TryOnPayload, useTryOnStore } from '@/stores/useTryOnStore';
+import { useTryOnStore } from '@/stores/useTryOnStore';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';

@@ -18,10 +18,12 @@ import { Analytics } from '@/analytics';
 export default function WardrobeScreen() {
   const { t } = useTranslation();
 
-  const items = useWardrobeStore((s) => s.items);
-  const isLoading = useWardrobeStore((s) => s.isLoading);
-  const fetchMine = useWardrobeStore((s) => s.fetchMine);
-  const removeItem = useWardrobeStore((s) => s.remove);
+  const {
+    items,
+    isLoading,
+    fetchMine,
+    remove: removeItem,
+  } = useWardrobeStore();
 
   useEffect(() => {
     if (!items?.length) fetchMine().catch(() => {});

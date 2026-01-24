@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useCreditsStore } from '@/stores/creditStore';
 import { Colors } from '@/constants/Colors';
 import { PackList } from '@/components/Pack';
 import { UserBalance } from '@/components/billing/UserBalance';
+import { ErrorBox } from '@/components/ui/ErrorBox';
 
 export default function PaywallContent() {
   const {
@@ -30,12 +31,7 @@ export default function PaywallContent() {
 
       <PackList packs={packs} isLoading={isLoading} />
 
-      {error ? (
-        <Pressable onPress={clearError} style={s.errorBox}>
-          <Text style={s.errorText}>{error}</Text>
-          <Text style={s.errorHint}>Tap to dismiss</Text>
-        </Pressable>
-      ) : null}
+      <ErrorBox error={error} clearError={clearError} />
     </View>
   );
 }
@@ -64,14 +60,4 @@ const s = StyleSheet.create({
     backgroundColor: '#111827',
   },
   buyText: { color: '#fff', fontWeight: '900' },
-
-  errorBox: {
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FCA5A5',
-  },
-  errorText: { color: '#991B1B', fontWeight: '900' },
-  errorHint: { color: '#991B1B', marginTop: 4, fontSize: 12 },
 });

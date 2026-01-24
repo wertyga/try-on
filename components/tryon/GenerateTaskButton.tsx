@@ -125,7 +125,7 @@ export const GenerateTaskButton: FC = () => {
   return (
     <Pressable
       style={[s.primaryBtn, isDisabled && s.btnDisabled]}
-      onPress={() => tryCreateTask()}
+      onPress={tryCreateTask}
       disabled={isDisabled}
     >
       <Text style={s.primaryBtnText}>{ctaLabel}</Text>

@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '@/stripe';
 import { installGlobalErrorHandlers } from '@/utils/errors';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { UpdateBanner } from '@/updates';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
@@ -14,7 +14,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import 'react-native-reanimated';
 import '@/i18n';
-import { Colors } from '@/constants/Colors';
+
+import { Button } from '@/components/ui/button';
+import { ErrorBox } from '@/components/ui/ErrorBox';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -73,14 +75,23 @@ export function ErrorBoundary({
   retry: () => void;
 }) {
   return (
-    <View style={{ padding: 16 }}>
-      <Text style={{ fontWeight: '800', marginBottom: 8 }}>Error</Text>
-      <Text style={{ color: '#991B1B', marginBottom: 12 }}>
-        {String(error?.message)}
-      </Text>
-      <Pressable onPress={retry}>
-        <Text>Repeat</Text>
-      </Pressable>
-    </View>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+        }}
+      >
+        <View style={{ padding: 16 }}>
+          <View style={{ marginBottom: 16 }}>
+            <ErrorBox error={String(error?.message)} />
+          </View>
+
+          <Button onPress={retry} dark>
+            Repeat
+          </Button>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

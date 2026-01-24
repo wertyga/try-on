@@ -32,7 +32,6 @@ export function TaskItem({
   const { user } = useUserStore();
   const { add: saveWardrobe, isLoading: isWardrobeLoading } =
     useWardrobeStore();
-  const { removeTask } = useTryOnStore();
 
   const { t } = useTranslation();
 

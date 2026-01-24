@@ -16,7 +16,7 @@ export const ButtonWithConfirm: FC<TButtonWithConfirmProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     Alert.alert(alertText, t('alerts.deleteLookText'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
@@ -34,7 +34,7 @@ export const ButtonWithConfirm: FC<TButtonWithConfirmProps> = ({
         },
       },
     ]);
-  }, [t]);
+  };
 
   return <Button {...buttonProps} onPress={handleClick} />;
 };

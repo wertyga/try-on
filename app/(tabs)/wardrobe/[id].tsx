@@ -28,8 +28,9 @@ export default function WardrobeDetailScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const storeItems = useWardrobeStore((s) => s.items);
-  const storeItem = storeItems.find((ti) => ti._id === id);
+  const storeItem = useWardrobeStore((s) =>
+    s.items.find((it) => it._id === id),
+  );
 
   const removeItem = useWardrobeStore((s) => s.remove);
   const [item, setItem] = useState<WardrobeItem | undefined>(undefined);
@@ -48,6 +49,7 @@ export default function WardrobeDetailScreen() {
   // fetch from backend if not in store
   useEffect(() => {
     let cancelled = false;
+
     async function fetchOne() {
       try {
         setLoading(true);
@@ -60,7 +62,9 @@ export default function WardrobeDetailScreen() {
         if (!cancelled) setLoading(false);
       }
     }
+
     if (!storeItem) fetchOne();
+
     return () => {
       cancelled = true;
     };
@@ -74,7 +78,7 @@ export default function WardrobeDetailScreen() {
     }
   }, [item?.createdAt]);
 
-  const onDelete = useCallback(async () => {
+  const onDelete = async () => {
     if (!item) return;
 
     try {
@@ -92,7 +96,7 @@ export default function WardrobeDetailScreen() {
     } catch (e: any) {
       Alert.alert(t('common.error'), e?.message || t('errors.failedToDelete'));
     }
-  }, [item, removeItem, t]);
+  };
 
   const onShare = useCallback(async () => {
     if (!item) return;

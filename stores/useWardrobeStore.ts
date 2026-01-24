@@ -84,6 +84,7 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
   async remove(id) {
     // оптимистично скрываем
     const prev = get().items;
+
     set({ items: prev.filter((i) => i._id !== id) });
     try {
       await removeWardrobeItem(id);
