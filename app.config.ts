@@ -5,8 +5,8 @@ import {
   pluginsConfig,
 } from './config/app.config.js';
 
-const VERSION = '2.1.2';
-export const BUILD_VERSION = 12;
+const VERSION = '3.0.0';
+export const BUILD_VERSION = 13;
 
 export default (): ExpoConfig => ({
   name: 'try-on',
@@ -25,7 +25,7 @@ export default (): ExpoConfig => ({
     backgroundColor: '#0F172A',
   },
   android: androidConfig(BUILD_VERSION),
-  plugins: pluginsConfig,
+  plugins: pluginsConfig as any,
   experiments: {
     typedRoutes: true,
   },
