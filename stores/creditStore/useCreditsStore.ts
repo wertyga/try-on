@@ -1,14 +1,19 @@
 import { create } from 'zustand';
+import { Platform } from 'react-native';
 
 import { TSettings } from '@/types';
 
 import { fetchBillingState } from './credit.api';
 import { buildAPIError } from '@/api/base';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { StripeSlice, TStripeSlice } from '@/stripe';
+import { useAuthStore } from '@/stores/auth/useAuthStore';
+import { useStripeStore } from '@/stores/billings/stripe';
+import { useIapStore } from '@/stores/billings/iap';
+import { TCreditPack } from './credit.types';
 
-type CreditsState = {
+type TCreditsState = {
   settings: TSettings | null;
+
+  packs: TCreditPack[];
 
   // guest
   guestFreeUsed: number;
@@ -28,19 +33,24 @@ type CreditsState = {
   isBuyingPackId: string | null;
 };
 
-type CreditsActions = {
+type TCreditsActions = {
   load: () => Promise<void>;
   canGenerate: () => boolean;
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
+  fetchPacks: () => Promise<void>;
+
+  _loadStripePacks: () => Promise<TCreditPack[]>;
+  _loadIapPacks: () => Promise<TCreditPack[]>;
 };
 
-export type UseCreditsStore = CreditsState & CreditsActions & TStripeSlice;
+export type TCreditsStore = TCreditsState & TCreditsActions;
 
-const initialState: CreditsState = {
+const initialState: TCreditsState = {
   settings: null,
+  packs: [],
 
   guestFreeUsed: 0,
   guestFreeLeft: 0,
@@ -58,16 +68,20 @@ const initialState: CreditsState = {
   isBuyingPackId: null,
 };
 
-export const useCreditsStore = create<UseCreditsStore>((set, get) => ({
-  ...initialState,
+const isIOS = Platform.OS === 'ios';
 
-  ...StripeSlice(set, get),
+export const useCreditsStore = create<TCreditsStore>((set, get) => ({
+  ...initialState,
 
   buyPack: async (priceId: string) => {
     set({ isBuyingPackId: priceId, error: null });
 
     try {
-      await get().buyStripeProduct(priceId);
+      const buyMethod = isIOS
+        ? useIapStore.getState().buyPack
+        : useStripeStore.getState().buyStripeProduct;
+
+      await buyMethod(priceId);
 
       await get().load();
     } catch (e: any) {
@@ -88,16 +102,56 @@ export const useCreditsStore = create<UseCreditsStore>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
+  _loadStripePacks: async (): Promise<TCreditPack[]> => {
+    await useStripeStore.getState().fetchStripeKey();
+
+    const stripePacks = await useStripeStore.getState().fetchProductsPacks();
+
+    return stripePacks;
+  },
+
+  _loadIapPacks: async (): Promise<TCreditPack[]> => {
+    const iapPacks = await useIapStore.getState().fetchPacks();
+
+    return iapPacks.map(
+      ({ title, description = '', productIdentifier, priceString }) => {
+        return {
+          id: productIdentifier,
+          priceId: productIdentifier,
+          title: `${title} - ${priceString}`,
+          description,
+          credits: 0,
+          priceLabel: '',
+          marketFeatures: [],
+          isActive: true,
+        };
+      },
+    );
+  },
+
+  fetchPacks: async () => {
+    try {
+      set({ isLoading: true, error: null });
+
+      const fetchProductsPacks = isIOS
+        ? get()._loadIapPacks
+        : get()._loadStripePacks;
+
+      const packs = await fetchProductsPacks();
+
+      set({ packs });
+    } catch (e: any) {
+      set({ error: e?.message || 'Failed to load packs' });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   load: async () => {
     set({ isLoading: true, error: null });
 
     try {
-      get().fetchStripeKey();
-
-      const [state] = await Promise.all([
-        fetchBillingState(),
-        get().fetchProductsPacks(),
-      ]);
+      const state = await fetchBillingState();
 
       set({
         settings: state.settings ?? null,
@@ -126,6 +180,7 @@ export const useCreditsStore = create<UseCreditsStore>((set, get) => ({
     if ((s.freeDailyLeft ?? 0) > 0) return true;
     if ((s.credits ?? 0) > 0) return true;
     if ((s.guestFreeLeft ?? 0) > 0) return true;
+
     return false;
   },
 

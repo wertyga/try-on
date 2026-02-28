@@ -1,5 +1,5 @@
 export * from './useUsageStore';
-export * from './useAuthStore';
+export * from './auth/useAuthStore';
 export * from './useTryOnStore';
 export * from './useWardrobeStore';
 export * from './useUserStore';

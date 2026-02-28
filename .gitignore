@@ -22,6 +22,7 @@ expo-env.d.ts
 *.aab
 *.tar.gz
 *.app/
+.proxyai/
 
 # Metro
 .metro-health-check*

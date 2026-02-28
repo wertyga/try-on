@@ -8,7 +8,7 @@ import { Colors } from '@/constants/Colors';
 
 import { useUserStore } from '@/stores/useUserStore';
 import { useWardrobeAutoSync } from '@/stores/useWardrobeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -54,12 +54,16 @@ export const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
   );
 };
 
-const getTabs = (): {
+const getTabs = ({
+  signedIn,
+}: {
+  signedIn: boolean;
+}): {
   hidden?: boolean;
   name: string;
   title: string;
   withLogin?: boolean;
-  icon: (color: string, isLoading: boolean) => React.ReactNode;
+  icon?: (color: string, isLoading?: boolean) => React.ReactNode;
 }[] => {
   return [
     {
@@ -101,19 +105,15 @@ const getTabs = (): {
     },
     {
       name: 'profile',
-      title: 'User',
+      title: signedIn ? 'User' : 'Login in',
       icon: (color: string) => {
         return <MaterialIcons size={28} name="person" color={color} />;
       },
-      withLogin: true,
     },
     {
       name: 'login',
       title: 'User',
-      icon: (color: string, isLoading: boolean) => {
-        return <LoginIcon color={color} isLoading={isLoading} />;
-      },
-      withLogin: false,
+      hidden: true,
     },
     {
       name: 'wardrobe/[id]',
@@ -130,7 +130,6 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
   const { user } = useUserStore();
-  const { signInWithGoogle, isLoading } = useAuthStore();
 
   useWardrobeAutoSync();
 
@@ -147,42 +146,33 @@ export default function TabLayout() {
         },
       }}
     >
-      {getTabs().map(({ name, title, icon, withLogin, hidden }) => {
-        const isLoginTab = name === 'login';
+      {getTabs({ signedIn: !!user }).map(
+        ({ name, title, icon, withLogin, hidden }) => {
+          let href = null;
 
-        let href = null;
-        if (withLogin === false && !user) {
-          href = undefined;
-        } else if (withLogin === true && !!user) {
-          href = undefined;
-        } else if (withLogin === undefined) {
-          href = undefined;
-        }
+          if (withLogin === false && !user) {
+            href = undefined;
+          } else if (withLogin === true && !!user) {
+            href = undefined;
+          } else if (withLogin === undefined) {
+            href = undefined;
+          }
 
-        if (hidden) href = null;
+          if (hidden) href = null;
 
-        return (
-          <Tabs.Screen
-            key={name}
-            name={name}
-            options={{
-              title,
-              href,
-              tabBarIcon: ({ color }) => icon(color, isLoading),
-            }}
-            listeners={
-              isLoginTab
-                ? {
-                    tabPress: (e) => {
-                      e.preventDefault();
-                      signInWithGoogle();
-                    },
-                  }
-                : undefined
-            }
-          />
-        );
-      })}
+          return (
+            <Tabs.Screen
+              key={name}
+              name={name}
+              options={{
+                title,
+                href,
+                tabBarIcon: ({ color }) => (icon ? icon(color) : null),
+              }}
+            />
+          );
+        },
+      )}
     </Tabs>
   );
 }

@@ -11,7 +11,6 @@ const commonConfig = {};
 const inAppConfigMap = {
   [Channels.Production]: {
     API_URL: 'https://api.zws.ink',
-
     ...commonConfig,
   },
   [Channels.Development]: {

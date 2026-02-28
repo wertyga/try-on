@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Analytics } from '@/analytics';
 import { useTranslation } from 'react-i18next';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from 'expo-router';
 
 type Props = {
   /** Hide the banner when user is logged in (default: true) */
@@ -34,7 +35,7 @@ export const SaveLooksGate: React.FC<Props> = ({
   style,
   compact,
 }) => {
-  const { signInWithGoogle, isLoading: isAuthLoading } = useAuthStore();
+  const { isLoading: isAuthLoading } = useAuthStore();
   const user = useUserStore((s) => s.user);
 
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export const SaveLooksGate: React.FC<Props> = ({
 
   const goLogin = () => {
     Analytics.event('save_gate_cta');
-    signInWithGoogle();
+    router.push('/(tabs)/login');
   };
 
   return (

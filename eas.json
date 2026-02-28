@@ -2,12 +2,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "ios": { "simulator": true },
       "distribution": "internal",
       "channel": "development",
       "env": {
         "NODE_ENV": "production"
       }
+    },
+    "development_device": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "env": { "NODE_ENV": "production" }
     },
     "development:apk": {
       "developmentClient": true,
@@ -35,6 +40,9 @@
     },
     "production": {
       "channel": "production",
+      "ios": {
+        "image": "macos-sequoia-15.6-xcode-26.0"
+      },
       "env": {
         "NODE_ENV": "production"
       }

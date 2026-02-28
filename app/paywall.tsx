@@ -19,11 +19,13 @@ export default function PaywallScreen() {
     error,
     load,
     clearError,
+    fetchPacks,
   } = useCreditsStore();
   const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
 
   useEffect(() => {
     load();
+    fetchPacks();
   }, [load]);
 
   const timeLeft = useMemo(() => formatTimeLeft(resetsAt), [resetsAt]);
@@ -94,7 +96,7 @@ export default function PaywallScreen() {
 
 const s = StyleSheet.create({
   wrap: {
-    padding: 12,
+    paddingTop: 20,
     paddingBottom: 28,
     gap: 12,
   },

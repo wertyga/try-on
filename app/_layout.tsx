@@ -1,10 +1,10 @@
-import { View, Text, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { StripeProvider } from '@/stripe';
+import { StripeProvider } from '../stores/billings/stripe';
 import { installGlobalErrorHandlers } from '@/utils/errors';
 import React, { useEffect } from 'react';
 import { UpdateBanner } from '@/updates';

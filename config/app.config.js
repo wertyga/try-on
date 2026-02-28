@@ -1,6 +1,7 @@
 export const iosConfig = (version) => ({
   bundleIdentifier: 'com.wertyga.tryon',
   supportsTablet: true,
+  usesAppleSignIn: true,
   buildNumber: version.toString(),
   googleServicesFile: './GoogleService-Info.plist',
   infoPlist: {
@@ -35,7 +36,9 @@ export const androidConfig = (version) => {
 };
 
 export const pluginsConfig = [
+  ['expo-apple-authentication'],
   ['@react-native-firebase/app'],
+  ['expo-iap'],
   [
     'expo-build-properties',
     {

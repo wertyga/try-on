@@ -5,8 +5,8 @@ import {
   pluginsConfig,
 } from './config/app.config.js';
 
-const VERSION = '3.0.0';
-export const BUILD_VERSION = 13;
+const VERSION = '4.0.0';
+export const BUILD_VERSION = 15;
 
 export default (): ExpoConfig => ({
   name: 'try-on',

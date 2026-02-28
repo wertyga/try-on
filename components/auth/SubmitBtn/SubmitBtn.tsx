@@ -1,19 +1,22 @@
 import React from 'react';
 
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Button } from '@/components/ui/button';
-
-
-// import { CONSTANTS } from '@/styles/constants';
 
 type Props = {
   onPress: () => void;
   children: string;
+  isLoading?: boolean;
 };
 
-export const SubmitBtn = ({ onPress, children }: Props) => {
+export const SubmitBtn = ({ onPress, children, isLoading }: Props) => {
   return (
-    <Button style={styles.submitBtn} onPress={onPress}>
+    <Button
+      style={styles.submitBtn}
+      onPress={onPress}
+      dark
+      isLoading={isLoading}
+    >
       {children}
     </Button>
   );
@@ -24,7 +27,5 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
   },
-  submitText: {
-    // color: CONSTANTS.colors.bgDarkest,
-  },
+  submitText: {},
 });

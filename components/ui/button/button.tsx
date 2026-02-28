@@ -103,7 +103,7 @@ const s = StyleSheet.create({
   disabledTransparent: { opacity: 0.5 },
 
   // text
-  text: { fontWeight: '600' },
+  text: { fontWeight: 700 },
   textTransparent: { color: Colors.light.text },
   textDisabled: { color: '#9CA3AF' }, // gray-400
   textDisabledTransparent: { color: '#9CA3AF' },

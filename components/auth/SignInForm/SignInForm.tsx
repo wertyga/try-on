@@ -8,9 +8,10 @@ import { SIGNIN_FORM_SCHEMA } from './SignInForm.utils';
 
 type Props = {
   onSubmit: (data: any) => void;
+  isLoading?: boolean;
 };
 
-export const SignInForm = ({ onSubmit }: Props) => {
+export const SignInForm = ({ onSubmit, isLoading }: Props) => {
   const {
     handleSubmit,
     control,
@@ -57,7 +58,9 @@ export const SignInForm = ({ onSubmit }: Props) => {
         name="password"
       />
 
-      <SubmitBtn onPress={handleSubmit(onSubmit)}>Sign in</SubmitBtn>
+      <SubmitBtn onPress={handleSubmit(onSubmit)} isLoading={isLoading}>
+        Sign in
+      </SubmitBtn>
     </View>
   );
 };

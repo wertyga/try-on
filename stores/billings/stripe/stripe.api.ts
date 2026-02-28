@@ -1,21 +1,23 @@
 import { baseQuery } from '@/api/base';
 import {
   PaymentStatus,
-  TProductPack,
+  TStripeProductPack,
   TPaymentSheetParams,
 } from './stripe.types';
 
 export async function fetchStripeConfig(): Promise<{ publishableKey: string }> {
   const { data } = await baseQuery<{ publishableKey: string }>({
     method: 'get',
-    url: '/billing/config',
+    url: '/billing/stripe/config',
   });
 
   return data;
 }
 
-export async function fetchStripePacks(): Promise<{ packs: TProductPack[] }> {
-  const { data } = await baseQuery<{ packs: TProductPack[] }>({
+export async function fetchStripePacks(): Promise<{
+  packs: TStripeProductPack[];
+}> {
+  const { data } = await baseQuery<{ packs: TStripeProductPack[] }>({
     method: 'get',
     url: '/billing/packs',
   });

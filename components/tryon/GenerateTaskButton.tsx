@@ -71,12 +71,12 @@ export const GenerateTaskButton: FC = () => {
   const currentFp = payload ? fingerprintFromPayload(payload) : null;
 
   async function tryCreateTask() {
-    if (creating || !payload || !currentFp) return;
-
     if (!user) {
-      await signInWithGoogle();
+      router.push('/(tabs)/login');
       return;
     }
+
+    if (creating || !payload || !currentFp) return;
 
     // 1) Обновим billing state перед проверкой (чтобы не было "устаревших" значений)
     await credits.load();
@@ -128,10 +128,6 @@ export const GenerateTaskButton: FC = () => {
   }
 
   const ctaLabel = useMemo(() => {
-    if (!credits.canGenerate()) {
-      return t('credits.labels.getMoreGenerations');
-    }
-
     if (!user) {
       return (
         <View
@@ -141,16 +137,23 @@ export const GenerateTaskButton: FC = () => {
             gap: 10,
           }}
         >
-          <LoginIcon color="white" isLoading={isAuthLoading} />
           <Text style={s.primaryBtnText}>{t('auth.signIn')}</Text>
         </View>
       );
     }
 
+    if (!credits.canGenerate()) {
+      return t('credits.labels.getMoreGenerations');
+    }
+
     return creating ? t('queue.creating') : t('home.generate');
   }, [creating, user, isAuthLoading]);
 
-  const isDisabled = !payload || creating || hasPendingTask;
+  const isDisabled = useMemo(() => {
+    if (!user) return false;
+
+    return !payload || creating || hasPendingTask;
+  }, [payload, creating, hasPendingTask]);
 
   return (
     <Pressable
