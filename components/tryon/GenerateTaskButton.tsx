@@ -1,9 +1,15 @@
 import React, { FC, useMemo, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { TryOnPayload, useProductsStore, useTryOnStore } from '@/stores';
+import {
+  TryOnPayload,
+  useAuthStore,
+  useProductsStore,
+  useTryOnStore,
+  useUserStore,
+} from '@/stores';
 import { trackTaskCreateEvent, trackTaskSucceededEvent } from '@/analytics';
 import { createTask } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
@@ -11,6 +17,7 @@ import { fingerprintFromPayload } from '@/utils/hash';
 
 import { useCreditsStore } from '@/stores/creditStore';
 import { TaskStatus } from '@/types/task';
+import { LoginIcon } from '@/app/(tabs)/_layout';
 
 export const GenerateTaskButton: FC = () => {
   const {
@@ -26,6 +33,9 @@ export const GenerateTaskButton: FC = () => {
     accessories,
   } = useTryOnStore();
   const { fetchCategoriesForImages } = useProductsStore();
+
+  const { user } = useUserStore();
+  const { isLoading: isAuthLoading, signInWithGoogle } = useAuthStore();
 
   const credits = useCreditsStore();
   const [creating, setCreating] = useState(false);
@@ -61,6 +71,11 @@ export const GenerateTaskButton: FC = () => {
   const currentFp = payload ? fingerprintFromPayload(payload) : null;
 
   async function tryCreateTask() {
+    if (!user) {
+      router.push('/(tabs)/login');
+      return;
+    }
+
     if (creating || !payload || !currentFp) return;
 
     // 1) Обновим billing state перед проверкой (чтобы не было "устаревших" значений)
@@ -113,14 +128,32 @@ export const GenerateTaskButton: FC = () => {
   }
 
   const ctaLabel = useMemo(() => {
+    if (!user) {
+      return (
+        <View
+          style={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            gap: 10,
+          }}
+        >
+          <Text style={s.primaryBtnText}>{t('auth.signIn')}</Text>
+        </View>
+      );
+    }
+
     if (!credits.canGenerate()) {
       return t('credits.labels.getMoreGenerations');
     }
 
     return creating ? t('queue.creating') : t('home.generate');
-  }, [creating]);
+  }, [creating, user, isAuthLoading]);
 
-  const isDisabled = !payload || creating || hasPendingTask;
+  const isDisabled = useMemo(() => {
+    if (!user) return false;
+
+    return !payload || creating || hasPendingTask;
+  }, [payload, creating, hasPendingTask]);
 
   return (
     <Pressable

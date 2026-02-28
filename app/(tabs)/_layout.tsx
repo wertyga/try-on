@@ -18,7 +18,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
+export const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
   isLoading,
   color,
 }) => {
