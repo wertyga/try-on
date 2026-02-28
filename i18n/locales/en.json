@@ -129,6 +129,7 @@
   },
   "profile": {
     "title": "Profile",
+    "titleLogin": "Login",
     "stats": "Stats",
     "looks": "Looks",
     "garments": "Garments",
@@ -143,7 +144,10 @@
   },
   "auth": {
     "login": "Login",
+    "title": "Login",
+    "titlePasswordRecovery": "Password Recovery",
     "register": "Register",
+    "signInWithApple": "Sign in with Apple",
     "signInWithGoogle": "Sign in with Google",
     "forgotPassword": "Forgot password?",
     "signIn": "Sign in",
@@ -204,6 +208,9 @@
       "guestFreeGeneration": "{{count}} guest free generation",
       "guestFreeGeneration_plural": "{{count}} guest free generations",
       "noneLeft": "No generations left",
+      "resetsSoon": "Resets soon",
+      "resetsIn": "Resets in {{h}}h {{m}}m",
+      "resetsInMinutes": "Resets in {{m}}m",
       "getMoreGenerations": "Get more generations"
     }
   },

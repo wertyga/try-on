@@ -1,16 +1,28 @@
 import { Text, View, StyleSheet } from 'react-native';
 import React, { FC, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 
-function formatTimeLeft(resetsAt: string | null) {
+function formatTimeLeft(
+  resetsAt: string | null,
+  t: (key: string, options?: Record<string, number>) => string,
+) {
   if (!resetsAt) return null;
+
   const end = new Date(resetsAt).getTime();
   const diff = end - Date.now();
-  if (!Number.isFinite(end) || diff <= 0) return 'Resets soon';
+
+  if (!Number.isFinite(end) || diff <= 0) {
+    return t('credits.labels.resetsSoon');
+  }
+
   const totalMin = Math.floor(diff / 60000);
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
-  return h > 0 ? `Resets in ${h}h ${m}m` : `Resets in ${m}m`;
+
+  return h > 0
+    ? t('credits.labels.resetsIn', { h, m })
+    : t('credits.labels.resetsInMinutes', { m });
 }
 
 export const UserBalance: FC<{
@@ -19,7 +31,8 @@ export const UserBalance: FC<{
   credits: number;
   guestFreeLeft: number;
 }> = ({ resetsAt, credits, guestFreeLeft, freeDailyLeft }) => {
-  const timeLeft = useMemo(() => formatTimeLeft(resetsAt), [resetsAt]);
+  const { t } = useTranslation();
+  const timeLeft = useMemo(() => formatTimeLeft(resetsAt, t), [resetsAt, t]);
 
   return (
     <View>

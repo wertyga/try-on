@@ -50,7 +50,7 @@ export const Input = ({
 const styles = StyleSheet.create({
   field: {
     width: '100%',
-    borderColor: Colors.light.text,
+    borderColor: Colors.light.textDisabled,
     borderWidth: 1,
     borderRadius: 8,
     overflow: 'hidden',

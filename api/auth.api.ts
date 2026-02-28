@@ -14,3 +14,16 @@ export const oauthGoogleRegister = async (data: {
 
   return response;
 };
+
+export const oauthAppleRegister = async (data: {
+  authorizationCode: string;
+  identityToken: string;
+}): Promise<UserResponse> => {
+  const { data: response } = await baseQuery({
+    method: 'post',
+    url: '/auth/oauth/apple',
+    data,
+  });
+
+  return response;
+};

@@ -9,7 +9,7 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
   const { t } = useTranslation();
 
   const user = useUserStore((s) => s.user);
-  const isBuying = useCreditsStore((s) => s.isBuyingPackId === pack.id);
+  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
   const { buyPack } = useCreditsStore();
   const { signInWithGoogle } = useAuthStore();
 
@@ -22,28 +22,27 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
     await buyPack(pack.id);
   };
 
+  const isRenderPriceString = !!pack.credits && pack.priceLabel;
+
   return (
     <View key={pack.id} style={s.packCard}>
       <View style={{ flex: 1 }}>
         <View style={s.packTitleRow}>
           <Text style={s.packTitle}>{pack.title}</Text>
-          {pack.bestValue ? (
-            <View style={s.badge}>
-              <Text style={s.badgeText}>{t('pack.bestValue')}</Text>
-            </View>
-          ) : null}
         </View>
 
         {!!pack.description && (
           <Text style={s.packDesc}>{pack.description}</Text>
         )}
 
-        <Text style={s.packMeta}>
-          {t('pack.generationPrice', {
-            credits: pack.credits,
-            priceLabel: pack.priceLabel,
-          })}
-        </Text>
+        {isRenderPriceString && (
+          <Text style={s.packMeta}>
+            {t('pack.generationPrice', {
+              credits: pack.credits,
+              priceLabel: pack.priceLabel,
+            })}
+          </Text>
+        )}
 
         {pack.marketFeatures?.map(({ name }) => (
           <Text style={s.packDesc} key={name}>{`- ${name}`}</Text>

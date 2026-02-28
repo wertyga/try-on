@@ -12,9 +12,10 @@ import { REGISTER_FORM_SCHEMA } from './SignUpForm.utils';
 
 type Props = {
   onSubmit: (data: any) => void;
+  isLoading?: boolean;
 };
 
-export const SignUpForm = ({ onSubmit }: Props) => {
+export const SignUpForm = ({ onSubmit, isLoading }: Props) => {
   const {
     handleSubmit,
     control,
@@ -93,7 +94,9 @@ export const SignUpForm = ({ onSubmit }: Props) => {
         name="confirmPassword"
       />
 
-      <SubmitBtn onPress={handleSubmit(onSubmit)}>Sign up</SubmitBtn>
+      <SubmitBtn onPress={handleSubmit(onSubmit)} isLoading={isLoading}>
+        Sign up
+      </SubmitBtn>
     </View>
   );
 };

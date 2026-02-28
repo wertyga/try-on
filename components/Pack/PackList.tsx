@@ -3,7 +3,7 @@ import { PackListItem } from '@/components/Pack/PackListItem';
 import React, { FC } from 'react';
 import { Colors } from '@/constants/Colors';
 import { useTranslation } from 'react-i18next';
-import { TCreditPack } from '@/types';
+import { TCreditPack } from '@/stores/creditStore/credit.types';
 
 export const PackList: FC<{
   packs: TCreditPack[];

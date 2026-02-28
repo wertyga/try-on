@@ -1,10 +1,12 @@
+import { create } from 'zustand';
+
 import {
   fetchStripeConfig,
   fetchStripePacks,
   createPaymentSheet,
   fetchPayment,
 } from './stripe.api';
-import { PaymentStatus, TProductPack } from './stripe.types';
+import { PaymentStatus, TStripeProductPack } from './stripe.types';
 
 import {
   initPaymentSheet,
@@ -12,30 +14,30 @@ import {
 } from '@stripe/stripe-react-native';
 
 export type TStripeSliceState = {
-  packs: TProductPack[];
   publishableKey: string;
 };
 
 export type TStripeActionsSlice = {
   fetchStripeKey: () => Promise<void>;
-  fetchProductsPacks: () => Promise<void>;
+  fetchProductsPacks: () => Promise<TStripeProductPack[]>;
   waitPayment: (paymentId: string, timeoutMs?: number) => Promise<boolean>;
   buyStripeProduct: (packId: string) => Promise<void>;
 };
 
-export type TStripeSlice = TStripeSliceState & TStripeActionsSlice & {};
+export type TStripeStore = TStripeSliceState & TStripeActionsSlice & {};
 
-export const StripeSlice = (set: any, get: any): TStripeSlice => {
+export const useStripeStore = create((set: any, get: any): TStripeStore => {
   return {
-    packs: [],
     publishableKey: '',
 
-    fetchProductsPacks: async () => {
+    fetchProductsPacks: async (): Promise<TStripeProductPack[]> => {
       const { packs } = await fetchStripePacks();
 
-      set({
-        packs: (packs ?? []).filter((p: TProductPack) => p.isActive !== false),
-      });
+      const activePacks = (packs ?? []).filter(
+        (p: TStripeProductPack) => p.isActive !== false,
+      );
+
+      return activePacks;
     },
 
     fetchStripeKey: async () => {
@@ -43,6 +45,7 @@ export const StripeSlice = (set: any, get: any): TStripeSlice => {
 
       set({ publishableKey: cfg.publishableKey });
     },
+
     waitPayment: async (paymentId: string, timeoutMs = 25000) => {
       const started = Date.now();
 
@@ -62,6 +65,7 @@ export const StripeSlice = (set: any, get: any): TStripeSlice => {
 
       throw new Error('Payment confirmation timeout');
     },
+
     buyStripeProduct: async (priceId: string) => {
       const ps = await createPaymentSheet(priceId);
 
@@ -86,4 +90,4 @@ export const StripeSlice = (set: any, get: any): TStripeSlice => {
       await get().waitPayment(ps.paymentId);
     },
   };
-};
+});

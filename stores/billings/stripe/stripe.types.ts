@@ -4,7 +4,7 @@ export enum PaymentStatus {
   failed = 'failed',
 }
 
-export type TProductPack = {
+export type TStripeProductPack = {
   id: string; // packId (metadata.packId)
   priceId: string; // Stripe price id
   title: string;
