@@ -44,7 +44,7 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
           </Text>
         )}
 
-        {pack.marketFeatures?.map(({ name }) => (
+        {pack.marketFeatures?.filter(Boolean).map(({ name }) => (
           <Text style={s.packDesc} key={name}>{`- ${name}`}</Text>
         ))}
       </View>
