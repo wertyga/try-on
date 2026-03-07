@@ -79,6 +79,7 @@ const getTabs = ({
       icon: (color: string) => {
         return <MaterialIcons size={28} name="local-mall" color={color} />;
       },
+      hidden: true,
     },
     {
       name: 'tasks-list',

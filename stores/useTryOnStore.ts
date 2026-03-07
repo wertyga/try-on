@@ -14,6 +14,8 @@ export type GarmentImage = { uri: string; base64?: string } | null;
 export type GarmentMode = 'dress' | 'separate';
 
 export type TryOnPayload = {
+  sampleId?: string;
+
   dressBase64?: string;
   upperBase64?: string;
   lowerBase64?: string;

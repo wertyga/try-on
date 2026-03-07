@@ -4,3 +4,4 @@ export * from './useTryOnStore';
 export * from './useWardrobeStore';
 export * from './useUserStore';
 export * from './useProductsStore';
+export * from './useTryOnSamplesStore';

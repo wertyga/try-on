@@ -9,10 +9,7 @@ type Props = {
 };
 
 export function CreditsBadge({ variant = 'compact' }: Props) {
-  const { freeDailyLeft, credits, guestFreeLeft, isLoading } =
-    useCreditsStore();
-
-  if (isLoading) return null;
+  const { freeDailyLeft, credits, guestFreeLeft } = useCreditsStore();
 
   const parts: string[] = [];
 

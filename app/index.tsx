@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function Boot() {
-  const { status, user, getUserSelf } = useUserStore();
+  const { status, getUserSelf } = useUserStore();
 
   useEffect(() => {
     getUserSelf();
@@ -13,8 +13,8 @@ export default function Boot() {
   useEffect(() => {
     if (status !== 'ready') return;
 
-    router.replace(user ? '/(tabs)/try-on' : '/welcome');
-  }, [status, user]);
+    router.replace('/(tabs)/try-on');
+  }, [status]);
 
   return <LoadingScreen />;
 }
