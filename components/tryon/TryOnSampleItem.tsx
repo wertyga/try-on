@@ -34,6 +34,7 @@ const s = StyleSheet.create({
     width: 132,
     borderRadius: 14,
     padding: 4,
+    paddingBottom: 12,
   },
   itemSelected: {
     backgroundColor: '#FFFFFF',
@@ -54,6 +55,7 @@ const s = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginTop: 8,
+    marginLeft: 10,
     paddingHorizontal: 2,
   },
   itemTitleSelected: {

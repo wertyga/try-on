@@ -32,20 +32,3 @@ export const updateUserCategories = async (
 
   return data.user;
 };
-
-export const fetchDeviceId = async (): Promise<{
-  deviceId: string;
-  generationsLeft: number;
-}> => {
-  const { data } = await baseQuery({
-    method: 'get',
-    url: '/users/device-id',
-  });
-
-  const generations = Number(data.generationsLeft);
-
-  return {
-    deviceId: data.deviceId,
-    generationsLeft: Number.isNaN(generations) ? 1 : generations,
-  };
-};

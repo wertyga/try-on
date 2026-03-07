@@ -78,7 +78,5 @@ export function getGenerateButtonDisabled({
   creating: boolean;
   hasPendingTask: boolean;
 }) {
-  if (!user) return false;
-
-  return !payload || creating || hasPendingTask;
+  return !payload || creating || hasPendingTask || !payload.userBase64;
 }

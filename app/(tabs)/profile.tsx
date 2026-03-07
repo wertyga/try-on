@@ -48,7 +48,7 @@ export default function UserScreen() {
         style: 'destructive',
         onPress: () => {
           logout();
-          router.replace('/welcome');
+          router.replace('/(tabs)/try-on');
         },
       },
     ]);

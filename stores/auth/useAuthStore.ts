@@ -10,10 +10,12 @@ import { useTryOnStore } from '@/stores/useTryOnStore';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { TUser } from '@/types';
 import { useOAuthStore } from '@/stores/auth/useOauthStore';
+import { useUsageStore } from '@/stores/useUsageStore';
 import {
   TAuthEmailStore,
   useAuthEmailStore,
 } from '@/stores/auth/useAuthEmailStore';
+import { useCreditsStore } from '@/stores/creditStore';
 
 type TAuthStore = {
   isLoading: boolean;
@@ -140,5 +142,19 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     useUserStore.getState().dropUser();
     useTryOnStore.getState().clear();
     useWardrobeStore.getState().clear();
+    useUsageStore.getState().reset();
+
+    await useCreditsStore.getState().load();
+    //
+    // try {
+    //   const usage = await fetchDeviceId();
+    //
+    //   await useUsageStore.getState().update({
+    //     deviceId: usage.deviceId,
+    //     count: usage.generationsLeft,
+    //   });
+    // } catch (e: any) {
+    //   sendLogs(e?.message || 'Failed to refresh usage after logout');
+    // }
   },
 }));

@@ -4,40 +4,34 @@ import { fetchSelfUser, updateUserCategories } from '@/api/user.api';
 import { TUser } from '@/types';
 import { useTryOnStore } from '@/stores/useTryOnStore';
 import { useCreditsStore } from '@/stores/creditStore';
-import { deviceId } from '@/utils/hash';
+import { useAppStore } from '@/stores/appStore';
 
 type Status = 'idle' | 'loading' | 'ready';
 
-type UserStore = {
+export type TUserStoreState = {
   status: Status; // когда status === 'ready' — init завершён
   user: TUser | null;
   error: string | null;
   preferredProductCategories: string[];
+};
 
+export type TUserStoreActions = {
   setUser: (u: TUser | null) => void;
   dropUser: () => void; // logout: очищает storage и user
   updateUserCategories: (categories?: string[]) => void; // logout: очищает storage и user
 
   getUserSelf: () => Promise<void>;
 
-  deviceId: string;
-
   updateUserTasks: () => void;
-  updateDeviceId: (deviceId: string) => void;
 };
 
-export const useUserStore = create<UserStore>((set, get) => ({
+type TUserStore = TUserStoreState & TUserStoreActions & {};
+
+export const useUserStore = create<TUserStore>((set, get) => ({
   status: 'idle',
   user: null,
   error: null,
   preferredProductCategories: [],
-
-  deviceId: '',
-
-  updateDeviceId: (deviceIdKey: string) => {
-    deviceId.set(deviceIdKey);
-    set({ deviceId: deviceIdKey });
-  },
 
   setUser: (user) => {
     if (user?.token) {
@@ -85,12 +79,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
 
   getUserSelf: async () => {
-    // MOCK
-    // storage.set?.(
-    //   'token',
-    //   '5816903e471f1ac60fe63768c05d7ac93682c8c26553cf6cea655e775510b03d.88969e138042cf8ae1a4c62ce59859de4da0273c811f5ec2c257491d4b186528',
-    // );
-    //
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });
@@ -100,7 +88,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
       set({ user });
 
-      get().updateDeviceId(deviceId);
+      useAppStore.getState().updateDeviceId(deviceId);
 
       if (user) {
         get().updateUserTasks();

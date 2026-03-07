@@ -78,7 +78,7 @@ export const useOAuthStore = create<TAuthStore>((set, get) => ({
       const googleUser = await GoogleSignin.getCurrentUser();
 
       if (googleUser) {
-        await GoogleSignin.revokeAccess();
+        // await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut();
       }
     } catch (e) {}

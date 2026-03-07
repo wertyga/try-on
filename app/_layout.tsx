@@ -17,6 +17,7 @@ import '@/i18n';
 
 import { Button } from '@/components/ui/button';
 import { ErrorBox } from '@/components/ui/ErrorBox';
+import { useAppStore } from '@/stores/appStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,18 +27,22 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  const { getDeviceId, appDeviceId } = useAppStore();
+
   useEffect(() => {
-    if (loaded) {
+    const hasDeviceId = appDeviceId !== null;
+
+    if (loaded && hasDeviceId) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, appDeviceId]);
 
   useEffect(() => {
     Analytics.screen(pathname);
   }, [pathname]);
 
   useEffect(() => {
-    installGlobalErrorHandlers();
+    getDeviceId();
   }, []);
 
   if (!loaded) return null;
@@ -53,7 +58,6 @@ export default function RootLayout() {
           <GestureHandlerRootView>
             <Stack initialRouteName="index">
               <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="welcome" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
 

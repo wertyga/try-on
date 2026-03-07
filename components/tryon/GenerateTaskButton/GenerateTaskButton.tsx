@@ -40,11 +40,6 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   });
 
   async function tryCreateTask() {
-    if (!user) {
-      router.push('/(tabs)/login');
-      return;
-    }
-
     if (isDisabled || !payload || !fingerPrint) return;
 
     await credits.load();
@@ -89,10 +84,6 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   }
 
   const ctaLabel = useMemo(() => {
-    if (!user) {
-      return t('auth.signIn');
-    }
-
     if (!credits.canGenerate()) {
       return t('credits.labels.getMoreGenerations');
     }
