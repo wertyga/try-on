@@ -32,6 +32,7 @@ export type TryOnTaskAssets = {
   dress?: string;
   upper?: string;
   lower?: string;
+  outfit?: string;
 };
 
 export type TryOnTask = TTask & {

@@ -1,9 +1,11 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { useTryOnSamplesStore } from '@/stores/useTryOnSamplesStore';
+import {
+  TTryOnSample,
+  useTryOnSamplesStore,
+} from '@/stores/useTryOnSamplesStore';
 import { useFocus } from '@/hooks';
-import { TTryOnSample } from '@/api/task.api';
 import { TryOnSampleItem } from './TryOnSampleItem';
 
 type TTryOnSamplesListProps = {

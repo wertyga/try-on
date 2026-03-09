@@ -2,13 +2,7 @@ import { TryOnPayload } from '@/stores/useTryOnStore';
 import { baseQuery } from './base';
 import { Categories } from '@/types';
 import { TTask } from '@/types/task';
-
-export type TTryOnSample = {
-  _id: string;
-  image: string;
-  assets: string[];
-  title: string;
-};
+import { TTryOnSample } from '@/stores';
 
 export async function createTask(data: TryOnPayload): Promise<{
   task: TTask;
@@ -72,6 +66,15 @@ export async function getTask(taskId: string): Promise<TTask> {
   });
 
   return task;
+}
+
+export async function getTaskList(): Promise<TTask[]> {
+  const { data: tasks } = await baseQuery({
+    method: 'get',
+    url: `/task`,
+  });
+
+  return tasks;
 }
 
 export const getFinishedTask = async (

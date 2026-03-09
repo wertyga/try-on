@@ -1,13 +1,13 @@
 import React, { FC, useMemo, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { createTask, createTaskBySample } from '@/api';
-import { TTryOnSample } from '@/api/task.api';
 import { trackTaskSucceededEvent } from '@/analytics';
 import { getTryOnTaskFromTask } from '@/utils';
 import { getGenerateButtonDisabled } from './GenerateTaskButton.utils';
 import { useGenerateTaskData } from './useGenerateTaskData';
+import { TTryOnSample } from '@/stores';
 
 type TGenerateTaskButtonProps = {
   selfUpload?: boolean;

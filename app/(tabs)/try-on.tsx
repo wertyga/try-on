@@ -7,7 +7,7 @@ import { GenerateTaskButton } from '@/components/tryon';
 import { useCreditsStore } from '@/stores/creditStore';
 import { CreditsBadge } from '@/components/CreditsBadge';
 import { TryOnSamplesList } from '@/components/tryon/TryOnSamplesList';
-import { TTryOnSample } from '@/api/task.api';
+import { TTryOnSample } from '@/stores/useTryOnSamplesStore';
 import { UserPhotoUploader } from '@/components/tryon/UserPhotoUploader';
 
 export default function TryOn() {

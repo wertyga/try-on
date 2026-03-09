@@ -17,7 +17,7 @@ export type TTask = {
   upperImageUrl?: string;
   lowerImageUrl?: string;
   resultImageUrl?: string;
-  isByDescription?: boolean;
+  outfitImageUrl?: string;
   message?: string;
   error?: string;
   createdAt: string;

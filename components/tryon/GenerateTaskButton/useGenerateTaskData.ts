@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
-import { TTryOnSample } from '@/api/task.api';
 import { useCreditsStore } from '@/stores/creditStore';
-import { useProductsStore, useTryOnStore, useUserStore } from '@/stores';
+import {
+  TTryOnSample,
+  useProductsStore,
+  useTryOnStore,
+  useUserStore,
+} from '@/stores';
 import { fingerprintFromPayload } from '@/utils/hash';
-import { buildTryOnPayload, hasPendingTryOnTask } from './GenerateTaskButton.utils';
+import {
+  buildTryOnPayload,
+  hasPendingTryOnTask,
+} from './GenerateTaskButton.utils';
 import { trackTaskCreateEvent } from '@/analytics';
 
 export function useGenerateTaskData(

@@ -1,4 +1,3 @@
-import { TTryOnSample } from '@/api/task.api';
 import {
   GarmentMode,
   GarmentImage,
@@ -7,6 +6,7 @@ import {
   UserPhoto,
 } from '@/stores/useTryOnStore';
 import { TaskStatus } from '@/types/task';
+import { TTryOnSample } from '@/stores';
 
 type TBuildPayloadArgs = {
   selfUpload?: boolean;

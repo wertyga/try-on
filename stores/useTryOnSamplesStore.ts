@@ -1,5 +1,12 @@
 import { create } from 'zustand';
-import { fetchTryOnSamples, TTryOnSample } from '@/api/task.api';
+import { fetchTryOnSamples } from '@/api/task.api';
+
+export type TTryOnSample = {
+  _id: string;
+  image: string;
+  assets: string[];
+  title: string;
+};
 
 type TTryOnSamplesState = {
   samples: TTryOnSample[];

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Image, Pressable, StyleSheet, Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { TTryOnSample } from '@/api/task.api';
+import { TTryOnSample } from '@/stores';
 
 type TTryOnSampleItemProps = {
   item: TTryOnSample;

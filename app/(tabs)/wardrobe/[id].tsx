@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert, Share, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Alert, Share } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
@@ -21,6 +21,7 @@ type WardrobeItem = {
     dress?: string;
     upper?: string;
     lower?: string;
+    outfit?: string;
   };
 };
 
@@ -33,6 +34,7 @@ export default function WardrobeDetailScreen() {
   );
 
   const removeItem = useWardrobeStore((s) => s.remove);
+
   const [item, setItem] = useState<WardrobeItem | undefined>(undefined);
   const [loading, setLoading] = useState(!storeItem);
 
@@ -112,6 +114,14 @@ export default function WardrobeDetailScreen() {
 
   if (!id) return null;
 
+  const assets: string[][] = [
+    [item?.assets.model, t('wardrobe.model')],
+    [item?.assets.outfit, t('wardrobe.outfit')],
+    [item?.assets.dress, t('wardrobe.dress')],
+    [item?.assets.upper, t('wardrobe.top')],
+    [item?.assets.lower, t('wardrobe.bottom')],
+  ].filter(([image]) => !!image) as string[][];
+
   return (
     <Container.WithTabBar
       title={item?.title || t('wardrobe.detailTitle')}
@@ -134,23 +144,11 @@ export default function WardrobeDetailScreen() {
           {/* Sources */}
           <View style={s.card}>
             <Text style={s.cardTitle}>{t('wardrobe.sources')}</Text>
+
             <View style={s.assetsRow}>
-              <AssetThumb label={t('wardrobe.model')} uri={item.assets.model} />
-              {!!item.assets.dress && (
-                <AssetThumb
-                  label={t('wardrobe.dress')}
-                  uri={item.assets.dress}
-                />
-              )}
-              {!!item.assets.upper && (
-                <AssetThumb label={t('wardrobe.top')} uri={item.assets.upper} />
-              )}
-              {!!item.assets.lower && (
-                <AssetThumb
-                  label={t('wardrobe.bottom')}
-                  uri={item.assets.lower}
-                />
-              )}
+              {assets.map(([image, label]) => {
+                return <AssetThumb key={image} label={label} uri={image} />;
+              })}
             </View>
           </View>
 
