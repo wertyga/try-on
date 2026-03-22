@@ -1,16 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-  Alert,
-  useWindowDimensions,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, useUserStore } from '@/stores';
+import { useAuthStore, useModalsStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
 import { useCreditsStore } from '@/stores/creditStore';
@@ -26,6 +18,7 @@ export default function UserScreen() {
   const { load: loadCredits } = useCreditsStore();
   const { logout } = useAuthStore();
   const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
+  const { openPaywall } = useModalsStore();
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -91,13 +84,10 @@ export default function UserScreen() {
             />
           )}
         </View>
+
         <UserCredits />
 
-        <Button
-          onPress={() => router.push('/paywall')}
-          style={s.paywallLink}
-          transparent
-        >
+        <Button onPress={openPaywall} style={s.paywallLink} transparent>
           See paywall
         </Button>
       </View>

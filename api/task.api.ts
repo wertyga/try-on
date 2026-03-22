@@ -2,7 +2,7 @@ import { TryOnPayload } from '@/stores/useTryOnStore';
 import { baseQuery } from './base';
 import { Categories } from '@/types';
 import { TTask } from '@/types/task';
-import { TTryOnSample } from '@/stores';
+import { TTryOnPreset, TTryOnSample } from '@/stores';
 
 export async function createTask(data: TryOnPayload): Promise<{
   task: TTask;
@@ -41,6 +41,24 @@ export async function createTaskBySample(
   return {
     task: create.task,
     imagesCategories: create.imagesCategories,
+  };
+}
+
+export async function createTaskByPreset(data: {
+  presetId: string;
+  imageBase64: string;
+  taskId?: string;
+}): Promise<{
+  task: TTask;
+}> {
+  const { data: create } = await baseQuery({
+    method: 'post',
+    url: '/tryon-preset',
+    data,
+  });
+
+  return {
+    task: create.task,
   };
 }
 
@@ -107,4 +125,16 @@ export async function fetchTryOnSamples(): Promise<TTryOnSample[]> {
   });
 
   return samples ?? [];
+}
+
+export async function fetchTryOnPresets(): Promise<TTryOnPreset[]> {
+  const {
+    data: { presets },
+  } = await baseQuery<{ presets: TTryOnPreset[] }>({
+    method: 'get',
+    url: '/tryon-preset/list',
+    silentError: true,
+  });
+
+  return presets ?? [];
 }

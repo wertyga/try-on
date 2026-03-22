@@ -9,6 +9,8 @@ import { useAuthStore } from '@/stores/auth/useAuthStore';
 import { useStripeStore } from '@/stores/billings/stripe';
 import { useIapStore } from '@/stores/billings/iap';
 import { TCreditPack } from './credit.types';
+import { useModalsStore } from '@/stores/useModalsStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 type TCreditsState = {
   settings: TSettings | null;
@@ -35,7 +37,7 @@ type TCreditsState = {
 
 type TCreditsActions = {
   load: () => Promise<void>;
-  canGenerate: () => boolean;
+  canGenerate: (showFallbackModal?: boolean) => boolean;
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
   clearError: () => void;
@@ -174,12 +176,25 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
     }
   },
 
-  canGenerate: () => {
+  canGenerate: (showFallbackModal = false) => {
     const s = get();
 
     if ((s.freeDailyLeft ?? 0) > 0) return true;
     if ((s.credits ?? 0) > 0) return true;
     if ((s.guestFreeLeft ?? 0) > 0) return true;
+
+    if (showFallbackModal) {
+      const modals = useModalsStore.getState();
+      const user = useUserStore.getState().user;
+
+      modals.closeAllModals();
+
+      if (user) {
+        modals.openPaywall();
+      } else {
+        modals.openLogin();
+      }
+    }
 
     return false;
   },

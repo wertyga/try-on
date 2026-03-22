@@ -1,58 +1,16 @@
-import { Tabs } from 'expo-router';
+import { Href, Tabs, router, usePathname } from 'expo-router';
 import React, { FC } from 'react';
-import AntDesignIcons from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { Colors } from '@/constants/Colors';
 
 import { useUserStore } from '@/stores/useUserStore';
 import { useWardrobeAutoSync } from '@/stores/useWardrobeStore';
+import { useCreditsStore } from '@/stores/creditStore';
 
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-export const LoginIcon: FC<{ isLoading: boolean; color: string }> = ({
-  isLoading,
-  color,
-}) => {
-  const rotation = useSharedValue(0);
-
-  React.useEffect(() => {
-    if (isLoading) {
-      rotation.value = withRepeat(
-        withTiming(360, {
-          duration: 900,
-          easing: Easing.linear,
-        }),
-        -1,
-        false,
-      );
-    } else {
-      rotation.value = 0;
-    }
-  }, [isLoading, rotation]);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
-
-  if (!isLoading) {
-    return <AntDesignIcons size={28} name="google" color={color} />;
-  }
-
-  return (
-    <Animated.View style={style}>
-      <AntDesignIcons size={28} name="loading1" color={color} />
-    </Animated.View>
-  );
-};
 
 const getTabs = ({
   signedIn,
@@ -108,7 +66,7 @@ const getTabs = ({
       name: 'profile',
       title: signedIn ? 'User' : 'Login in',
       icon: (color: string) => {
-        return <MaterialIcons size={28} name="person" color={color} />;
+        return <ProfileTabIcon color={color} />;
       },
     },
     {
@@ -124,15 +82,26 @@ const getTabs = ({
       },
       hidden: true,
     },
+    {
+      name: 'task/[id]',
+      title: 'task_id',
+      hidden: true,
+    },
   ];
 };
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const pathname = usePathname();
 
   const { user } = useUserStore();
+  const loadCredits = useCreditsStore((s) => s.load);
 
   useWardrobeAutoSync();
+
+  React.useEffect(() => {
+    loadCredits();
+  }, [loadCredits, user?._id]);
 
   return (
     <Tabs
@@ -149,7 +118,7 @@ export default function TabLayout() {
     >
       {getTabs({ signedIn: !!user }).map(
         ({ name, title, icon, withLogin, hidden }) => {
-          let href = null;
+          let href: Href | null | undefined = null;
 
           if (withLogin === false && !user) {
             href = undefined;
@@ -170,6 +139,19 @@ export default function TabLayout() {
                 href,
                 tabBarIcon: ({ color }) => (icon ? icon(color) : null),
               }}
+              listeners={{
+                tabPress: (event) => {
+                  if (name !== 'profile' || !!user) return;
+
+                  event.preventDefault();
+                  router.push({
+                    pathname: '/(tabs)/login',
+                    params: {
+                      redirectTo: pathname,
+                    },
+                  });
+                },
+              }}
             />
           );
         },
@@ -177,3 +159,45 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const ProfileTabIcon = ({ color }: { color: string }) => {
+  const credits = useCreditsStore((s) => s.credits ?? 0);
+  const label = `Credits: ${credits}`;
+
+  return (
+    <View style={s.profileIconWrap}>
+      <MaterialIcons size={28} name="person" color={color} />
+
+      <View style={s.creditsBadge}>
+        <Text style={s.creditsText}>{label}</Text>
+      </View>
+    </View>
+  );
+};
+
+const s = StyleSheet.create({
+  profileIconWrap: {
+    width: 34,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  creditsBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 64,
+    height: 22,
+    paddingHorizontal: 8,
+    borderTopLeftRadius: 999,
+    borderBottomLeftRadius: 999,
+    backgroundColor: '#111827',
+  },
+  creditsText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#fff',
+  },
+});

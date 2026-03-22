@@ -20,15 +20,10 @@ export const useUsageStore = create<TUsageStore>((set) => ({
       count: usage.count ?? 0,
       isAllowed: (usage.count as number) > 0,
     });
-
-    // if (usage?.deviceId) {
-    //   await deviceId.set(usage.deviceId);
-    // }
   },
 
   reset: () => {
     set({
-      // deviceId: '',
       count: 0,
       isAllowed: false,
     });

@@ -13,7 +13,7 @@ const DISMISSED_KEY_PREFIX = 'dismissed_binary_update_v_';
 
 // Android package / iOS app id
 const ANDROID_PACKAGE = 'com.wertyga.tryon';
-const IOS_APP_ID = 'YOUR_APP_ID';
+const IOS_APP_ID = 'com.wertyga.tryon';
 
 export function openStorePage() {
   if (Platform.OS === 'android') {

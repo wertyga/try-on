@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { TaskItem } from '@/components/tryon';
 import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 import { retryTaskCreate } from '@/api';
@@ -18,20 +19,16 @@ export default function TryOnQueueScreen() {
   const { tasks, updateTask, removeTask, clearFinished, fetchFinishedTask } =
     useTryOnStore();
 
-  useEffect(() => {
-    const fetchUnCompletedTasks = () => {
-      tasks
-        .filter(
-          (t) =>
-            t.status === TaskStatus.running || t.status === TaskStatus.queued,
-        )
-        .forEach((task) => {
-          fetchFinishedTask(task.id);
-        });
-    };
-
-    fetchUnCompletedTasks();
-  }, [tasks]);
+  const fetchUnCompletedTasks = () => {
+    tasks
+      .filter(
+        (t) =>
+          t.status === TaskStatus.running || t.status === TaskStatus.queued,
+      )
+      .forEach((task) => {
+        fetchFinishedTask(task.id);
+      });
+  };
 
   async function retryTask(tryOnTask: TryOnTask) {
     try {
@@ -84,6 +81,10 @@ export default function TryOnQueueScreen() {
     }
   };
 
+  useEffect(() => {
+    fetchUnCompletedTasks();
+  }, [tasks]);
+
   const empty = useMemo(
     () => (
       <View style={{ alignItems: 'center', marginTop: 24 }}>
@@ -95,7 +96,16 @@ export default function TryOnQueueScreen() {
     [t],
   );
 
-  const hasFinishedTask = !!tasks.find(
+  const sortedTasks = useMemo(
+    () =>
+      [...tasks].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
+    [tasks],
+  );
+
+  const completedTask = sortedTasks.find(
     (t) => t.status === TaskStatus.completed,
   );
 
@@ -103,7 +113,7 @@ export default function TryOnQueueScreen() {
     <Container.WithTabBar title={t('queue.title')}>
       <SaveLooksGate style={{ marginBottom: 12 }} />
 
-      {hasFinishedTask && (
+      {!!completedTask && (
         <View style={s.actions}>
           <Pressable style={s.btnLight} onPress={clearFinished}>
             <Text style={s.btnLightText}>{t('queue.clearFinished')}</Text>
@@ -111,15 +121,20 @@ export default function TryOnQueueScreen() {
         </View>
       )}
 
-      {!tasks.length && empty}
+      {!sortedTasks.length && empty}
 
-      {tasks.map((item) => (
+      {sortedTasks.map((item) => (
         <TaskItem
           key={item.id}
           task={item}
           isLoading={taskLoading === item.id}
           onRetry={retryTask}
           onRemove={handleRemoveTask}
+          onOpen={
+            item.status === TaskStatus.completed
+              ? () => router.push(`/(tabs)/task/${item.id}`)
+              : undefined
+          }
         />
       ))}
     </Container.WithTabBar>

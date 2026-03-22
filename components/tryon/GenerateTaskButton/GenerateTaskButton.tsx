@@ -44,10 +44,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
 
     await credits.load();
 
-    if (!credits.canGenerate()) {
-      router.push('/paywall');
-      return;
-    }
+    if (!credits.canGenerate(true)) return;
 
     setCreating(true);
 
@@ -55,11 +52,12 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
       trackTaskCreating();
 
       if (selfUpload) {
-        fetchCategoriesForImages({
-          upperBase64: payload.upperBase64,
-          dressBase64: payload.dressBase64,
-          lowerBase64: payload.lowerBase64,
-        });
+        // TODO: Disable for now
+        // fetchCategoriesForImages({
+        //   upperBase64: payload.upperBase64,
+        //   dressBase64: payload.dressBase64,
+        //   lowerBase64: payload.lowerBase64,
+        // });
       }
 
       if (!selfUpload && !payload.sampleId) return;
@@ -68,7 +66,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
         ? await createTask(payload)
         : await createTaskBySample({
             sampleId: payload.sampleId!,
-            mode: payload.mode,
+            mode: 'sample',
             userBase64: payload.userBase64,
           });
 
@@ -77,7 +75,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
 
       await credits.onGenerationSuccess();
 
-      router.push('/(tabs)/tasks-list');
+      router.push(`/(tabs)/task/${task._id}`);
     } finally {
       setCreating(false);
     }

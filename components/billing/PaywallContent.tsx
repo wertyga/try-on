@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import { useCreditsStore } from '@/stores/creditStore';
 import { PackList } from '@/components/Pack';
 import { UserCredits } from '@/components/user/UserCredits/UserCredits';
-import { ErrorBox } from '@/components/ui/ErrorBox';
+import { StatusBox } from '@/components/ui/StatusBox';
 import { useFocus } from '@/hooks';
 
-export default function PaywallContent() {
+export function PaywallContent() {
   const { fetchPacks, isLoading, error, clearError, packs } =
     useCreditsStore();
 
@@ -21,7 +21,14 @@ export default function PaywallContent() {
 
       <PackList packs={packs} isLoading={isLoading} />
 
-      <ErrorBox error={error} clearError={clearError} />
+      <StatusBox
+        message={error}
+        variant="error"
+        hint="Tap to dismiss"
+        onPress={clearError}
+      />
     </View>
   );
 }
+
+export default PaywallContent;

@@ -51,9 +51,11 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
       await Analytics.userId(user.email);
       await Analytics.userProp('auth', 'user');
 
-      router.replace('/try-on');
-
-      callback?.();
+      if (callback) {
+        callback();
+      } else {
+        router.replace('/try-on');
+      }
     } catch (e: any) {
       Analytics.event('login_apple_error', {
         code: e.code || 'unknown',
@@ -87,9 +89,11 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
       await Analytics.userId(user.email);
       await Analytics.userProp('auth', 'user');
 
-      router.replace('/try-on');
-
-      callback?.();
+      if (callback) {
+        callback();
+      } else {
+        router.replace('/try-on');
+      }
     } catch (e: any) {
       Analytics.event('login_google_error', {
         code: e.code || 'unknown',
@@ -145,16 +149,5 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     useUsageStore.getState().reset();
 
     await useCreditsStore.getState().load();
-    //
-    // try {
-    //   const usage = await fetchDeviceId();
-    //
-    //   await useUsageStore.getState().update({
-    //     deviceId: usage.deviceId,
-    //     count: usage.generationsLeft,
-    //   });
-    // } catch (e: any) {
-    //   sendLogs(e?.message || 'Failed to refresh usage after logout');
-    // }
   },
 }));

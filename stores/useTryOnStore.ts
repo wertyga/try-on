@@ -11,7 +11,7 @@ export type UserPhoto = {
 } | null;
 
 export type GarmentImage = { uri: string; base64?: string } | null;
-export type GarmentMode = 'dress' | 'separate';
+export type GarmentMode = 'dress' | 'separate' | 'preset' | 'sample';
 
 export type TryOnPayload = {
   sampleId?: string;
@@ -33,6 +33,10 @@ export type TryOnTaskAssets = {
   upper?: string;
   lower?: string;
   outfit?: string;
+  preset?: string;
+  glasses?: string;
+  hairstyle?: string;
+  accessories?: string;
 };
 
 export type TryOnTask = TTask & {
@@ -79,20 +83,14 @@ type TryOnState = TTryOnImages & {
   updateTasksState: (tasks: TryOnTask[]) => void;
   removeTask: (id: string) => Promise<void>;
   addTask: (t: TryOnTask) => void;
-  addBunchTasks: (t: TryOnTask[]) => void;
   updateTask: (id: string, patch: Partial<TryOnTask>) => void;
 
   clear: () => void;
 
   init: () => Promise<void>;
-};
 
-const sortTasks = (arr: TryOnTask[]) =>
-  [...arr].sort((a, b) => {
-    const da = new Date((a as any).createdAt ?? 0).getTime();
-    const db = new Date((b as any).createdAt ?? 0).getTime();
-    return db - da; // новые сверху
-  });
+  getTask: (id: string) => TryOnTask | undefined;
+};
 
 export const useTryOnStore = create<TryOnState>((set, get) => ({
   userPhoto: null,
@@ -110,9 +108,12 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   consent: false,
 
   init: async () => {
-    const userPhoto = await storage.get('userPhoto');
+    const [userPhoto, tasks] = await Promise.all([
+      storage.get('userPhoto'),
+      storage.get('tasks'),
+    ]);
 
-    set({ userPhoto });
+    set({ userPhoto, tasks });
   },
 
   setConsent: (consent: boolean) => {
@@ -138,7 +139,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   setMode: async (mode) => {
-    set((state) =>
+    set(() =>
       mode === 'dress'
         ? { mode, upper: null, lower: null }
         : { mode, dress: null },
@@ -146,6 +147,10 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
 
     await Analytics.event('garment_mode_set', { mode });
     Analytics.userProp('tryon_mode', mode);
+  },
+
+  getTask: (id) => {
+    return get().tasks.find((task) => task.id === id);
   },
 
   resetInputs: () => {
@@ -162,11 +167,8 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   addTask: (t) => {
     const updatedTaskList = [t, ...get().tasks];
 
-    storage.set('userPhoto', { uri: t.assets.model, base64: t.assets.model });
-
     get().updateTasksState(updatedTaskList);
   },
-  addBunchTasks: (tasks) => set((s) => ({ tasks: [...tasks, ...s.tasks] })),
 
   updateTask: (id, patch) => {
     const updatedTaskList = get().tasks.map((x) =>
@@ -186,6 +188,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     }
 
     const updatedTaskList = get().tasks.filter((x) => x.id !== id);
+
     get().updateTasksState(updatedTaskList);
   },
 
@@ -196,17 +199,9 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   addTasksList: (tasks: TryOnTask[]) => {
-    const map = new Map<string, TryOnTask>();
+    const allTasks = [...tasks, ...get().tasks];
 
-    // чтобы данные “обновлялись”, но порядок был по времени — просто мержим и сортим
-    for (const t of get().tasks) map.set(t.id, t);
-    for (const t of tasks) map.set(t.id, { ...map.get(t.id), ...t });
-
-    const merged = Array.from(map.values());
-    const sorted = sortTasks(merged);
-
-    set({ tasks: sorted });
-    storage.set('tasks', sorted);
+    get().updateTasksState(allTasks);
   },
 
   clear: () => {
@@ -224,18 +219,20 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
         x.status !== TaskStatus.completed && x.status !== TaskStatus.failed,
     );
 
-    storage.set('tasks', updatedTaskList);
-
-    set({ tasks: updatedTaskList });
+    get().updateTasksState(updatedTaskList);
   },
 
   fetchFinishedTask: async (id: string) => {
     try {
       const task = await getFinishedTask(id);
+      const prevTask = get().getTask(id);
+      const nextTask = getTryOnTaskFromTask(task);
 
-      get().updateTask(id, getTryOnTaskFromTask(task));
+      if (prevTask?.assets.preset && !nextTask.assets.preset) {
+        nextTask.assets.preset = prevTask.assets.preset;
+      }
 
-      useUserStore.getState().getUserSelf();
+      get().updateTask(id, nextTask);
     } catch (e: any) {
       get().updateTask(id, { error: e.message, status: TaskStatus.failed });
     }

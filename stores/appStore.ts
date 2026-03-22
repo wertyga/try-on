@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { Platform } from 'react-native';
 import * as Application from 'expo-application';
-import { deviceId } from '@/utils/hash';
 
 export type TAppStoreState = {
   appDeviceId: string | null;

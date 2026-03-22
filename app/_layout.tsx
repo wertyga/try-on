@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '../stores/billings/stripe';
 import { installGlobalErrorHandlers } from '@/utils/errors';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UpdateBanner } from '@/updates';
 import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
@@ -16,8 +16,9 @@ import 'react-native-reanimated';
 import '@/i18n';
 
 import { Button } from '@/components/ui/button';
-import { ErrorBox } from '@/components/ui/ErrorBox';
+import { StatusBox } from '@/components/ui/StatusBox';
 import { useAppStore } from '@/stores/appStore';
+import { ModalsList } from '@/components/ModalsList';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,6 +29,8 @@ export default function RootLayout() {
   });
 
   const { getDeviceId, appDeviceId } = useAppStore();
+
+  const [state, setState] = useState(true);
 
   useEffect(() => {
     const hasDeviceId = appDeviceId !== null;
@@ -62,8 +65,9 @@ export default function RootLayout() {
             </Stack>
 
             <StatusBar style="auto" />
-            <Toast />
             <UpdateBanner />
+            <ModalsList />
+            <Toast />
           </GestureHandlerRootView>
         </StripeProvider>
       </SafeAreaView>
@@ -88,7 +92,7 @@ export function ErrorBoundary({
       >
         <View style={{ padding: 16 }}>
           <View style={{ marginBottom: 16 }}>
-            <ErrorBox error={String(error?.message)} />
+            <StatusBox message={String(error?.message)} variant="error" />
           </View>
 
           <Button onPress={retry} dark>

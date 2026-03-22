@@ -12,6 +12,8 @@ export type TTask = {
   owner?: TUser | string;
   status: TaskStatus;
   _id: string;
+  preset?: string;
+  sample?: string;
   userImageUrl: string;
   dressImageUrl?: string;
   upperImageUrl?: string;

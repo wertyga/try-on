@@ -1,23 +1,22 @@
 import { TryOnTaskAssets } from '@/stores/useTryOnStore';
-import { TTryOnSample } from '@/stores';
 
 export type WardrobeItem = {
   _id: string;
+  user?: string;
   title?: string;
   imageUrl: string;
   createdAt: string;
-  sample: TTryOnSample;
+  sample?: {
+    image?: string;
+    title?: string;
+  };
+  preset?: {
+    image?: string;
+    title?: string;
+  };
   assets: TryOnTaskAssets;
-};
-
-export type TSaveWardrobeAssetsPayload = {
-  assets: TryOnTaskAssets;
-};
-export type TSaveWardrobeSamplePayload = {
-  sampleId: string;
 };
 
 export type TSaveWardrobePayload = {
-  title?: string;
-  imageUrl: string;
-} & (TSaveWardrobeAssetsPayload | TSaveWardrobeSamplePayload);
+  taskId: string;
+};

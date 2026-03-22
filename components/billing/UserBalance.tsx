@@ -32,19 +32,19 @@ export const UserBalance: FC<{
   guestFreeLeft: number;
 }> = ({ resetsAt, credits, guestFreeLeft, freeDailyLeft }) => {
   const { t } = useTranslation();
-  const timeLeft = useMemo(() => formatTimeLeft(resetsAt, t), [resetsAt, t]);
+  // const timeLeft = useMemo(() => formatTimeLeft(resetsAt, t), [resetsAt, t]);
 
   return (
     <View>
       <View style={s.rowBetween}>
         <Text style={s.title}>Your balance</Text>
-        {!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}
+        {/*{!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}*/}
       </View>
 
-      <View style={s.line}>
-        <Text style={s.label}>Free today</Text>
-        <Text style={s.value}>{freeDailyLeft ?? 0}</Text>
-      </View>
+      {/*<View style={s.line}>*/}
+      {/*  <Text style={s.label}>Free today</Text>*/}
+      {/*  <Text style={s.value}>{freeDailyLeft ?? 0}</Text>*/}
+      {/*</View>*/}
 
       <View style={s.line}>
         <Text style={s.label}>Credits</Text>
@@ -58,7 +58,7 @@ export const UserBalance: FC<{
         </View>
       ) : null}
 
-      <Text style={s.hint}>Free resets daily. Credits never expire.</Text>
+      {/*<Text style={s.hint}>Free resets daily. Credits never expire.</Text>*/}
     </View>
   );
 };

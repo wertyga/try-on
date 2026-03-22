@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/button';
 import { FONTS } from '@/types';
 import { useAuthStore } from '@/stores';
 
-const OauthGoogle = () => {
+const OauthGoogle = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { isLoading, signInWithGoogle } = useAuthStore();
 
   const signIn = async () => {
-    await signInWithGoogle();
+    await signInWithGoogle(onSuccess);
   };
 
   return (

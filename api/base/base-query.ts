@@ -64,7 +64,6 @@ export const baseQuery = async <R = any>({
 
     return { data: data?.data } as any;
   } catch (e: any) {
-    // console.log({ e }, config.url, JSON.stringify(e, null, 2));
     const { message, status } = buildAPIError(e);
 
     if (!silentError && status !== 403) {

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { StyleSheet } from 'react-native';
 import { Button } from '@/components/ui/button';
+import { FONTS } from '@/types';
 
 type Props = {
   onPress: () => void;
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
   submitBtn: {
     width: '100%',
     marginTop: 20,
+    fontFamily: FONTS.OpenSansSemiBold,
   },
   submitText: {},
 });

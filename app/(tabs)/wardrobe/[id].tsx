@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert, Share } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  Share,
+  useWindowDimensions,
+} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { createTaskBySample } from '@/api';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { Button } from '@/components/ui/button';
@@ -10,24 +19,57 @@ import { Analytics } from '@/analytics';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 import { Colors } from '@/constants/Colors';
+import { DownloadImageButton } from '@/components/DownloadImageButton';
+import { MaterialIcons } from '@expo/vector-icons';
+import { PresetsList, TryOnSamplesList } from '@/components/tryon';
+import {
+  TTryOnPreset,
+  TTryOnSample,
+  useTryOnPresetsStore,
+  useTryOnStore,
+} from '@/stores';
+import { useCreditsStore } from '@/stores/creditStore';
+import { getTryOnTaskFromTask } from '@/utils';
+import { hash } from '@/utils/hash';
 
 type WardrobeItem = {
   _id: string;
+  user?: string;
   title?: string;
   imageUrl: string;
   createdAt: string;
+  sample?: {
+    image?: string;
+    title?: string;
+  };
+  preset?: {
+    image?: string;
+    title?: string;
+  };
+  mode?: 'dress' | 'separate' | 'preset' | 'sample';
   assets: {
     model: string;
     dress?: string;
     upper?: string;
     lower?: string;
     outfit?: string;
+    preset?: string;
+    glasses?: string;
+    hairstyle?: string;
+    accessories?: string;
   };
 };
 
 export default function WardrobeDetailScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { height: windowHeight } = useWindowDimensions();
+  const credits = useCreditsStore();
+  const addTask = useTryOnStore((s) => s.addTask);
+  const creatingPresetId = useTryOnPresetsStore((s) => s.creatingPresetId);
+  const createTaskWithPreset = useTryOnPresetsStore(
+    (s) => s.createTaskWithPreset,
+  );
 
   const storeItem = useWardrobeStore((s) =>
     s.items.find((it) => it._id === id),
@@ -37,6 +79,7 @@ export default function WardrobeDetailScreen() {
 
   const [item, setItem] = useState<WardrobeItem | undefined>(undefined);
   const [loading, setLoading] = useState(!storeItem);
+  const [creatingSampleId, setCreatingSampleId] = useState<string | null>(null);
 
   useEffect(() => {
     setItem(storeItem);
@@ -112,30 +155,152 @@ export default function WardrobeDetailScreen() {
     } catch {}
   }, [item]);
 
+  const handleSampleSelect = (sample: TTryOnSample) => {
+    if (!item) return;
+
+    Alert.alert(t('samples.confirmTitle'), t('samples.confirmText'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.continue'),
+        onPress: async () => {
+          await credits.load();
+
+          if (!credits.canGenerate(true)) return;
+
+          try {
+            setCreatingSampleId(sample._id);
+
+            const { task } = await createTaskBySample({
+              sampleId: sample._id,
+              mode: 'sample',
+              userBase64: item.imageUrl,
+            });
+
+            addTask(
+              getTryOnTaskFromTask(
+                task,
+                `${sample._id}|${hash(item.imageUrl)}`,
+                false,
+              ),
+            );
+
+            await credits.onGenerationSuccess();
+
+            router.push(`/(tabs)/task/${task._id}`);
+          } catch (e: any) {
+            Alert.alert(
+              t('common.error'),
+              e?.message || t('errors.failedToCreate'),
+            );
+          } finally {
+            setCreatingSampleId(null);
+          }
+        },
+      },
+    ]);
+  };
+
+  const handlePresetSelect = (preset: TTryOnPreset) => {
+    if (!item) return;
+
+    Alert.alert(t('presets.confirmTitle'), t('presets.confirmText'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.continue'),
+        onPress: async () => {
+          await credits.load();
+
+          if (!credits.canGenerate(true)) return;
+
+          try {
+            const task = await createTaskWithPreset({
+              presetId: preset._id,
+              image: item.imageUrl,
+              presetImage: preset.image,
+            });
+
+            if (task) {
+              router.push(`/(tabs)/task/${task._id}`);
+            }
+          } catch (e: any) {
+            Alert.alert(
+              t('common.error'),
+              e?.message || t('errors.failedToCreate'),
+            );
+          }
+        },
+      },
+    ]);
+  };
+
   if (!id) return null;
 
   const assets: string[][] = [
-    [item?.assets.model, t('wardrobe.model')],
-    [item?.assets.outfit, t('wardrobe.outfit')],
-    [item?.assets.dress, t('wardrobe.dress')],
-    [item?.assets.upper, t('wardrobe.top')],
-    [item?.assets.lower, t('wardrobe.bottom')],
+    [item?.assets?.outfit, t('wardrobe.outfit')],
+    [item?.assets?.dress, t('wardrobe.dress')],
+    [item?.assets?.upper, t('wardrobe.top')],
+    [item?.assets?.lower, t('wardrobe.bottom')],
+    [item?.assets?.glasses, t('wardrobe.glasses')],
+    [item?.assets?.hairstyle, t('wardrobe.hairstyle')],
+    [item?.assets?.accessories, t('wardrobe.accessories')],
   ].filter(([image]) => !!image) as string[][];
+
+  if (item?.assets?.model) {
+    assets.unshift([item.assets.model, t('wardrobe.model')]);
+  }
+
+  if (item?.sample?.image) {
+    assets.splice(1, 0, [
+      item.sample.image,
+      item.sample.title || t('wardrobe.sample'),
+    ]);
+  }
+
+  if (item?.preset?.image) {
+    assets.splice(2, 0, [
+      item.preset.image,
+      item.preset.title || t('wardrobe.preset'),
+    ]);
+  }
+
+  const minContentHeight = Math.max(420, windowHeight - 240);
 
   return (
     <Container.WithTabBar
       title={item?.title || t('wardrobe.detailTitle')}
       isLoading={loading}
+      childrenStyle={s.containerInner}
     >
       {item && (
-        <>
+        <View style={[s.content, { minHeight: minContentHeight }]}>
           {/* Hero */}
-          <ImageZoom
-            source={{ uri: item.imageUrl }}
-            style={s.heroWrap}
-            imageStyle={s.heroImage}
-            withDownload
-          />
+          <View style={s.heroWrap}>
+            <ImageZoom
+              source={{ uri: item.imageUrl }}
+              style={s.heroImageWrap}
+              imageStyle={s.heroImage}
+            />
+
+            <View style={s.actions}>
+              <ButtonWithConfirm
+                dark
+                style={s.actionButton}
+                onPress={onDelete}
+                alertText={t('alerts.deleteLookTitle')}
+              >
+                <MaterialIcons name="delete-outline" size={24} color="#fff" />
+              </ButtonWithConfirm>
+
+              <DownloadImageButton
+                imageUrl={item.imageUrl}
+                style={s.actionButton}
+              />
+
+              <Button dark style={s.actionButton} onPress={onShare}>
+                <MaterialIcons name="share" size={22} color="#fff" />
+              </Button>
+            </View>
+          </View>
 
           <Text style={s.muted}>
             {t('wardrobe.createdAt', { date: created })}
@@ -145,36 +310,38 @@ export default function WardrobeDetailScreen() {
           <View style={s.card}>
             <Text style={s.cardTitle}>{t('wardrobe.sources')}</Text>
 
-            <View style={s.assetsRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.assetsRow}
+            >
               {assets.map(([image, label]) => {
                 return <AssetThumb key={image} label={label} uri={image} />;
               })}
-            </View>
+            </ScrollView>
           </View>
 
-          {/* Actions */}
-          <View style={s.actions}>
-            <Button fullWidth onPress={onShare} dark>
-              {t('common.share')}
-            </Button>
-            <ButtonWithConfirm
-              fullWidth
-              transparent
-              onPress={onDelete}
-              alertText={t('alerts.deleteLookTitle')}
-            >
-              {t('common.delete')}
-            </ButtonWithConfirm>
-          </View>
-        </>
+          <TryOnSamplesList
+            selectedSampleId={creatingSampleId ?? undefined}
+            onSelectSample={handleSampleSelect}
+          />
+
+          <PresetsList
+            title={t('presets.sectionTitle')}
+            disabledPresetId={creatingPresetId}
+            onSelectPreset={handlePresetSelect}
+          />
+        </View>
       )}
     </Container.WithTabBar>
   );
 }
 
 function AssetThumb({ label, uri }: { label: string; uri: string }) {
+  const { width: windowWidth } = useWindowDimensions();
+
   return (
-    <View style={s.asset}>
+    <View style={[s.asset, { width: windowWidth / 3 - 30 }]}>
       <ImageZoom
         source={{ uri }}
         imageStyle={s.assetImg}
@@ -188,41 +355,74 @@ function AssetThumb({ label, uri }: { label: string; uri: string }) {
 }
 
 const s = StyleSheet.create({
+  containerInner: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    gap: 12,
+  },
   heroWrap: {
-    aspectRatio: 3 / 4,
+    flex: 1,
+    minHeight: 260,
     backgroundColor: Colors.light.disabledBg,
     width: '100%',
+    position: 'relative',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  heroImageWrap: {
+    width: '100%',
+    height: '100%',
   },
   heroImage: {
     objectFit: 'contain',
   },
 
-  muted: { color: '#6B7280', marginBottom: 12 },
+  muted: { color: '#6B7280' },
 
   card: {
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
-    padding: 12,
-    marginBottom: 12,
+    paddingVertical: 12,
   },
   cardTitle: { fontWeight: '800', marginBottom: 8 },
 
-  assetsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  assetsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingRight: 12,
+  },
   asset: {
-    width: '31%',
-    aspectRatio: 1,
+    aspectRatio: 3 / 4,
     borderRadius: 12,
+    minHeight: 172,
     backgroundColor: '#E5E7EB',
     overflow: 'hidden',
+    position: 'relative',
   },
   assetImg: { width: '100%', height: '100%', objectFit: 'cover' },
   assetLabel: {
+    position: 'absolute',
+    bottom: -1,
     textAlign: 'center',
     fontSize: 12,
     paddingTop: 2,
     paddingBottom: 5,
     color: '#111827',
+    backgroundColor: '#E5E7EB',
+    width: '100%',
   },
 
-  actions: { gap: 10, marginTop: 24, marginBottom: 12 },
+  actions: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    gap: 8,
+  },
+  actionButton: {
+    width: 50,
+    height: 50,
+    paddingHorizontal: 0,
+  },
 });

@@ -31,6 +31,7 @@
     "error": "Error",
     "tryAgain": "Try again",
     "done": "Done",
+    "continue": "Continue",
     "select": "Select",
     "change": "Change",
     "notSelected": "Not selected",
@@ -96,7 +97,7 @@
     "clickUpload": "Click and upload"
   },
   "queue": {
-    "title": "Try-on queue",
+    "title": "Creations",
     "empty": "Queue is empty. On Home, pick a photo and garments, then tap “Generate try-on”.",
     "creating": "Creating…",
     "clearFinished": "Clear finished"
@@ -109,19 +110,37 @@
     "retry": "Retry",
     "remove": "Remove",
     "taskId": "Task: {{id}}",
-    "resultNotFound": "Image URL not found"
+    "resultNotFound": "Image URL not found",
+    "firstLookReadyTitle": "Your first look is ready",
+    "firstLookReadyText": "Add a studio scene to keep exploring"
   },
   "tryon": {
     "generatingTitle": "Generating try-on…"
+  },
+  "samples": {
+    "confirmTitle": "Open sample?",
+    "confirmText": "Continue to create a new try-on from this sample."
+  },
+  "presets": {
+    "unAuthTitle": "Want to try studio scenes?",
+    "title": "Try your look in a new scene",
+    "sectionTitle": "Studio scenes",
+    "confirmTitle": "Open preset?",
+    "confirmText": "Continue to create a new try-on from this preset."
   },
   "wardrobe": {
     "createdAt": "Created: {{date}}",
     "sources": "Sources",
     "model": "Model",
+    "sample": "Sample",
     "dress": "Dress",
     "top": "Top",
     "bottom": "Bottom",
     "outfit": "Full Outfit",
+    "preset": "Preset",
+    "glasses": "Glasses",
+    "hairstyle": "Hairstyle",
+    "accessories": "Accessories",
     "title": "Looks",
     "emptyTitle": "Nothing here yet",
     "emptyText": "Save your favorite try-ons — they will appear here.",
@@ -141,7 +160,8 @@
     "logout": "Log out",
     "confirmLogout": "Sign out of your account?",
     "appVersion": "App version: {{version}}",
-    "sendFeedback": "Send feedback"
+    "sendFeedback": "Send feedback",
+    "loginFormTitleTaskScreen": "Save your look and try more scenes\nSign up to continue"
   },
   "auth": {
     "login": "Login",

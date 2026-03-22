@@ -20,7 +20,7 @@ export default function WardrobeScreen() {
 
   const {
     items,
-    isLoading,
+    isFetching,
     fetchMine,
     remove: removeItem,
   } = useWardrobeStore();
@@ -70,12 +70,12 @@ export default function WardrobeScreen() {
   return (
     <Container.WithTabBar
       title={t('wardrobe.title')}
-      isLoading={isLoading}
-      refreshControl={
-        <RefreshControl refreshing={!!isLoading} onRefresh={onRefresh} />
-      }
+      isLoading={isFetching}
+      // refreshControl={
+      //   <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
+      // }
     >
-      {items.length === 0 && !isLoading ? (
+      {items.length === 0 && !isFetching ? (
         <View style={s.empty}>
           <Text style={s.emptyTitle}>{t('wardrobe.emptyTitle')}</Text>
           <Text style={s.emptyText}>{t('wardrobe.emptyText')}</Text>
