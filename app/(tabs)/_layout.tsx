@@ -1,10 +1,11 @@
-import { Href, Tabs, router, usePathname } from 'expo-router';
-import React, { FC } from 'react';
+import { Tabs, router, usePathname } from 'expo-router';
+import React from 'react';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { Colors } from '@/constants/Colors';
+import { useCustomOutfitGuard } from '@/hooks';
 
 import { useUserStore } from '@/stores/useUserStore';
 import { useWardrobeAutoSync } from '@/stores/useWardrobeStore';
@@ -29,6 +30,17 @@ const getTabs = ({
       title: 'Try on',
       icon: (color: string) => {
         return <MaterialIcons size={28} name="checkroom" color={color} />;
+      },
+    },
+    {
+      name: 'custom-outfit',
+      title: 'Custom outfit',
+      icon: (color: string, isLoading?: boolean) => {
+        if (isLoading) {
+          return <ActivityIndicator size="small" color={color} />;
+        }
+
+        return <MaterialIcons size={28} name="style" color={color} />;
       },
     },
     {
@@ -96,12 +108,60 @@ export default function TabLayout() {
 
   const { user } = useUserStore();
   const loadCredits = useCreditsStore((s) => s.load);
+  const { checkCustomOutfitAccess, isCheckingAccess } = useCustomOutfitGuard();
 
   useWardrobeAutoSync();
 
   React.useEffect(() => {
     loadCredits();
   }, [loadCredits, user?._id]);
+
+  const openLoginScreen = React.useCallback((redirectTo: string) => {
+    router.push({
+      pathname: '/(tabs)/login',
+      params: { redirectTo },
+    });
+  }, []);
+
+  const handleProfileTabPress = React.useCallback(
+    (event: { preventDefault: () => void }) => {
+      if (user) return false;
+
+      event.preventDefault();
+      openLoginScreen(pathname);
+
+      return true;
+    },
+    [openLoginScreen, pathname, user],
+  );
+
+  const handleCustomOutfitTabPress = React.useCallback(
+    async (event: { preventDefault: () => void }) => {
+      event.preventDefault();
+
+      const hasAccess = await checkCustomOutfitAccess();
+
+      if (hasAccess) {
+        router.push('/(tabs)/custom-outfit');
+      }
+    },
+    [checkCustomOutfitAccess],
+  );
+
+  const handleTabPress = React.useCallback(
+    async (name: string, event: { preventDefault: () => void }) => {
+      if (name === 'profile') {
+        const handled = handleProfileTabPress(event);
+
+        if (handled) return;
+      }
+
+      if (name === 'custom-outfit') {
+        await handleCustomOutfitTabPress(event);
+      }
+    },
+    [handleCustomOutfitTabPress, handleProfileTabPress],
+  );
 
   return (
     <Tabs
@@ -118,7 +178,7 @@ export default function TabLayout() {
     >
       {getTabs({ signedIn: !!user }).map(
         ({ name, title, icon, withLogin, hidden }) => {
-          let href: Href | null | undefined = null;
+          let href: null | undefined = null;
 
           if (withLogin === false && !user) {
             href = undefined;
@@ -137,20 +197,13 @@ export default function TabLayout() {
               options={{
                 title,
                 href,
-                tabBarIcon: ({ color }) => (icon ? icon(color) : null),
+                tabBarIcon: ({ color }) =>
+                  icon
+                    ? icon(color, name === 'custom-outfit' && isCheckingAccess)
+                    : null,
               }}
               listeners={{
-                tabPress: (event) => {
-                  if (name !== 'profile' || !!user) return;
-
-                  event.preventDefault();
-                  router.push({
-                    pathname: '/(tabs)/login',
-                    params: {
-                      redirectTo: pathname,
-                    },
-                  });
-                },
+                tabPress: (event) => handleTabPress(name, event),
               }}
             />
           );
