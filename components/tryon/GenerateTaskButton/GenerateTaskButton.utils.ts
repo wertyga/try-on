@@ -68,12 +68,10 @@ export function hasPendingTryOnTask(tasks: TryOnTask[]) {
 }
 
 export function getGenerateButtonDisabled({
-  user,
   payload,
   creating,
   hasPendingTask,
 }: {
-  user: unknown;
   payload: TryOnPayload | null;
   creating: boolean;
   hasPendingTask: boolean;

@@ -4,6 +4,7 @@ import { TaskStatus, TTask } from '@/types/task';
 import { getFinishedTask, removeTask } from '@/api';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { useUserStore } from '@/stores/useUserStore';
+import { useCreditsStore } from '@/stores/creditStore';
 
 export type UserPhoto = {
   uri: string;
@@ -145,7 +146,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
         : { mode, dress: null },
     );
 
-    await Analytics.event('garment_mode_set', { mode });
+    Analytics.event('garment_mode_set', { mode });
     Analytics.userProp('tryon_mode', mode);
   },
 
@@ -233,6 +234,8 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
       }
 
       get().updateTask(id, nextTask);
+
+      await useCreditsStore.getState().onGenerationSuccess();
     } catch (e: any) {
       get().updateTask(id, { error: e.message, status: TaskStatus.failed });
     }

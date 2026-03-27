@@ -33,7 +33,6 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   } = useGenerateTaskData(selectedSample, selfUpload);
 
   const isDisabled = getGenerateButtonDisabled({
-    user,
     payload,
     creating,
     hasPendingTask,

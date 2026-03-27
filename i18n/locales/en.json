@@ -15,7 +15,7 @@
     "wardrobe": "Wardrobe",
     "profile": "Profile",
     "user": "User",
-    "login": "Login"
+    "login": "Login",
   },
   "common": {
     "download": "Download",
@@ -94,7 +94,8 @@
     "cardGlasses": "Glasses",
     "cardHairstyle": "Hairstyle",
     "cardAccessories": "Accessories",
-    "clickUpload": "Click and upload"
+    "clickUpload": "Click and upload",
+    "customOutfitUploadListTitle": "Try own outfit"
   },
   "queue": {
     "title": "Creations",

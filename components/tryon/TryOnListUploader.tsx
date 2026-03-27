@@ -1,72 +1,105 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CardWithImage } from '@/components/CardWithImage';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Colors } from '@/constants/Colors';
 import { useTryOnStore } from '@/stores';
 import { useTranslation } from 'react-i18next';
-import { router } from 'expo-router';
+import { BottomModal } from '@/components/ui/BottomModal';
+import { GarmentUploader } from '@/components/tryon/GarmentUploader';
 
 export const TryOnListUploader = () => {
   const { t } = useTranslation();
+
+  const [isGarmentOpened, setIsGarmentOpened] = useState(false);
 
   const { mode, dress, upper, lower, glasses, hairstyle, accessories } =
     useTryOnStore();
 
   function goGarnet() {
-    router.push('/(tabs)/garment');
+    setIsGarmentOpened(true);
   }
 
   const notSelectedText = t('common.notSelected');
 
+  const imagesList = useMemo(() => {
+    const commonItems = [
+      {
+        key: 'glasses',
+        title: t('garnet.cardGlasses'),
+        uris: [glasses?.uri],
+      },
+      {
+        key: 'hairstyle',
+        title: t('garnet.cardHairstyle'),
+        uris: [hairstyle?.uri],
+      },
+      {
+        key: 'accessories',
+        title: t('garnet.cardAccessories'),
+        uris: [accessories?.uri],
+      },
+    ];
+
+    if (mode === 'dress') {
+      return [
+        {
+          key: 'dress',
+          title: t('garnet.cardDress'),
+          uris: [dress?.uri],
+        },
+        ...commonItems,
+      ];
+    }
+
+    return [
+      {
+        key: 'upper',
+        title: t('garnet.cardTop'),
+        uris: [upper?.uri],
+      },
+      {
+        key: 'lower',
+        title: t('garnet.cardBottom'),
+        uris: [lower?.uri],
+      },
+      ...commonItems,
+    ];
+  }, [
+    accessories?.uri,
+    dress?.uri,
+    glasses?.uri,
+    hairstyle?.uri,
+    lower?.uri,
+    mode,
+    t,
+    upper?.uri,
+  ]);
+
   return (
     <View style={s.card}>
-      <Text style={s.cardTitle}>Try-on items</Text>
+      <Text style={s.cardTitle}>{t('garnet.customOutfitUploadListTitle')}</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={s.itemsRow}
       >
-        <Pressable style={s.itemCard} onPress={goGarnet}>
-          <CardWithImage
-            title={t('home.garment')}
-            chipMode={mode === 'dress' ? 'dark' : 'light'}
-            chipTitle={
-              mode === 'dress'
-                ? t('garnet.modeDress')
-                : t('garnet.modeSeparate')
-            }
-            uris={mode === 'dress' ? [dress?.uri] : [upper?.uri, lower?.uri]}
-            uriTitles={
-              mode === 'dress' ? [] : [t('wardrobe.top'), t('wardrobe.bottom')]
-            }
-            notSelectedText={notSelectedText}
-          />
-        </Pressable>
-
-        <Pressable style={s.itemCard} onPress={goGarnet}>
-          <CardWithImage
-            title={'Glasses'}
-            uris={[glasses?.uri]}
-            notSelectedText={notSelectedText}
-          />
-        </Pressable>
-
-        <Pressable style={s.itemCard} onPress={goGarnet}>
-          <CardWithImage
-            title={'Hairstyle'}
-            uris={[hairstyle?.uri]}
-            notSelectedText={notSelectedText}
-          />
-        </Pressable>
-
-        <Pressable style={s.itemCard} onPress={goGarnet}>
-          <CardWithImage
-            title={'Accessories'}
-            uris={[accessories?.uri]}
-            notSelectedText={notSelectedText}
-          />
-        </Pressable>
+        {imagesList.map((item) => (
+          <Pressable key={item.key} style={s.itemCard} onPress={goGarnet}>
+            <CardWithImage
+              title={item.title}
+              uris={item.uris}
+              notSelectedText={notSelectedText}
+            />
+          </Pressable>
+        ))}
       </ScrollView>
+
+      <BottomModal
+        visible={isGarmentOpened}
+        onClose={() => setIsGarmentOpened(false)}
+      >
+        <GarmentUploader />
+      </BottomModal>
     </View>
   );
 };
