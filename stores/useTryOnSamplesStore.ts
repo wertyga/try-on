@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchTryOnSamples } from '@/api/task.api';
+import { buildAPIError } from '@/api/base';
 
 export type TTryOnSample = {
   _id: string;
@@ -35,8 +36,10 @@ export const useTryOnSamplesStore = create<TTryOnSamplesStore>((set, get) => ({
 
       set({ samples });
     } catch (e: any) {
+      const { message = 'Failed to load try-on samples' } = buildAPIError(e);
+
       set({
-        error: e?.message ?? 'Failed to load try-on samples',
+        error: message,
       });
     } finally {
       set({ isLoading: false });

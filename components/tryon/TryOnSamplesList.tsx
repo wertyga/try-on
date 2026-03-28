@@ -39,13 +39,10 @@ export const TryOnSamplesList = ({
         contentContainerStyle={s.list}
       >
         {samples.map((item) => {
-          const isSelected = selectedSampleId === item._id;
-
           return (
             <TryOnSampleItem
               key={item._id}
               item={item}
-              isSelected={isSelected}
               onPress={onSelectSample}
             />
           );

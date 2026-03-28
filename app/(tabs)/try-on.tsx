@@ -15,8 +15,12 @@ import { useTryOnStore, useUserStore } from '@/stores';
 import { createTaskBySample } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
 import { hash } from '@/utils/hash';
-import { trackTaskSucceededEvent } from '@/analytics';
 import { hasPendingTryOnTask } from '@/components/tryon/GenerateTaskButton/GenerateTaskButton.utils';
+import {
+  trackCreditSpent,
+  trackSampleClicked,
+  trackTaskCreated,
+} from '@/analytics';
 
 export default function TryOn() {
   const credits = useCreditsStore();
@@ -38,6 +42,8 @@ export default function TryOn() {
   const handleSampleSelect = (sample: TTryOnSample) => {
     if (!userPhoto?.base64 || hasPendingTask) return;
 
+    trackSampleClicked(sample._id);
+
     Alert.alert(t('samples.confirmTitle'), t('samples.confirmText'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
@@ -58,7 +64,8 @@ export default function TryOn() {
 
             const fingerprint = `${sample._id}|${hash(userPhoto.base64)}`;
             addTask(getTryOnTaskFromTask(task, fingerprint, false));
-            trackTaskSucceededEvent(task._id, fingerprint);
+            trackTaskCreated('sample', task._id);
+            trackCreditSpent('sample', task._id);
 
             await credits.onGenerationSuccess();
 

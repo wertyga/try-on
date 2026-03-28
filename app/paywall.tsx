@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container';
 import { Colors } from '@/constants/Colors';
 import { PackList } from '@/components/Pack';
 import { formatTimeLeft } from '@/utils';
+import { trackPaywallOpened } from '@/analytics';
 
 export default function PaywallScreen() {
   const {
@@ -21,9 +22,10 @@ export default function PaywallScreen() {
     clearError,
     fetchPacks,
   } = useCreditsStore();
-  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
+  const isBuying = useCreditsStore((s) => s.isBuyingPack);
 
   useEffect(() => {
+    trackPaywallOpened('screen');
     load();
     fetchPacks();
   }, [load]);

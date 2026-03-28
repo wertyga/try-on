@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { TTryOnPreset, useTryOnPresetsStore } from '@/stores';
 import { useCreditsStore } from '@/stores/creditStore';
+import { trackStudioPresetClicked } from '@/analytics';
 
 import { PresetsList } from './PresetsList';
 
@@ -28,6 +29,8 @@ export const TaskPresetsSection = ({
   );
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
+    trackStudioPresetClicked(preset._id);
+
     Alert.alert(t('presets.confirmTitle'), t('presets.confirmText'), [
       { text: t('common.cancel'), style: 'cancel' },
       {

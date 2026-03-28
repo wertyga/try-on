@@ -5,26 +5,22 @@ import { TTryOnSample } from '@/stores';
 
 type TTryOnSampleItemProps = {
   item: TTryOnSample;
-  isSelected: boolean;
   onPress: (sample: TTryOnSample) => void;
 };
 
 export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
   item,
-  isSelected,
   onPress,
 }) => {
   return (
     <Pressable
-      style={[s.item, isSelected && s.itemSelected]}
+      style={[s.item]}
       onPress={() => onPress(item)}
       hitSlop={8}
       pressRetentionOffset={20}
     >
       <Image source={{ uri: item.image }} style={s.image} resizeMode="cover" />
-      <Text style={[s.itemTitle, isSelected && s.itemTitleSelected]}>
-        {item.title}
-      </Text>
+      <Text style={[s.itemTitle]}>{item.title}</Text>
     </Pressable>
   );
 };
@@ -35,14 +31,6 @@ const s = StyleSheet.create({
     borderRadius: 14,
     padding: 4,
     paddingBottom: 12,
-  },
-  itemSelected: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#111827',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 14,
-    elevation: 8,
   },
   image: {
     width: '100%',
@@ -57,9 +45,5 @@ const s = StyleSheet.create({
     marginTop: 8,
     marginLeft: 10,
     paddingHorizontal: 2,
-  },
-  itemTitleSelected: {
-    color: '#111827',
-    fontWeight: '700',
   },
 });

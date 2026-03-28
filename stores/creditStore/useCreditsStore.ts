@@ -12,6 +12,11 @@ import { TCreditPack } from './credit.types';
 import { useModalsStore } from '@/stores/useModalsStore';
 import { useUserStore } from '@/stores/useUserStore';
 
+export enum PaymentCode {
+  Canceled = 'Canceled',
+  Failed = 'Failed',
+}
+
 type TCreditsState = {
   settings: TSettings | null;
 
@@ -30,9 +35,12 @@ type TCreditsState = {
   autoRefillEnabled: boolean;
 
   isLoading: boolean;
-  error: string | null;
+  error: {
+    message: string;
+    code: PaymentCode;
+  } | null;
 
-  isBuyingPackId: string | null;
+  isBuyingPack: boolean;
 };
 
 type TCreditsActions = {
@@ -67,7 +75,7 @@ const initialState: TCreditsState = {
   isLoading: false,
   error: null,
 
-  isBuyingPackId: null,
+  isBuyingPack: false,
 };
 
 const isIOS = Platform.OS === 'ios';
@@ -76,7 +84,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   ...initialState,
 
   buyPack: async (priceId: string) => {
-    set({ isBuyingPackId: priceId, error: null });
+    set({ isBuyingPack: true, error: null });
 
     try {
       const buyMethod = isIOS
@@ -86,19 +94,23 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       await buyMethod(priceId);
 
       await get().load();
+
+      useModalsStore.getState().closePaywall();
     } catch (e: any) {
-      const { message = 'Payment failed', status } = buildAPIError(e);
+      const { message = 'Payment failed', status, code } = buildAPIError(e);
 
       if (status === 403) {
         await useAuthStore.getState().logout();
       } else {
         set({
-          error: message,
+          error: {
+            message,
+            code,
+          },
         });
-        throw e;
       }
     } finally {
-      set({ isBuyingPackId: null });
+      set({ isBuyingPack: false });
     }
   },
 
@@ -143,7 +155,15 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
 
       set({ packs });
     } catch (e: any) {
-      set({ error: e?.message || 'Failed to load packs' });
+      const { message = 'Failed to load packs', code = PaymentCode.Failed } =
+        buildAPIError(e);
+
+      set({
+        error: {
+          message,
+          code,
+        },
+      });
     } finally {
       set({ isLoading: false });
     }
@@ -170,7 +190,17 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
         autoRefillEnabled: state.autoRefillEnabled ?? false,
       });
     } catch (e: any) {
-      set({ error: e?.message || 'Failed to load billing state' });
+      const {
+        message = 'Failed to load billing state',
+        code = PaymentCode.Failed,
+      } = buildAPIError(e);
+
+      set({
+        error: {
+          message,
+          code,
+        },
+      });
     } finally {
       set({ isLoading: false });
     }

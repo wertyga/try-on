@@ -13,7 +13,6 @@ import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Analytics } from '@/analytics';
 
 export default function WardrobeScreen() {
   const { t } = useTranslation();
@@ -27,8 +26,6 @@ export default function WardrobeScreen() {
 
   useEffect(() => {
     if (!items?.length) fetchMine().catch(() => {});
-
-    Analytics.event('wardrobe_open');
   }, []);
 
   const { width } = useWindowDimensions();
@@ -50,12 +47,8 @@ export default function WardrobeScreen() {
         text: t('common.delete'),
         style: 'destructive',
         onPress: () => {
-          Analytics.event('wardrobe_item_delete_click', { item_id: id });
-
           removeItem(id)
-            .then(() => {
-              Analytics.event('wardrobe_item_delete_success', { item_id: id });
-            })
+            .then(() => {})
             .catch((e) =>
               Alert.alert(
                 t('common.error'),

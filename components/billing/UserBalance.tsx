@@ -79,7 +79,7 @@ const s = StyleSheet.create({
   line: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: Colors.light.border,
   },

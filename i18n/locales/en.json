@@ -243,6 +243,16 @@
     "generationPrice": "{{credits}} generations · {{priceLabel}}",
     "buy": "Buy"
   },
+  "paywall": {
+    "default": {
+      "title": "Get more generations",
+      "subtitle": "Top up credits to keep creating try-ons without waiting for the daily reset.\n1 generation = 1 final image"
+    },
+    "customOutfit": {
+      "title": "Buy any plan to unlock custom outfits",
+      "subtitle": "Premium unlocked with any purchase"
+    }
+  },
   "updates": {
     "ota": "Updating application…",
     "binary": {

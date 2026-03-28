@@ -1,10 +1,12 @@
 import React, { FC, ReactNode, useEffect } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -16,11 +18,14 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
+import { Colors } from '@/constants/Colors';
 
 type BottomModalProps = {
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
+  isLoading?: boolean;
 };
 
 const CLOSE_DISTANCE = 80;
@@ -31,7 +36,9 @@ export const BottomModal: FC<BottomModalProps> = ({
   visible,
   onClose,
   children,
+  isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const { height } = useWindowDimensions();
 
   const translateY = useSharedValue(SHEET_CLOSE_OFFSET);
@@ -47,9 +54,18 @@ export const BottomModal: FC<BottomModalProps> = ({
     .activeOffsetY(8)
     .failOffsetX([-20, 20])
     .onUpdate((event) => {
+      if (isLoading) return;
       translateY.value = Math.max(0, event.translationY);
     })
     .onEnd((event) => {
+      if (isLoading) {
+        translateY.value = withSpring(0, {
+          damping: 18,
+          stiffness: 180,
+        });
+        return;
+      }
+
       const shouldClose =
         event.translationY > CLOSE_DISTANCE || event.velocityY > CLOSE_VELOCITY;
 
@@ -81,10 +97,14 @@ export const BottomModal: FC<BottomModalProps> = ({
       visible={visible}
       transparent
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={isLoading ? undefined : onClose}
     >
       <View style={[s.root]}>
-        <Pressable style={s.backdrop} onPress={onClose} />
+        <Pressable
+          style={s.backdrop}
+          onPress={isLoading ? undefined : onClose}
+          disabled={isLoading}
+        />
 
         <View style={[s.sheetWrap]} pointerEvents="box-none">
           <GestureDetector gesture={panGesture}>
@@ -100,6 +120,13 @@ export const BottomModal: FC<BottomModalProps> = ({
               </View>
 
               <ScrollView style={s.content}>{children}</ScrollView>
+
+              {isLoading ? (
+                <View style={s.loadingOverlay}>
+                  <ActivityIndicator size="large" />
+                  <Text style={s.loadingText}>{t('common.loading')}</Text>
+                </View>
+              ) : null}
             </Animated.View>
           </GestureDetector>
         </View>
@@ -144,5 +171,16 @@ const s = StyleSheet.create({
     flexShrink: 1,
     minHeight: 0,
     padding: 12,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    zIndex: 1,
+  },
+  loadingText: {
+    marginTop: 8,
+    color: Colors.light.text,
   },
 });

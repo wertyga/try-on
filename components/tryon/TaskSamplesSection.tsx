@@ -7,7 +7,11 @@ import { TTryOnSample, useCreditsStore, useTryOnStore } from '@/stores';
 import { TryOnSamplesList } from './TryOnSamplesList';
 import { getTryOnTaskFromTask } from '@/utils';
 import { hash } from '@/utils/hash';
-import { trackTaskSucceededEvent } from '@/analytics';
+import {
+  trackCreditSpent,
+  trackSampleClicked,
+  trackTaskCreated,
+} from '@/analytics';
 
 type TTaskSamplesSectionProps = {
   image: string;
@@ -19,6 +23,8 @@ export const TaskSamplesSection = ({ image }: TTaskSamplesSectionProps) => {
   const addTask = useTryOnStore((s) => s.addTask);
 
   const handleSampleSelect = (sample: TTryOnSample) => {
+    trackSampleClicked(sample._id);
+
     Alert.alert(t('samples.confirmTitle'), t('samples.confirmText'), [
       { text: t('common.cancel'), style: 'cancel' },
       {
@@ -37,7 +43,8 @@ export const TaskSamplesSection = ({ image }: TTaskSamplesSectionProps) => {
 
             const fingerprint = `${sample._id}|${hash(image)}`;
             addTask(getTryOnTaskFromTask(task, fingerprint, false));
-            trackTaskSucceededEvent(task._id, fingerprint);
+            trackTaskCreated('sample', task._id);
+            trackCreditSpent('sample', task._id);
 
             await credits.onGenerationSuccess();
 

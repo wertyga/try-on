@@ -4,13 +4,24 @@ import React from 'react';
 import { useModalsStore } from '@/stores';
 
 export const ModalsList = () => {
-  const { isLoginOpen, isPaywallOpen, closeLogin, closePaywall } =
-    useModalsStore();
+  const {
+    isLoginOpen,
+    isPaywallOpen,
+    paywallTitleKey,
+    paywallSubtitleKey,
+    closeLogin,
+    closePaywall,
+  } = useModalsStore();
 
   return (
     <>
       <LoginModal visible={isLoginOpen} onClose={closeLogin} />
-      <PaywallModal visible={isPaywallOpen} onClose={closePaywall} />
+      <PaywallModal
+        visible={isPaywallOpen}
+        onClose={closePaywall}
+        titleKey={paywallTitleKey}
+        subtitleKey={paywallSubtitleKey}
+      />
     </>
   );
 };

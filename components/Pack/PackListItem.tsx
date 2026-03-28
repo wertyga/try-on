@@ -9,7 +9,7 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
   const { t } = useTranslation();
 
   const user = useUserStore((s) => s.user);
-  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
+  const isBuying = useCreditsStore((s) => s.isBuyingPack);
   const { buyPack } = useCreditsStore();
   const { signInWithGoogle } = useAuthStore();
 

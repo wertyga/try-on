@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useUserStore, useAuthStore } from '@/stores';
 import { Button } from '@/components/ui/button';
-import { Analytics } from '@/analytics';
 import { useTranslation } from 'react-i18next';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
@@ -40,14 +39,9 @@ export const SaveLooksGate: React.FC<Props> = ({
 
   const { t } = useTranslation();
 
-  useEffect(() => {
-    Analytics.event('save_gate_shown');
-  }, []);
-
   if (user) return null;
 
   const goLogin = () => {
-    Analytics.event('save_gate_cta');
     router.push('/(tabs)/login');
   };
 

@@ -34,7 +34,7 @@ export async function createTaskBySample(
 }> {
   const { data: create } = await baseQuery({
     method: 'post',
-    url: '/tryon/sample',
+    url: '/tryon/samples',
     data,
   });
 

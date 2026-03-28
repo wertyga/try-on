@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 import { useUserStore } from '@/stores/useUserStore';
-import { Analytics } from '@/analytics';
 import { router } from 'expo-router';
 import { sendLogs } from '@/api';
 import Toast from 'react-native-toast-message';
@@ -41,34 +40,14 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      Analytics.event('login_apple_start');
-
       const user = await useOAuthStore.getState().signInWithApple();
 
       await get().updateUser(user);
-
-      await Analytics.event('login_apple_success');
-      await Analytics.userId(user.email);
-      await Analytics.userProp('auth', 'user');
 
       if (callback) {
         callback();
       } else {
         router.replace('/try-on');
-      }
-    } catch (e: any) {
-      Analytics.event('login_apple_error', {
-        code: e.code || 'unknown',
-        message: e.message,
-      });
-
-      if (e.code !== 'ERR_REQUEST_CANCELED') {
-        sendLogs(e.message);
-
-        Toast.show({
-          type: 'error',
-          text1: e.message,
-        });
       }
     } finally {
       set({ isLoading: false });
@@ -79,15 +58,9 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      Analytics.event('login_google_start');
-
       const user = await useOAuthStore.getState().signInWithGoogle();
 
       await get().updateUser(user);
-
-      await Analytics.event('login_google_success');
-      await Analytics.userId(user.email);
-      await Analytics.userProp('auth', 'user');
 
       if (callback) {
         callback();
@@ -95,17 +68,7 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
         router.replace('/try-on');
       }
     } catch (e: any) {
-      Analytics.event('login_google_error', {
-        code: e.code || 'unknown',
-        message: e.message,
-      });
-
       sendLogs(e.message);
-
-      Toast.show({
-        type: 'error',
-        text1: e.message,
-      });
     } finally {
       set({ isLoading: false });
     }
@@ -113,17 +76,14 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
 
   signInByEmail: async (...params: Parameters<TAuthEmailStore['signIn']>) => {
     try {
+      set({ isLoading: true });
+
       const user = await useAuthEmailStore.getState().signIn(...params);
 
       await get().updateUser(user);
 
       return true;
     } catch (e: any) {
-      Analytics.event('login_google_error', {
-        code: e.status || 'unknown',
-        message: e.message,
-      });
-
       sendLogs(e.message);
 
       Toast.show({
@@ -138,8 +98,6 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   },
 
   logout: async () => {
-    Analytics.event('logout');
-
     await useOAuthStore.getState().appleLogout();
     await useOAuthStore.getState().googleLogout();
 

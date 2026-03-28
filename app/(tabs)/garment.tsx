@@ -15,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Container } from '@/components/ui/Container';
 import { TTryOnImagesKeys, useTryOnStore } from '@/stores/useTryOnStore';
-import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { UploadItem } from '@/components/UploadItem';
 
@@ -38,14 +37,11 @@ export default function Garment() {
   const [busy, setBusy] = useState(false);
 
   const clear = (slot: TTryOnImagesKeys) => {
-    Analytics.event('garment_clear', { slot });
     clearImage(slot);
   };
 
   async function pick(slot: TTryOnImagesKeys) {
     try {
-      Analytics.event('garment_pick_start', { slot });
-
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (perm.status !== 'granted') {
         Alert.alert(
@@ -77,11 +73,7 @@ export default function Garment() {
         uri: manip.uri,
         base64: `data:image/jpeg;base64,${manip.base64!}`,
       });
-
-      Analytics.event('garment_pick_success', { slot });
     } catch (e: any) {
-      Analytics.event('garment_pick_error', { slot });
-
       Alert.alert(
         t('common.error'),
         e?.message || t('errors.pickImageFallback'),

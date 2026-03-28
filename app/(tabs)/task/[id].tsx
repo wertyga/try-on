@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Alert } from 'react-native';
 
 import {
   TaskPresetsSection,
@@ -7,7 +8,7 @@ import {
   TaskItem,
 } from '@/components/tryon';
 import { Container } from '@/components/ui/Container';
-import { useTryOnStore } from '@/stores/useTryOnStore';
+import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 import { TaskStatus } from '@/types/task';
 import { useTranslation } from 'react-i18next';
 import { StatusBox } from '@/components/ui/StatusBox';
@@ -18,7 +19,7 @@ export default function TaskDetailScreen() {
 
   const [taskLoading, setTaskLoading] = useState('');
 
-  const { removeTask, fetchFinishedTask } = useTryOnStore();
+  const { removeTask, fetchFinishedTask, retryTask } = useTryOnStore();
   const task = useTryOnStore((s) => s.getTask(id));
   const tasksLength = useTryOnStore((s) => s.tasks.length);
 
@@ -43,6 +44,17 @@ export default function TaskDetailScreen() {
     } catch (e) {
     } finally {
       setTaskLoading('');
+    }
+  };
+
+  const handleRetryTask = async (tryOnTask: TryOnTask) => {
+    try {
+      await retryTask(tryOnTask);
+    } catch (e: any) {
+      Alert.alert(
+        t('common.error'),
+        e?.message || t('task.retryFailed', 'Retry failed'),
+      );
     }
   };
 
@@ -76,6 +88,7 @@ export default function TaskDetailScreen() {
           <TaskItem
             task={task}
             isLoading={taskLoading === task.id}
+            onRetry={handleRetryTask}
             onRemove={handleRemoveTask}
             onSaveSuccess={() => router.replace('/(tabs)/wardrobe')}
           />

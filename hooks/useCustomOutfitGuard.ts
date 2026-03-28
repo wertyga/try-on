@@ -40,7 +40,10 @@ export const useCustomOutfitGuard = ({
       const succeededPayment = await fetchHasSucceededPayment();
 
       if (!succeededPayment) {
-        openPaywall();
+        openPaywall({
+          titleKey: 'paywall.customOutfit.title',
+          subtitleKey: 'paywall.customOutfit.subtitle',
+        });
 
         return false;
       }

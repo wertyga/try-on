@@ -6,8 +6,6 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { storage } from '@/utils';
 import { buildAPIError } from './base-query.utils';
 import Constants from 'expo-constants';
-import { Analytics } from '@/analytics';
-import { deviceId } from '@/utils/hash';
 import { inAppConfig } from '@/config';
 import { useAppStore } from '@/stores/appStore';
 
@@ -67,8 +65,6 @@ export const baseQuery = async <R = any>({
     const { message, status } = buildAPIError(e);
 
     if (!silentError && status !== 403) {
-      Analytics.event('error', { place: 'tryon_poll', message });
-
       Toast.show({
         type: 'error',
         text1: message,

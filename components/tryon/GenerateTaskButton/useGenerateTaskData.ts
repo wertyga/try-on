@@ -11,7 +11,6 @@ import {
   buildTryOnPayload,
   hasPendingTryOnTask,
 } from './GenerateTaskButton.utils';
-import { trackTaskCreateEvent } from '@/analytics';
 
 export function useGenerateTaskData(
   selectedSample?: TTryOnSample | null,
@@ -66,17 +65,6 @@ export function useGenerateTaskData(
     accessories,
   ]);
 
-  const trackTaskCreating = () => {
-    trackTaskCreateEvent({
-      upper: payload?.upperBase64,
-      mode: payload?.mode,
-      dress: payload?.dressBase64,
-      lower: payload?.lowerBase64,
-      fp: fingerPrint,
-      user: payload?.userBase64,
-    });
-  };
-
   return {
     addTask,
     fetchCategoriesForImages,
@@ -85,6 +73,5 @@ export function useGenerateTaskData(
     payload,
     fingerPrint,
     hasPendingTask,
-    trackTaskCreating,
   };
 }

@@ -8,14 +8,16 @@ import {
   Alert,
   Platform,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/Colors';
 import { useTryOnStore } from '@/stores/useTryOnStore';
-import { Analytics } from '@/analytics';
 import { BottomModal } from '@/components/ui/BottomModal';
+
+const { height } = Dimensions.get('window');
 
 export function UserPhotoUploader() {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
@@ -62,8 +64,6 @@ export function UserPhotoUploader() {
     setIsPhotoLoading(true);
 
     try {
-      await Analytics.event('photo_pick_start', { source: 'gallery' });
-
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (perm.status !== 'granted') {
@@ -86,18 +86,7 @@ export function UserPhotoUploader() {
       const asset = res.assets[0];
 
       await processAndSetPhoto(asset.uri, asset.width, asset.height);
-
-      await Analytics.event('photo_pick_success', {
-        source: 'gallery',
-        width: asset.width,
-        height: asset.height,
-      });
     } catch (e: any) {
-      await Analytics.event('photo_pick_error', {
-        source: 'gallery',
-        message: e?.message,
-      });
-
       Alert.alert(
         t('errors.pickImageTitle'),
         e?.message || t('errors.pickImageFallback'),
@@ -111,8 +100,6 @@ export function UserPhotoUploader() {
     setIsPhotoLoading(true);
 
     try {
-      await Analytics.event('photo_pick_start', { source: 'camera' });
-
       const perm = await ImagePicker.requestCameraPermissionsAsync();
 
       if (perm.status !== 'granted') {
@@ -132,14 +119,7 @@ export function UserPhotoUploader() {
       const asset = res.assets[0];
 
       await processAndSetPhoto(asset.uri, asset.width, asset.height);
-
-      await Analytics.event('photo_pick_success', { source: 'camera' });
     } catch (e: any) {
-      await Analytics.event('photo_pick_error', {
-        source: 'camera',
-        message: e?.message,
-      });
-
       Alert.alert(
         t('errors.cameraTitle'),
         e?.message || t('errors.cameraFallback'),
@@ -150,14 +130,13 @@ export function UserPhotoUploader() {
   }
 
   async function clearPhoto() {
-    await Analytics.event('photo_clear');
     setUserPhoto(null);
   }
 
   return (
     <>
       <View style={s.card}>
-        <Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>
+        {/*<Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>*/}
 
         <Pressable
           style={s.previewFrame}
@@ -194,6 +173,7 @@ export function UserPhotoUploader() {
       <BottomModal
         visible={isSourceModalVisible}
         onClose={() => setIsSourceModalVisible(false)}
+        isLoading={isPhotoLoading || isPhotoProcessing}
       >
         <View style={s.modalCard}>
           <Pressable
@@ -253,7 +233,7 @@ const s = StyleSheet.create({
 
   previewFrame: {
     width: '100%',
-    height: 320,
+    height: height * 0.3,
     borderRadius: 16,
     backgroundColor: '#E5E7EB',
     overflow: 'hidden',

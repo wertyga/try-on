@@ -3,21 +3,23 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { TaskItem } from '@/components/tryon';
 import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
-import { retryTaskCreate } from '@/api';
 import SaveLooksGate from '@/components/SaveLooksGate';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
-import { trackRetryTask } from '@/analytics';
 import { TaskStatus } from '@/types/task';
-import { getTryOnTaskFromTask } from '@/utils';
 
 export default function TryOnQueueScreen() {
   const { t } = useTranslation();
 
   const [taskLoading, setTaskLoading] = useState('');
 
-  const { tasks, updateTask, removeTask, clearFinished, fetchFinishedTask } =
-    useTryOnStore();
+  const {
+    tasks,
+    retryTask: retryTaskInStore,
+    removeTask,
+    clearFinished,
+    fetchFinishedTask,
+  } = useTryOnStore();
 
   const fetchUnCompletedTasks = () => {
     tasks
@@ -30,38 +32,9 @@ export default function TryOnQueueScreen() {
       });
   };
 
-  async function retryTask(tryOnTask: TryOnTask) {
+  async function handleRetryTask(tryOnTask: TryOnTask) {
     try {
-      trackRetryTask(tryOnTask);
-
-      const payload = {
-        userBase64: tryOnTask.assets.model,
-        dressBase64: tryOnTask.assets.dress,
-        mode: tryOnTask.mode,
-        upperBase64: tryOnTask.assets.upper,
-        lowerBase64: tryOnTask.assets.lower,
-      };
-
-      updateTask(tryOnTask.id, {
-        status: TaskStatus.queued,
-        error: '',
-        assets: {
-          upper: '',
-          dress: '',
-          model: '',
-          lower: '',
-        },
-      });
-
-      const { task } = await retryTaskCreate(payload, tryOnTask.id);
-
-      const newTryOnTask = getTryOnTaskFromTask(
-        task,
-        tryOnTask.fingerprint,
-        false,
-      );
-
-      updateTask(tryOnTask.id, newTryOnTask);
+      await retryTaskInStore(tryOnTask);
     } catch (e: any) {
       Alert.alert(
         t('common.error'),
@@ -128,7 +101,7 @@ export default function TryOnQueueScreen() {
           key={item.id}
           task={item}
           isLoading={taskLoading === item.id}
-          onRetry={retryTask}
+          onRetry={handleRetryTask}
           onRemove={handleRemoveTask}
           onOpen={
             item.status === TaskStatus.completed

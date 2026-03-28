@@ -6,6 +6,7 @@ import { getTryOnTaskFromTask } from '@/utils';
 import { hash } from '@/utils/hash';
 import { TTask } from '@/types/task';
 import { useCreditsStore } from '@/stores/creditStore';
+import { trackCreditSpent, trackTaskCreated } from '@/analytics';
 
 export type TTryOnPreset = {
   _id: string;
@@ -77,6 +78,8 @@ export const useTryOnPresetsStore = create<TTryOnPresetsStore>((set, get) => ({
       }
 
       useTryOnStore.getState().addTask(nextTask);
+      trackTaskCreated('preset', task._id);
+      trackCreditSpent('preset', task._id);
 
       await useCreditsStore.getState().onGenerationSuccess();
 

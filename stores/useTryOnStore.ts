@@ -1,10 +1,14 @@
 import { create } from 'zustand';
-import { Analytics } from '@/analytics';
 import { TaskStatus, TTask } from '@/types/task';
-import { getFinishedTask, removeTask } from '@/api';
+import { getFinishedTask, removeTask, retryTaskCreate } from '@/api';
 import { getTryOnTaskFromTask, storage } from '@/utils';
 import { useUserStore } from '@/stores/useUserStore';
 import { useCreditsStore } from '@/stores/creditStore';
+import {
+  trackCreditSpent,
+  trackGenerationCompleted,
+  trackTaskCreated,
+} from '@/analytics';
 
 export type UserPhoto = {
   uri: string;
@@ -79,6 +83,7 @@ type TryOnState = TTryOnImages & {
   clearFinished: () => void;
 
   fetchFinishedTask: (id: string) => void;
+  retryTask: (task: TryOnTask) => Promise<void>;
 
   addTasksList: (tasks: TryOnTask[]) => void;
   updateTasksState: (tasks: TryOnTask[]) => void;
@@ -118,14 +123,10 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   setConsent: (consent: boolean) => {
-    Analytics.event('consent_photo_processing', { value: consent });
-
     set({ consent });
   },
 
   clearImage: (slot: TTryOnImagesKeys) => {
-    Analytics.event('garment_clear', { slot });
-
     set({ [slot]: null });
   },
 
@@ -145,9 +146,6 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
         ? { mode, upper: null, lower: null }
         : { mode, dress: null },
     );
-
-    Analytics.event('garment_mode_set', { mode });
-    Analytics.userProp('tryon_mode', mode);
   },
 
   getTask: (id) => {
@@ -180,8 +178,6 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   removeTask: async (id) => {
-    Analytics.event('tryon_task_remove', { task_id: id });
-
     const user = useUserStore.getState().user;
 
     if (user) {
@@ -213,8 +209,6 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   },
 
   clearFinished: () => {
-    Analytics.event('queue_clear_finished');
-
     const updatedTaskList = get().tasks.filter(
       (x) =>
         x.status !== TaskStatus.completed && x.status !== TaskStatus.failed,
@@ -233,11 +227,51 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
         nextTask.assets.preset = prevTask.assets.preset;
       }
 
+      if (
+        prevTask?.status !== TaskStatus.completed &&
+        nextTask.status === TaskStatus.completed
+      ) {
+        trackGenerationCompleted(id);
+      }
+
       get().updateTask(id, nextTask);
 
       await useCreditsStore.getState().onGenerationSuccess();
     } catch (e: any) {
       get().updateTask(id, { error: e.message, status: TaskStatus.failed });
     }
+  },
+
+  retryTask: async (tryOnTask: TryOnTask) => {
+    const payload = {
+      userBase64: tryOnTask.assets.model,
+      dressBase64: tryOnTask.assets.dress,
+      mode: tryOnTask.mode,
+      upperBase64: tryOnTask.assets.upper,
+      lowerBase64: tryOnTask.assets.lower,
+    };
+
+    get().updateTask(tryOnTask.id, {
+      status: TaskStatus.queued,
+      error: '',
+      assets: {
+        upper: '',
+        dress: '',
+        model: '',
+        lower: '',
+      },
+    });
+
+    const { task } = await retryTaskCreate(payload, tryOnTask.id);
+    const newTryOnTask = getTryOnTaskFromTask(
+      task,
+      tryOnTask.fingerprint,
+      false,
+    );
+
+    trackTaskCreated('retry', task._id);
+    trackCreditSpent('retry', task._id);
+
+    get().updateTask(tryOnTask.id, newTryOnTask);
   },
 }));

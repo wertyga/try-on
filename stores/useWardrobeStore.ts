@@ -10,6 +10,8 @@ import {
 import { useUserStore } from '@/stores/useUserStore';
 import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
 import { TaskStatus } from '@/types/task';
+import { router } from 'expo-router';
+import { trackSaveToWardrobe } from '@/analytics';
 
 type WardrobeState = {
   items: WardrobeItem[];
@@ -80,7 +82,11 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
         items: [real, ...s.items],
       }));
 
+      trackSaveToWardrobe(task.id);
+
       useTryOnStore.getState().removeTask(task.id);
+
+      router.push('/(tabs)/wardrobe');
     } catch (e) {
       throw e;
     } finally {

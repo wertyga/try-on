@@ -3,6 +3,7 @@ export const buildAPIError = (e: any, defaultErrorMessage?: string) => {
     e.response?.data?.error?.message ||
     e.response?.data?.message ||
     e.response?.data?.error ||
+    e.localizedMessage ||
     e.message ||
     defaultErrorMessage;
 
@@ -12,5 +13,6 @@ export const buildAPIError = (e: any, defaultErrorMessage?: string) => {
   return {
     message,
     status,
+    code: e.code,
   };
 };

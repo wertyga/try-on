@@ -1,91 +1,41 @@
-import {
-  getAnalytics,
-  logEvent,
-  setUserId,
-  setUserProperty,
-} from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { getApp } from '@react-native-firebase/app';
+
+type EventName =
+  | 'sample_clicked'
+  | 'task_created'
+  | 'generation_completed'
+  | 'studio_preset_clicked'
+  | 'auth_modal_opened'
+  | 'signup_completed'
+  | 'signup_bonus_granted'
+  | 'credit_spent'
+  | 'paywall_opened'
+  | 'save_to_wardrobe'
+  | 'custom_upload_opened'
+  | 'custom_generation_started';
 
 type EventParams = Record<string, string | number | boolean | null | undefined>;
 
-// имена событий — короткие, snake_case, ≤40 символов
-export type EventName =
-  | 'app_open'
-  | 'screen_view'
-  | 'consent_toggle'
-  | 'error'
-  | 'photo_pick_start'
-  | 'photo_pick_success'
-  | 'photo_pick_error'
-  | 'photo_clear'
-  | 'garment_mode_set'
-  | 'garment_pick'
-  | 'wardrobe_item_delete_click'
-  | 'wardrobe_item_delete_success'
-  | 'garment_clear'
-  | 'tryon_generate_tap'
-  | 'task_created'
-  | 'task_status'
-  | 'task_completed'
-  | 'task_failed'
-  | 'task_retry'
-  | 'queue_clear_finished'
-  | 'save_gate_shown'
-  | 'save_gate_cta'
-  | 'save_gate_dismiss'
-  | 'wardrobe_open'
-  | 'wardrobe_item_open'
-  | 'wardrobe_item_share'
-  | 'wardrobe_item_delete'
-  | 'wardrobe_item_save'
-  | 'login_apple_start'
-  | 'login_apple_success'
-  | 'login_apple_error'
-  | 'login_google_start'
-  | 'login_google_success'
-  | 'login_google_error'
-  | 'logout'
-  | 'policy_open'
-  | 'permission_prompt'
-  | 'permission_result'
-  | 'error_alert'
-  | 'welcome_continue_click'
-  | 'garment_pick_start'
-  | 'garment_pick_error'
-  | 'garment_pick_success'
-  | 'tryon_generate_click'
-  | 'tryon_task_create_start'
-  | 'tryon_task_create_success'
-  | 'tryon_task_remove'
-  | 'consent_photo_processing';
-
-const a = () => getAnalytics(getApp());
+const analytics = () => getAnalytics(getApp());
 
 const sanitize = (params?: EventParams) => {
   if (!params) return undefined;
-  const out: Record<string, any> = {};
-  Object.entries(params).forEach(([k, v]) => {
-    if (v === undefined) return;
-    const key = k.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 24); // ограничения Firebase
-    out[key] = typeof v === 'string' ? v.slice(0, 100) : v;
+
+  const out: Record<string, string | number | boolean | null> = {};
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined) return;
+
+    out[key.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 24)] =
+      typeof value === 'string' ? value.slice(0, 100) : value;
   });
+
   return out;
 };
 
 export const Analytics = {
-  event: async (name: EventName, params?: Record<string, any>) => {
-    await logEvent(a(), name as string, sanitize(params));
-  },
-  userId: async (id: string | null) => {
-    await setUserId(a(), id ?? '');
-  },
-  userProp: async (name: string, value: string) => {
-    await setUserProperty(a(), name, value);
-  },
-  screen: async (name: string, klass?: string) => {
-    await logEvent(a(), 'screen_view', {
-      firebase_screen: name,
-      firebase_screen_class: klass ?? name,
-    });
+  event: async (name: EventName, params?: EventParams) => {
+    await logEvent(analytics(), name, sanitize(params));
   },
 };

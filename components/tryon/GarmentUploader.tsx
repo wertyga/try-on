@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,14 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
 
 import { TTryOnImagesKeys, useTryOnStore } from '@/stores/useTryOnStore';
-import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { UploadItem } from '@/components/UploadItem';
 
-export const GarmentUploader = () => {
+type GarmentUploaderProps = {
+  onBusyChange?: (busy: boolean) => void;
+};
+
+export const GarmentUploader = ({ onBusyChange }: GarmentUploaderProps) => {
   const { t } = useTranslation();
 
   const {
@@ -35,15 +38,16 @@ export const GarmentUploader = () => {
 
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
+
   const clear = (slot: TTryOnImagesKeys) => {
-    Analytics.event('garment_clear', { slot });
     clearImage(slot);
   };
 
   async function pick(slot: TTryOnImagesKeys) {
     try {
-      Analytics.event('garment_pick_start', { slot });
-
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (perm.status !== 'granted') {
@@ -77,11 +81,7 @@ export const GarmentUploader = () => {
         uri: manip.uri,
         base64: `data:image/jpeg;base64,${manip.base64!}`,
       });
-
-      Analytics.event('garment_pick_success', { slot });
     } catch (e: any) {
-      Analytics.event('garment_pick_error', { slot });
-
       Alert.alert(
         t('common.error'),
         e?.message || t('errors.pickImageFallback'),

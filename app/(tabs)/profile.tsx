@@ -17,7 +17,6 @@ export default function UserScreen() {
   const { user } = useUserStore();
   const { load: loadCredits } = useCreditsStore();
   const { logout } = useAuthStore();
-  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
   const { openPaywall } = useModalsStore();
 
   const name = user?.username ?? '';
@@ -54,7 +53,7 @@ export default function UserScreen() {
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <Container isLoading={isBuying} childrenStyle={s.containerBody}>
+    <Container childrenStyle={s.containerBody}>
       <View>
         {/* Header */}
         <View style={s.header}>

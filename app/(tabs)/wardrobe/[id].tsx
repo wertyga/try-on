@@ -15,7 +15,6 @@ import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { Button } from '@/components/ui/button';
 import { getWardrobeItem } from '@/api/wardrobe';
 import { useTranslation } from 'react-i18next';
-import { Analytics } from '@/analytics';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 import { Colors } from '@/constants/Colors';
@@ -31,6 +30,12 @@ import {
 import { useCreditsStore } from '@/stores/creditStore';
 import { getTryOnTaskFromTask } from '@/utils';
 import { hash } from '@/utils/hash';
+import {
+  trackCreditSpent,
+  trackSampleClicked,
+  trackStudioPresetClicked,
+  trackTaskCreated,
+} from '@/analytics';
 
 type WardrobeItem = {
   _id: string;
@@ -83,12 +88,6 @@ export default function WardrobeDetailScreen() {
 
   useEffect(() => {
     setItem(storeItem);
-
-    if (storeItem) {
-      Analytics.event('wardrobe_item_open', {
-        item_hint: storeItem._id.slice(-6),
-      });
-    }
   }, [storeItem?._id]);
 
   // fetch from backend if not in store
@@ -127,15 +126,7 @@ export default function WardrobeDetailScreen() {
     if (!item) return;
 
     try {
-      Analytics.event('wardrobe_item_delete', {
-        item_hint: item._id.slice(-6),
-      });
-
       await removeItem(item._id);
-
-      Analytics.event('wardrobe_item_delete_success', {
-        item_id: item._id,
-      });
 
       router.replace('/(tabs)/wardrobe');
     } catch (e: any) {
@@ -146,8 +137,6 @@ export default function WardrobeDetailScreen() {
   const onShare = useCallback(async () => {
     if (!item) return;
     try {
-      Analytics.event('wardrobe_item_share', { item_hint: item._id.slice(-6) });
-
       await Share.share({
         message: item.title ? `${item.title}\n${item.imageUrl}` : item.imageUrl,
         url: item.imageUrl,
@@ -157,6 +146,8 @@ export default function WardrobeDetailScreen() {
 
   const handleSampleSelect = (sample: TTryOnSample) => {
     if (!item) return;
+
+    trackSampleClicked(sample._id);
 
     Alert.alert(t('samples.confirmTitle'), t('samples.confirmText'), [
       { text: t('common.cancel'), style: 'cancel' },
@@ -183,6 +174,8 @@ export default function WardrobeDetailScreen() {
                 false,
               ),
             );
+            trackTaskCreated('sample', task._id);
+            trackCreditSpent('sample', task._id);
 
             await credits.onGenerationSuccess();
 
@@ -202,6 +195,8 @@ export default function WardrobeDetailScreen() {
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
     if (!item) return;
+
+    trackStudioPresetClicked(preset._id);
 
     Alert.alert(t('presets.confirmTitle'), t('presets.confirmText'), [
       { text: t('common.cancel'), style: 'cancel' },

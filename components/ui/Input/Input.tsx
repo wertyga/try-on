@@ -38,6 +38,7 @@ export const Input = ({
           ]}
           multiline={multiline}
           onChangeText={onChange}
+          placeholderTextColor={Colors.light.textDisabled}
           {...inputProps}
         />
       </View>

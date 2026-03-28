@@ -51,13 +51,10 @@ export const PresetsList = ({
         contentContainerStyle={s.list}
       >
         {presets.map((item) => {
-          const isSelected = selectedPresetId === item._id;
-
           return (
             <PresetItem
               key={item._id}
               item={item}
-              isSelected={isSelected}
               disabled={disabledPresetId === item._id}
               onPress={onSelectPreset}
             />

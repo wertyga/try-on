@@ -37,10 +37,18 @@ const getTabs = ({
       title: 'Custom outfit',
       icon: (color: string, isLoading?: boolean) => {
         if (isLoading) {
-          return <ActivityIndicator size="small" color={color} />;
+          return (
+            <CustomOutfitTabIcon>
+              <ActivityIndicator size="small" color={color} />
+            </CustomOutfitTabIcon>
+          );
         }
 
-        return <MaterialIcons size={28} name="style" color={color} />;
+        return (
+          <CustomOutfitTabIcon>
+            <MaterialIcons size={28} name="style" color={color} />
+          </CustomOutfitTabIcon>
+        );
       },
     },
     {
@@ -214,7 +222,7 @@ export default function TabLayout() {
 }
 
 const ProfileTabIcon = ({ color }: { color: string }) => {
-  const credits = useCreditsStore((s) => s.credits ?? 0);
+  const credits = useCreditsStore((s) => s.credits || s.guestFreeLeft || 0);
   const label = `Credits: ${credits}`;
 
   return (
@@ -228,24 +236,53 @@ const ProfileTabIcon = ({ color }: { color: string }) => {
   );
 };
 
+const CustomOutfitTabIcon = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <View style={s.customOutfitIconWrap}>
+      <View style={s.premiumBadge}>
+        <Text style={s.premiumText}>Premium</Text>
+      </View>
+
+      {children}
+    </View>
+  );
+};
+
 const s = StyleSheet.create({
+  customOutfitIconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  premiumBadge: {
+    position: 'absolute',
+    top: -10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 56,
+    height: 18,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    backgroundColor: '#111827',
+  },
+  premiumText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#fff',
+  },
   profileIconWrap: {
-    width: 34,
-    height: 30,
+    width: 75,
     alignItems: 'center',
     justifyContent: 'center',
   },
   creditsBadge: {
     position: 'absolute',
-    top: -8,
-    right: -40,
+    top: -10,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 64,
-    height: 22,
+    minWidth: 60,
+    height: 18,
     paddingHorizontal: 8,
-    borderTopLeftRadius: 999,
-    borderBottomLeftRadius: 999,
+    borderRadius: 100,
     backgroundColor: '#111827',
   },
   creditsText: {

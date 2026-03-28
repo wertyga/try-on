@@ -3,11 +3,15 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { createTask, createTaskBySample } from '@/api';
-import { trackTaskSucceededEvent } from '@/analytics';
 import { getTryOnTaskFromTask } from '@/utils';
 import { getGenerateButtonDisabled } from './GenerateTaskButton.utils';
 import { useGenerateTaskData } from './useGenerateTaskData';
 import { TTryOnSample } from '@/stores';
+import {
+  trackCreditSpent,
+  trackCustomGenerationStarted,
+  trackTaskCreated,
+} from '@/analytics';
 
 type TGenerateTaskButtonProps = {
   selfUpload?: boolean;
@@ -24,7 +28,6 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   const {
     addTask,
     fetchCategoriesForImages,
-    trackTaskCreating,
     user,
     credits,
     payload,
@@ -48,7 +51,9 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
     setCreating(true);
 
     try {
-      trackTaskCreating();
+      if (selfUpload) {
+        trackCustomGenerationStarted();
+      }
 
       if (selfUpload) {
         // TODO: Disable for now
@@ -70,7 +75,8 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
           });
 
       addTask(getTryOnTaskFromTask(task, fingerPrint, false));
-      trackTaskSucceededEvent(task._id, fingerPrint);
+      trackTaskCreated(selfUpload ? 'custom' : 'sample', task._id);
+      trackCreditSpent(selfUpload ? 'custom' : 'sample', task._id);
 
       await credits.onGenerationSuccess();
 

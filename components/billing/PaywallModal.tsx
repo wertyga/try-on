@@ -1,37 +1,47 @@
 import React, { FC, useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BottomModal } from '@/components/ui/BottomModal';
 import { Colors } from '@/constants/Colors';
 import { PaywallContent } from './PaywallContent';
 import { useCreditsStore } from '@/stores/creditStore';
+import { useTranslation } from 'react-i18next';
 
 type PaywallModalProps = {
   visible: boolean;
   onClose: () => void;
-  title?: string;
-  subtitle?: string;
+  titleKey?: string;
+  subtitleKey?: string;
 };
 
 export const PaywallModal: FC<PaywallModalProps> = ({
   visible,
   onClose,
-  title = 'Get more generations',
-  subtitle = 'Top up credits to keep creating try-ons without waiting for the daily reset.',
+  titleKey = 'paywall.default.title',
+  subtitleKey = 'paywall.default.subtitle',
 }) => {
+  const { t } = useTranslation();
   const load = useCreditsStore((s) => s.load);
+  const fetchPacks = useCreditsStore((s) => s.fetchPacks);
+  const isLoading = useCreditsStore((s) => s.isLoading);
+  const isBuyingPack = useCreditsStore((s) => s.isBuyingPack);
 
   useEffect(() => {
     if (!visible) return;
 
     load();
-  }, [visible, load]);
+    fetchPacks();
+  }, [visible, load, fetchPacks]);
 
   return (
-    <BottomModal visible={visible} onClose={onClose}>
+    <BottomModal
+      visible={visible}
+      onClose={onClose}
+      isLoading={isLoading || isBuyingPack}
+    >
       <View style={s.header}>
         <View style={s.headerCopy}>
-          <Text style={s.title}>{title}</Text>
-          <Text style={s.subtitle}>{subtitle}</Text>
+          <Text style={s.title}>{t(titleKey)}</Text>
+          <Text style={s.subtitle}>{t(subtitleKey)}</Text>
         </View>
       </View>
 

@@ -1,14 +1,12 @@
 import { View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
-import { Stack, usePathname } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '../stores/billings/stripe';
-import { installGlobalErrorHandlers } from '@/utils/errors';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { UpdateBanner } from '@/updates';
-import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -23,14 +21,11 @@ import { ModalsList } from '@/components/ModalsList';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const pathname = usePathname();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   const { getDeviceId, appDeviceId } = useAppStore();
-
-  const [state, setState] = useState(true);
 
   useEffect(() => {
     const hasDeviceId = appDeviceId !== null;
@@ -39,10 +34,6 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded, appDeviceId]);
-
-  useEffect(() => {
-    Analytics.screen(pathname);
-  }, [pathname]);
 
   useEffect(() => {
     getDeviceId();

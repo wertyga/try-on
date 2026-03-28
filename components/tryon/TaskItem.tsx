@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { TaskStatus } from '@/types/task';
 import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
-import { trackTaskErrorEvent } from '@/analytics';
 import { useErrorMessage } from '@/utils/errors';
 import { DownloadImageButton } from '@/components/DownloadImageButton';
 
@@ -43,12 +42,6 @@ export function TaskItem({
   const { t } = useTranslation();
 
   const errorMessage = useErrorMessage(task.error);
-
-  useEffect(() => {
-    if (!errorMessage) return;
-
-    trackTaskErrorEvent({ ...task, errorMessage });
-  }, [errorMessage]);
 
   const isInProcess =
     task.status === TaskStatus.queued || task.status === TaskStatus.running;

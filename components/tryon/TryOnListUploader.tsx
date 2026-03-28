@@ -11,6 +11,7 @@ export const TryOnListUploader = () => {
   const { t } = useTranslation();
 
   const [isGarmentOpened, setIsGarmentOpened] = useState(false);
+  const [isGarmentLoading, setIsGarmentLoading] = useState(false);
 
   const { mode, dress, upper, lower, glasses, hairstyle, accessories } =
     useTryOnStore();
@@ -97,8 +98,9 @@ export const TryOnListUploader = () => {
       <BottomModal
         visible={isGarmentOpened}
         onClose={() => setIsGarmentOpened(false)}
+        isLoading={isGarmentLoading}
       >
-        <GarmentUploader />
+        <GarmentUploader onBusyChange={setIsGarmentLoading} />
       </BottomModal>
     </View>
   );
