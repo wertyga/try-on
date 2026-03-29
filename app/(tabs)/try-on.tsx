@@ -100,12 +100,6 @@ export default function TryOn() {
         />
       )}
 
-      {/*<View style={{ alignItems: 'flex-end', marginBottom: 8 }}>*/}
-      {/*  <CreditsBadge />*/}
-      {/*</View>*/}
-
-      {/*<GenerateTaskButton selfUpload={false} selectedSample={selectedSample} />*/}
-
       <ReccomendationProducts />
     </Container.WithTabBar>
   );

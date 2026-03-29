@@ -62,8 +62,10 @@ export function buildTryOnPayload({
 }
 
 export function hasPendingTryOnTask(tasks: TryOnTask[]) {
-  return tasks.some(
-    (t) => t.status === TaskStatus.running || t.status === TaskStatus.queued,
+  return (
+    tasks?.some(
+      (t) => t.status === TaskStatus.running || t.status === TaskStatus.queued,
+    ) ?? []
   );
 }
 

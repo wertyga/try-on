@@ -119,7 +119,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
       storage.get('tasks'),
     ]);
 
-    set({ userPhoto, tasks });
+    set({ userPhoto, tasks: tasks ?? [] });
   },
 
   setConsent: (consent: boolean) => {

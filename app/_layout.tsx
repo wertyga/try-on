@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBox } from '@/components/ui/StatusBox';
 import { useAppStore } from '@/stores/appStore';
 import { ModalsList } from '@/components/ModalsList';
+import { sendLogs } from '@/api';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -73,6 +74,10 @@ export function ErrorBoundary({
   error: Error;
   retry: () => void;
 }) {
+  useEffect(() => {
+    sendLogs(error);
+  }, []);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView
@@ -82,9 +87,9 @@ export function ErrorBoundary({
         }}
       >
         <View style={{ padding: 16 }}>
-          <View style={{ marginBottom: 16 }}>
+          <ScrollView style={{ marginBottom: 16 }}>
             <StatusBox message={String(error?.message)} variant="error" />
-          </View>
+          </ScrollView>
 
           <Button onPress={retry} dark>
             Repeat

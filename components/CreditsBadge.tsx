@@ -9,9 +9,8 @@ type Props = {
 };
 
 export function CreditsBadge({ variant = 'compact' }: Props) {
-  console.log('CreditsBadge');
   const { freeDailyLeft, credits, guestFreeLeft } = useCreditsStore();
-  console.log({ credits });
+
   const parts: string[] = [];
 
   if (freeDailyLeft > 0) {
@@ -30,7 +29,7 @@ export function CreditsBadge({ variant = 'compact' }: Props) {
   if (parts.length === 0) {
     parts.push('No generations left');
   }
-  console.log({ parts });
+
   return (
     <Pressable
       onPress={() => router.push('/paywall')}
