@@ -1,4 +1,4 @@
-export const iosConfig = (version) => ({
+const iosConfig = (version) => ({
   bundleIdentifier: 'com.wertyga.tryon',
   supportsTablet: true,
   usesAppleSignIn: true,
@@ -15,7 +15,7 @@ export const iosConfig = (version) => ({
   },
 });
 
-export const androidConfig = (version) => {
+const androidConfig = (version) => {
   return {
     versionCode: version,
     adaptiveIcon: {
@@ -35,7 +35,7 @@ export const androidConfig = (version) => {
   };
 };
 
-export const pluginsConfig = [
+const pluginsConfig = [
   ['expo-apple-authentication'],
   ['@react-native-firebase/app'],
   ['expo-iap'],
@@ -67,3 +67,9 @@ export const pluginsConfig = [
     },
   ],
 ];
+
+module.exports = {
+  iosConfig,
+  pluginsConfig,
+  androidConfig
+}

@@ -78,13 +78,13 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
-    "sp-react-native-in-app-updates": "^1.5.0",
     "uuid": "^13.0.0",
     "yup": "^1.7.0",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/node": "^25.5.0",
     "@types/react": "~19.0.10",
     "@types/uuid": "^10.0.0",
     "eslint": "^9.25.0",

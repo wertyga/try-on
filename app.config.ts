@@ -1,9 +1,9 @@
 import { ExpoConfig } from 'expo/config';
-import {
+const {
   androidConfig,
   iosConfig,
   pluginsConfig,
-} from './config/app.config.js';
+} = require('./config/app.config.js');
 
 const VERSION = '4.0.1';
 export const BUILD_VERSION = 15;
