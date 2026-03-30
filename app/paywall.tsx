@@ -28,7 +28,7 @@ export default function PaywallScreen() {
     trackPaywallOpened('screen');
     load();
     fetchPacks();
-  }, [load]);
+  }, [fetchPacks, load]);
 
   const timeLeft = useMemo(() => formatTimeLeft(resetsAt), [resetsAt]);
 
@@ -39,7 +39,7 @@ export default function PaywallScreen() {
           headerShown: false,
         }}
       />
-      <Container title="Get more generations" isLoading={isBuying}>
+      <Container title="Upgrade to TryOn Premium" isLoading={isBuying}>
         {/* Error */}
         {error && (
           <Pressable onPress={clearError} style={s.errorBox}>
@@ -113,18 +113,20 @@ const s = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: '#EEF2FF',
-  },
-  backText: { fontWeight: '800', color: '#111827' },
-
-  card: {
     backgroundColor: Colors.light.cardBg,
-    borderRadius: 16,
-    padding: 12,
     borderWidth: 1,
     borderColor: Colors.light.border,
   },
-  title: { fontSize: 18, fontWeight: '900', marginBottom: 8 },
+  backText: { fontWeight: '700', color: Colors.light.text },
+
+  card: {
+    backgroundColor: Colors.light.cardBg,
+    borderRadius: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+  },
+  title: { fontSize: 22, fontWeight: '500', marginBottom: 8, color: Colors.light.text },
 
   line: {
     flexDirection: 'row',
@@ -133,8 +135,8 @@ const s = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.light.border,
   },
-  label: { color: '#6B7280', fontWeight: '700' },
-  value: { fontWeight: '900', color: '#111827' },
+  label: { color: Colors.light.textDisabled, fontWeight: '600' },
+  value: { fontWeight: '700', color: Colors.light.text },
 
   hint: { marginTop: 8, color: '#6B7280', fontSize: 12 },
 
@@ -176,7 +178,7 @@ const s = StyleSheet.create({
   },
   buyText: { color: '#fff', fontWeight: '900' },
 
-  muted: { color: '#6B7280', fontWeight: '700' },
+  muted: { color: Colors.light.textDisabled, fontWeight: '600' },
 
   errorBox: {
     padding: 12,
@@ -188,5 +190,5 @@ const s = StyleSheet.create({
   errorText: { color: '#991B1B', fontWeight: '900' },
   errorHint: { color: '#991B1B', marginTop: 4, fontSize: 12 },
 
-  footer: { marginTop: 8, color: '#6B7280', fontSize: 12 },
+  footer: { marginTop: 8, color: Colors.light.textDisabled, fontSize: 12 },
 });

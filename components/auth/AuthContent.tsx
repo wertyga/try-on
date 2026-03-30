@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { AuthCommonRequest } from '@/types';
 import { useAuthStore } from '@/stores';
@@ -9,6 +9,7 @@ import OauthGoogle from '@/components/auth/OauthGoogle/OauthGoogle';
 import { SignInForm } from '@/components/auth/SignInForm/SignInForm';
 import { SignUpForm } from '@/components/auth/SignUpForm/SignUpForm';
 import { RecoveryPasswordForm } from '@/components/auth/RecoveryPasswordForm/RecoveryPasswordForm';
+import { Colors } from '@/constants/Colors';
 
 type TState = 'signin' | 'signup' | 'recovery-password';
 
@@ -94,42 +95,55 @@ export const AuthContent: FC<AuthContentProps> = ({
       contentContainerStyle={s.content}
       showsVerticalScrollIndicator={false}
     >
-      <View style={s.topRow}>
-        <Button style={s.switchButton} onPress={toggleFormState} transparent>
-          {state === 'signin' ? 'Register' : 'Login'}
-        </Button>
-      </View>
+      <View style={s.card}>
+        <Text style={s.cardTitle}>
+          {state === 'signin'
+            ? 'Sign In'
+            : state === 'signup'
+              ? 'Create Account'
+              : 'Reset Password'}
+        </Text>
 
-      {state === 'signup' && (
-        <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
-      )}
-      {state === 'signin' && (
-        <SignInForm onSubmit={onSignIn} isLoading={isLoading} />
-      )}
-      {state === 'recovery-password' && (
-        <RecoveryPasswordForm onSubmit={onRecoveryPassword} codeSent={codeSent} />
-      )}
-
-      {!hideOauth && (
-        <View style={s.oauth}>
-          {Platform.OS === 'ios' && <OauthApple onSuccess={onAuthSuccess} />}
-          <OauthGoogle onSuccess={onAuthSuccess} />
+        <View style={s.topRow}>
+          <Button style={s.switchButton} onPress={toggleFormState} transparent>
+            {state === 'signin' ? 'Register' : 'Login'}
+          </Button>
         </View>
-      )}
 
-      <Button
-        transparent
-        style={s.forgotButton}
-        onPress={() => setState('recovery-password')}
-      >
-        Forgot password?
-      </Button>
+        {state === 'signup' && (
+          <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
+        )}
+        {state === 'signin' && (
+          <SignInForm onSubmit={onSignIn} isLoading={isLoading} />
+        )}
+        {state === 'recovery-password' && (
+          <RecoveryPasswordForm
+            onSubmit={onRecoveryPassword}
+            codeSent={codeSent}
+          />
+        )}
 
-      {showMaybeLater && onMaybeLaterPress ? (
-        <Button transparent style={s.laterButton} onPress={onMaybeLaterPress}>
-          Maybe later
+        {!hideOauth && (
+          <View style={s.oauth}>
+            {Platform.OS === 'ios' && <OauthApple onSuccess={onAuthSuccess} />}
+            <OauthGoogle onSuccess={onAuthSuccess} />
+          </View>
+        )}
+
+        <Button
+          transparent
+          style={s.forgotButton}
+          onPress={() => setState('recovery-password')}
+        >
+          Forgot password?
         </Button>
-      ) : null}
+
+        {showMaybeLater && onMaybeLaterPress ? (
+          <Button transparent style={s.laterButton} onPress={onMaybeLaterPress}>
+            Maybe later
+          </Button>
+        ) : null}
+      </View>
     </ScrollView>
   );
 };
@@ -141,6 +155,21 @@ const s = StyleSheet.create({
   content: {
     paddingTop: 12,
     paddingBottom: 24,
+  },
+  card: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+    backgroundColor: Colors.light.cardBg,
+  },
+  cardTitle: {
+    textAlign: 'center',
+    fontSize: 32,
+    lineHeight: 38,
+    color: Colors.light.text,
+    marginBottom: 8,
+    fontWeight: '500',
   },
   topRow: {
     alignItems: 'flex-end',
@@ -157,6 +186,6 @@ const s = StyleSheet.create({
     marginTop: 20,
   },
   laterButton: {
-    marginTop: 12,
+    marginTop: 8,
   },
 });

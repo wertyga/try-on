@@ -51,22 +51,24 @@ export const Input = ({
 const styles = StyleSheet.create({
   field: {
     width: '100%',
-    borderColor: Colors.light.textDisabled,
+    borderColor: Colors.light.border,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     overflow: 'hidden',
+    backgroundColor: Colors.light.cardBg,
   },
   fieldError: {
     borderColor: '#D33', // можешь оставить Colors.light.text если не хочешь красный
   },
 
   inputBase: {
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(246, 245, 242, 0.40)',
-    color: 'black',
+    paddingHorizontal: 14,
+    backgroundColor: Colors.light.cardBg,
+    color: Colors.light.text,
+    fontSize: 15,
   },
   inputSingle: {
-    height: 42,
+    height: 48,
     paddingVertical: 10,
   },
   inputMultiline: {
