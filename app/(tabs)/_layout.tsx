@@ -175,19 +175,12 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.light.tint,
-        tabBarInactiveTintColor: Colors.light.tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: '#FFFCF9',
-          borderTopColor: Colors.light.border,
           paddingTop: 8,
           paddingBottom: 0,
           height: insets.bottom > 30 ? 60 : 80,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
         },
       }}
     >
@@ -269,7 +262,7 @@ const s = StyleSheet.create({
     height: 18,
     paddingHorizontal: 8,
     borderRadius: 999,
-    backgroundColor: '#2F2A25',
+    backgroundColor: '#111827',
   },
   premiumText: {
     fontSize: 9,
@@ -290,7 +283,7 @@ const s = StyleSheet.create({
     height: 18,
     paddingHorizontal: 8,
     borderRadius: 100,
-    backgroundColor: '#2F2A25',
+    backgroundColor: '#111827',
   },
   creditsText: {
     fontSize: 9,

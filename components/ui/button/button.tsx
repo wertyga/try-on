@@ -82,12 +82,12 @@ export const Button: FC<TButtonProps> = ({
 
 const s = StyleSheet.create({
   container: {
-    minHeight: 52,
-    paddingHorizontal: 20,
+    minHeight: 50,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 14,
+    borderRadius: 12,
   },
 
   solid: { backgroundColor: Colors.light.btnBg },
@@ -98,15 +98,15 @@ const s = StyleSheet.create({
   flexStart: { justifyContent: 'flex-start' },
 
   // states
-  pressed: { opacity: 0.88 },
-  disabled: { backgroundColor: Colors.light.disabledBg },
+  pressed: { opacity: 0.85 },
+  disabled: { backgroundColor: '#D1D5DB' }, // gray-300
   disabledTransparent: { opacity: 0.5 },
 
   // text
-  text: { fontWeight: 600, fontSize: 16, letterSpacing: 0.2 },
+  text: { fontWeight: 700 },
   textTransparent: { color: Colors.light.text },
-  textDisabled: { color: Colors.light.textDisabled },
-  textDisabledTransparent: { color: Colors.light.textDisabled },
+  textDisabled: { color: '#9CA3AF' }, // gray-400
+  textDisabledTransparent: { color: '#9CA3AF' },
   loadingText: { opacity: 0 }, // прячем текст под лоадер
 
   darkTextTheme: {
