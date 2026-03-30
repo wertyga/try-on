@@ -170,6 +170,10 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   },
 
   load: async () => {
+    if (get().isLoading) {
+      return;
+    }
+
     set({ isLoading: true, error: null });
 
     try {

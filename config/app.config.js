@@ -44,9 +44,12 @@ const pluginsConfig = [
     {
       ios: {
         useFrameworks: 'static',
-        extraPods: [
-          { name: 'GoogleUtilities', modular_headers: true },
-          { name: 'FirebaseCoreInternal', modular_headers: true },
+        buildReactNativeFromSource: true,
+        forceStaticLinking: [
+          'FirebaseCore',
+          'FirebaseCoreExtension',
+          'FirebaseCoreInternal',
+          'GoogleUtilities',
         ],
       },
     },
@@ -71,5 +74,5 @@ const pluginsConfig = [
 module.exports = {
   iosConfig,
   pluginsConfig,
-  androidConfig
-}
+  androidConfig,
+};

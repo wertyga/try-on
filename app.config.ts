@@ -5,7 +5,7 @@ const {
   pluginsConfig,
 } = require('./config/app.config.js');
 
-const VERSION = '4.0.1';
+const VERSION = '4.0.2';
 export const BUILD_VERSION = 15;
 
 export default (): ExpoConfig => ({
@@ -17,7 +17,6 @@ export default (): ExpoConfig => ({
   icon: './assets/icon_black_bg.png',
   scheme: 'tryon',
   userInterfaceStyle: 'automatic',
-  newArchEnabled: true,
   ios: iosConfig(BUILD_VERSION),
   splash: {
     image: './assets/splash_t.png',
