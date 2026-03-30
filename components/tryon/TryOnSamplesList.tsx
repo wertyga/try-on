@@ -1,6 +1,5 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/Colors';
 import {
   TTryOnSample,
   useTryOnSamplesStore,
@@ -32,6 +31,11 @@ export const TryOnSamplesList = ({
   return (
     <View style={s.card}>
       <Text style={s.cardTitle}>Popular styles</Text>
+      <View style={s.dividerRow}>
+        <View style={s.divider} />
+        <Text style={s.sectionTitle}>Select Outfit</Text>
+        <View style={s.divider} />
+      </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -43,6 +47,7 @@ export const TryOnSamplesList = ({
             <TryOnSampleItem
               key={item._id}
               item={item}
+              isSelected={item._id === selectedSampleId}
               onPress={onSelectSample}
             />
           );
@@ -54,22 +59,36 @@ export const TryOnSamplesList = ({
 
 const s = StyleSheet.create({
   card: {
-    backgroundColor: Colors.light.cardBg,
-    borderRadius: 16,
-    paddingTop: 12,
+    backgroundColor: 'transparent',
+    borderRadius: 0,
+    paddingTop: 8,
     marginBottom: 12,
   },
   cardTitle: {
-    color: Colors.light.text,
-    fontSize: 16,
-    fontWeight: '700',
-    paddingHorizontal: 12,
+    display: 'none',
+  },
+  dividerRow: {
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#CBD2E1',
+  },
+  sectionTitle: {
+    color: '#3B4E77',
+    fontSize: 20,
+    fontWeight: '800',
   },
   list: {
     gap: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingRight: 20,
     paddingBottom: 12,
-    paddingTop: 12,
+    paddingTop: 2,
   },
 });

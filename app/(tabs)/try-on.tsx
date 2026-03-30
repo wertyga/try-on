@@ -1,12 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
-import { GenerateTaskButton, TaskPresetsSection } from '@/components/tryon';
+import { TaskPresetsSection } from '@/components/tryon';
 import { useCreditsStore } from '@/stores/creditStore';
-import { CreditsBadge } from '@/components/CreditsBadge';
 import { TryOnSamplesList } from '@/components/tryon/TryOnSamplesList';
 import { TTryOnSample } from '@/stores/useTryOnSamplesStore';
 import { UserPhotoUploader } from '@/components/tryon/UserPhotoUploader';
@@ -21,6 +20,7 @@ import {
   trackSampleClicked,
   trackTaskCreated,
 } from '@/analytics';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TryOn() {
   const credits = useCreditsStore();
@@ -82,11 +82,20 @@ export default function TryOn() {
   };
 
   return (
-    <Container.WithTabBar
-      keyboardShouldPersistTaps="handled"
-      title={t('home.title')}
-    >
-      <UserPhotoUploader />
+    <Container.WithTabBar keyboardShouldPersistTaps="handled">
+      <View style={s.topBar}>
+        <View style={s.topPill}>
+          <Text style={s.topPillText}>AR</Text>
+        </View>
+        <View style={s.logoWrap}>
+          <Text style={s.logoText}>TryOn</Text>
+        </View>
+        <View style={s.topPill}>
+          <MaterialIcons name="auto-fix-high" size={24} color="#fff" />
+        </View>
+      </View>
+
+      <UserPhotoUploader variant="hero" />
 
       <TryOnSamplesList
         selectedSampleId={selectedSample?._id}
@@ -104,3 +113,36 @@ export default function TryOn() {
     </Container.WithTabBar>
   );
 }
+
+const s = StyleSheet.create({
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    marginTop: 4,
+  },
+  topPill: {
+    backgroundColor: '#8B97AE',
+    borderRadius: 999,
+    minWidth: 74,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  topPillText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  logoWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#33456A',
+  },
+});

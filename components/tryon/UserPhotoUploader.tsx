@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +20,11 @@ import { BottomModal } from '@/components/ui/BottomModal';
 
 const { height } = Dimensions.get('window');
 
-export function UserPhotoUploader() {
+type TUserPhotoUploaderProps = {
+  variant?: 'default' | 'hero';
+};
+
+export function UserPhotoUploader({ variant = 'default' }: TUserPhotoUploaderProps) {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [isPhotoProcessing, setIsPhotoProcessing] = useState(false);
   const [isSourceModalVisible, setIsSourceModalVisible] = useState(false);
@@ -129,17 +134,15 @@ export function UserPhotoUploader() {
     }
   }
 
-  async function clearPhoto() {
-    setUserPhoto(null);
-  }
-
   return (
     <>
-      <View style={s.card}>
-        {/*<Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>*/}
+      <View style={[s.card, variant === 'hero' && s.heroCard]}>
+        {variant === 'hero' && (
+          <Text style={s.heroTitle}>See how the clothes look on you!</Text>
+        )}
 
         <Pressable
-          style={s.previewFrame}
+          style={[s.previewFrame, variant === 'hero' && s.heroPreviewFrame]}
           onPress={() => setIsSourceModalVisible(true)}
           disabled={isPhotoLoading || isPhotoProcessing}
         >
@@ -147,7 +150,7 @@ export function UserPhotoUploader() {
             <Image
               source={{ uri: userPhoto.uri }}
               style={s.preview}
-              resizeMode="contain"
+              resizeMode={variant === 'hero' ? 'cover' : 'contain'}
             />
           ) : (
             <View style={s.placeholder}>
@@ -163,11 +166,31 @@ export function UserPhotoUploader() {
           )}
         </Pressable>
 
-        {/*{userPhoto && (*/}
-        {/*  <Pressable style={s.clearBtn} onPress={clearPhoto}>*/}
-        {/*    <Text style={s.clearBtnText}>{t('welcome.clear')}</Text>*/}
-        {/*  </Pressable>*/}
-        {/*)}*/}
+        {variant === 'hero' && (
+          <View style={s.heroActions}>
+            <Pressable
+              style={[s.heroButton, s.heroButtonSecondary]}
+              onPress={pickFromGallery}
+              disabled={isPhotoLoading || isPhotoProcessing}
+            >
+              <MaterialIcons name="photo-camera" size={22} color="#3B4E77" />
+              <Text style={[s.heroButtonText, s.heroButtonTextSecondary]}>
+                Change Photo
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[s.heroButton, s.heroButtonPrimary]}
+              onPress={takeFromCamera}
+              disabled={isPhotoLoading || isPhotoProcessing}
+            >
+              <MaterialIcons name="photo-camera" size={22} color="#fff" />
+              <Text style={[s.heroButtonText, s.heroButtonTextPrimary]}>
+                Take Photo
+              </Text>
+            </Pressable>
+          </View>
+        )}
       </View>
 
       <BottomModal
@@ -212,6 +235,19 @@ const s = StyleSheet.create({
     marginBottom: 12,
     borderColor: Colors.light.border,
   },
+  heroCard: {
+    borderRadius: 28,
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+    backgroundColor: '#FAFBFF',
+  },
+  heroTitle: {
+    color: '#33456A',
+    fontSize: 22,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 14,
+  },
   cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
   muted: { color: '#6B7280' },
   placeholder: {
@@ -240,6 +276,11 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heroPreviewFrame: {
+    borderRadius: 0,
+    height: height * 0.58,
+    backgroundColor: '#EEF0F7',
+  },
   preview: { width: '100%', height: '100%' },
   loaderOverlay: {
     position: 'absolute',
@@ -267,4 +308,41 @@ const s = StyleSheet.create({
     backgroundColor: '#FFE4E6',
   },
   modalCancelText: { color: '#991B1B', fontWeight: '700' },
+  heroActions: {
+    marginTop: -38,
+    marginBottom: 6,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  heroButton: {
+    borderRadius: 999,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: '46%',
+    justifyContent: 'center',
+    shadowColor: '#1C2B4A',
+    shadowOpacity: 0.16,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  heroButtonSecondary: {
+    backgroundColor: '#FFFFFF',
+  },
+  heroButtonPrimary: {
+    backgroundColor: '#1964E8',
+  },
+  heroButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  heroButtonTextPrimary: {
+    color: '#fff',
+  },
+  heroButtonTextSecondary: {
+    color: '#3B4E77',
+  },
 });
