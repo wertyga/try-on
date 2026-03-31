@@ -6,7 +6,6 @@ import {
   Image,
   Pressable,
   useWindowDimensions,
-  RefreshControl,
   Alert,
 } from 'react-native';
 import { Container } from '@/components/ui/Container';
@@ -61,13 +60,7 @@ export default function WardrobeScreen() {
   };
 
   return (
-    <Container.WithTabBar
-      title={t('wardrobe.title')}
-      isLoading={isFetching}
-      // refreshControl={
-      //   <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
-      // }
-    >
+    <Container.WithTabBar title={t('wardrobe.title')} isLoading={isFetching}>
       {items.length === 0 && !isFetching ? (
         <View style={s.empty}>
           <Text style={s.emptyTitle}>{t('wardrobe.emptyTitle')}</Text>
@@ -113,7 +106,7 @@ function formatDate(d?: string) {
 const s = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   card: {
-    aspectRatio: 1,
+    aspectRatio: 3 / 4,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#F3F4F6',

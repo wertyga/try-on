@@ -27,23 +27,19 @@ export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
 
 const s = StyleSheet.create({
   item: {
-    width: 132,
-    borderRadius: 14,
-    padding: 4,
-    paddingBottom: 12,
+    width: 114,
   },
   image: {
     width: '100%',
-    height: 172,
-    borderRadius: 14,
+    height: 156,
+    borderRadius: 16,
     backgroundColor: '#F3F4F6',
   },
   itemTitle: {
     color: Colors.light.text,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     marginTop: 8,
-    marginLeft: 10,
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
   },
 });

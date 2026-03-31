@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   Pressable,
-  Image,
   Alert,
   ActivityIndicator,
   Platform,
@@ -84,9 +83,7 @@ export default function Garment() {
   }
 
   return (
-    <Container.WithTabBar>
-      <Text style={s.title}>{t('garnet.title')}</Text>
-
+    <Container.WithTabBar title={t('garnet.title')}>
       {/* Mode switch */}
       <View style={s.switchRow}>
         <Pressable
@@ -161,53 +158,8 @@ export default function Garment() {
   );
 }
 
-function Card({
-  title,
-  imageUri,
-  onPick,
-  onClear,
-}: {
-  title: string;
-  imageUri?: string;
-  onPick: () => void;
-  onClear: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <View style={s.card}>
-      <Text style={s.cardTitle}>{title}</Text>
-
-      {imageUri ? (
-        <View style={s.previewFrame}>
-          <Image
-            source={{ uri: imageUri }}
-            style={s.preview}
-            resizeMode="contain"
-          />
-        </View>
-      ) : (
-        <Text style={s.muted}>{t('garnet.noImage')}</Text>
-      )}
-
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <Pressable style={s.primaryBtn} onPress={onPick}>
-          <Text style={s.primaryBtnText}>
-            {imageUri ? t('garnet.replace') : t('garnet.upload')}
-          </Text>
-        </Pressable>
-        {imageUri && (
-          <Pressable style={s.clearBtn} onPress={onClear}>
-            <Text style={s.clearBtnText}>{t('garnet.clear')}</Text>
-          </Pressable>
-        )}
-      </View>
-    </View>
-  );
-}
-
 const s = StyleSheet.create({
   container: { padding: 16, paddingBottom: 24 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 8 },
   switchRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   switchBtn: {
     flex: 1,

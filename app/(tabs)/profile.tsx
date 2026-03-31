@@ -44,7 +44,7 @@ export default function UserScreen() {
         },
       },
     ]);
-  }, []);
+  }, [logout, t]);
 
   useFocus(() => {
     loadCredits();
@@ -53,7 +53,7 @@ export default function UserScreen() {
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <Container childrenStyle={s.containerBody}>
+    <Container title={t('profile.title')} childrenStyle={s.containerBody}>
       <View>
         {/* Header */}
         <View style={s.header}>

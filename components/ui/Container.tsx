@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LoaderOverlay } from '@/components/Loader';
 import { buildStyles } from '@/utils';
 
@@ -19,10 +18,6 @@ export type TContainerProps = ScrollViewProps & {
   title?: string;
   isLoading?: boolean;
   childrenStyle?: StyleProp<ViewStyle>;
-};
-
-const Title: FC<{ title: string }> = ({ title }) => {
-  return <Text style={s.title}>{title}</Text>;
 };
 
 const ScrollContent = ({
@@ -36,13 +31,11 @@ const ScrollContent = ({
 }: TContainerProps) => {
   return (
     <ScrollView
-      style={buildStyles(s.container, style)}
+      style={buildStyles(s.scroll, style)}
       contentContainerStyle={buildStyles(s.content, contentContainerStyle)}
       showsVerticalScrollIndicator={false}
       {...scrollViewProps}
     >
-      {!!title && <Title title={title} />}
-
       <View style={[{ width: '100%', flex: 1 }, childrenStyle]}>
         {children}
       </View>
@@ -58,12 +51,19 @@ export const Container = ({
   ...props
 }: TContainerProps) => {
   return (
-    <ScrollContent
-      {...props}
-      contentContainerStyle={[{ paddingBottom: 16 }, contentContainerStyle]}
-    >
-      {children}
-    </ScrollContent>
+    <View style={s.container}>
+      {!!props.title && (
+        <View style={s.header}>
+          <Text style={s.title}>{props.title}</Text>
+        </View>
+      )}
+      <ScrollContent
+        {...props}
+        contentContainerStyle={[{ paddingBottom: 16 }, contentContainerStyle]}
+      >
+        {children}
+      </ScrollContent>
+    </View>
   );
 };
 
@@ -73,31 +73,54 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
   ...props
 }) => {
   return (
-    <ScrollContent
-      {...props}
-      contentContainerStyle={Platform.select({
-        android: {
-          paddingBottom: 32,
-        },
-        ios: {
-          paddingBottom: 16,
-        },
-      })}
-    >
-      {children}
-    </ScrollContent>
+    <View style={s.container}>
+      {!!props.title && (
+        <View style={s.header}>
+          <Text style={s.title}>{props.title}</Text>
+        </View>
+      )}
+      <ScrollContent
+        {...props}
+        contentContainerStyle={Platform.select({
+          android: {
+            paddingBottom: 32,
+          },
+          ios: {
+            paddingBottom: 16,
+          },
+        })}
+      >
+        {children}
+      </ScrollContent>
+    </View>
   );
 };
 
 Container.WithTabBar = ScrollableContainerWithTabs;
 
 const s = StyleSheet.create({
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 16 },
-  content: { paddingHorizontal: 16, flexGrow: 1 },
   container: {
-    paddingTop: 16,
-    paddingHorizontal: 8,
     flex: 1,
     backgroundColor: Colors.light.background,
   },
+  header: {
+    backgroundColor: Colors.light.cardBg,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.border,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  title: {
+    color: Colors.light.text,
+    fontSize: 22,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  scroll: {
+    flex: 1,
+    paddingTop: 16,
+    paddingHorizontal: 0,
+    backgroundColor: Colors.light.background,
+  },
+  content: { paddingHorizontal: 16, flexGrow: 1 },
 });

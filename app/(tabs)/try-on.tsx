@@ -1,12 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
-import { GenerateTaskButton, TaskPresetsSection } from '@/components/tryon';
+import { TaskPresetsSection } from '@/components/tryon';
 import { useCreditsStore } from '@/stores/creditStore';
-import { CreditsBadge } from '@/components/CreditsBadge';
 import { TryOnSamplesList } from '@/components/tryon/TryOnSamplesList';
 import { TTryOnSample } from '@/stores/useTryOnSamplesStore';
 import { UserPhotoUploader } from '@/components/tryon/UserPhotoUploader';
@@ -85,22 +84,33 @@ export default function TryOn() {
     <Container.WithTabBar
       keyboardShouldPersistTaps="handled"
       title={t('home.title')}
+      contentContainerStyle={s.content}
     >
-      <UserPhotoUploader />
+      <UserPhotoUploader variant="hero" />
 
-      <TryOnSamplesList
-        selectedSampleId={selectedSample?._id}
-        onSelectSample={handleSampleSelect}
-      />
+      <View style={{ marginRight: -16 }}>
+        <TryOnSamplesList
+          selectedSampleId={selectedSample?._id}
+          onSelectSample={handleSampleSelect}
+        />
+      </View>
 
       {!!user && !!userPhoto?.base64 && (
-        <TaskPresetsSection
-          image={userPhoto.base64}
-          title={t('presets.sectionTitle')}
-        />
+        <View style={{ marginRight: -16 }}>
+          <TaskPresetsSection
+            image={userPhoto.base64}
+            title={t('presets.sectionTitle')}
+          />
+        </View>
       )}
 
       <ReccomendationProducts />
     </Container.WithTabBar>
   );
 }
+
+const s = StyleSheet.create({
+  content: {
+    paddingBottom: 28,
+  },
+});

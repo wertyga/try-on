@@ -55,21 +55,22 @@ export const TryOnSamplesList = ({
 const s = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.cardBg,
-    borderRadius: 16,
-    paddingTop: 12,
-    marginBottom: 12,
+    paddingTop: 4,
+    marginBottom: 16,
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
   },
   cardTitle: {
+    marginLeft: 16,
     color: Colors.light.text,
-    fontSize: 16,
-    fontWeight: '700',
-    paddingHorizontal: 12,
+    fontSize: 15,
+    fontWeight: '800',
+    paddingHorizontal: 0,
   },
   list: {
-    gap: 12,
-    paddingHorizontal: 12,
-    paddingRight: 20,
-    paddingBottom: 12,
-    paddingTop: 12,
+    paddingHorizontal: 16,
+    gap: 10,
+    paddingBottom: 14,
+    paddingTop: 10,
   },
 });

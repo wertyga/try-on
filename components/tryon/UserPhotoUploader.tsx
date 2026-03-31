@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useTranslation } from 'react-i18next';
@@ -19,13 +20,23 @@ import { BottomModal } from '@/components/ui/BottomModal';
 
 const { height } = Dimensions.get('window');
 
-export function UserPhotoUploader() {
+type UserPhotoUploaderProps = {
+  variant?: 'default' | 'hero';
+};
+
+export function UserPhotoUploader({
+  variant = 'default',
+}: UserPhotoUploaderProps) {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [isPhotoProcessing, setIsPhotoProcessing] = useState(false);
   const [isSourceModalVisible, setIsSourceModalVisible] = useState(false);
   const { t } = useTranslation();
 
   const { userPhoto, setUserPhoto } = useTryOnStore();
+  const isHero = variant === 'hero';
+  const ctaLabel = userPhoto
+    ? `${t('common.edit')} ${t('home.yourPhoto')}`
+    : t('home.addPhoto');
 
   async function processAndSetPhoto(
     uri: string,
@@ -129,29 +140,34 @@ export function UserPhotoUploader() {
     }
   }
 
-  async function clearPhoto() {
-    setUserPhoto(null);
-  }
-
   return (
     <>
-      <View style={s.card}>
-        {/*<Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>*/}
+      <View style={[s.card, isHero && s.heroCard]}>
+        {!isHero && <Text style={s.cardTitle}>{t('home.yourPhoto')}</Text>}
 
         <Pressable
-          style={s.previewFrame}
+          style={[s.previewFrame, isHero && s.heroPreviewFrame]}
           onPress={() => setIsSourceModalVisible(true)}
           disabled={isPhotoLoading || isPhotoProcessing}
         >
           {userPhoto ? (
             <Image
               source={{ uri: userPhoto.uri }}
-              style={s.preview}
+              style={[s.preview, isHero && s.heroPreview]}
               resizeMode="contain"
             />
           ) : (
-            <View style={s.placeholder}>
-              <Text style={s.muted}>{t('home.noPhoto')}</Text>
+            <View style={[s.placeholder, isHero && s.heroPlaceholder]}>
+              <View style={[s.placeholderIconWrap, isHero && s.heroIconWrap]}>
+                <MaterialIcons
+                  name="add-a-photo"
+                  size={isHero ? 30 : 24}
+                  color="#4B5563"
+                />
+              </View>
+              <Text style={[s.muted, isHero && s.heroMuted]}>
+                {t('home.noPhoto')}
+              </Text>
               <Text style={s.placeholderCta}>{t('home.addPhoto')}</Text>
             </View>
           )}
@@ -161,13 +177,16 @@ export function UserPhotoUploader() {
               <ActivityIndicator size="small" color="#111827" />
             </View>
           )}
-        </Pressable>
 
-        {/*{userPhoto && (*/}
-        {/*  <Pressable style={s.clearBtn} onPress={clearPhoto}>*/}
-        {/*    <Text style={s.clearBtnText}>{t('welcome.clear')}</Text>*/}
-        {/*  </Pressable>*/}
-        {/*)}*/}
+          {isHero && (
+            <View style={s.heroButtonWrap}>
+              <View style={s.heroButton}>
+                <MaterialIcons name="photo-camera" size={18} color="#374151" />
+                <Text style={s.heroButtonText}>{ctaLabel}</Text>
+              </View>
+            </View>
+          )}
+        </Pressable>
       </View>
 
       <BottomModal
@@ -212,6 +231,16 @@ const s = StyleSheet.create({
     marginBottom: 12,
     borderColor: Colors.light.border,
   },
+  heroCard: {
+    borderRadius: 24,
+    padding: 12,
+    marginBottom: 18,
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.06,
+    shadowRadius: 24,
+    elevation: 4,
+  },
   cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
   muted: { color: '#6B7280' },
   placeholder: {
@@ -221,15 +250,27 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  placeholderCta: { color: '#111827', fontWeight: '700' },
-  clearBtn: {
-    marginTop: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 10,
-    backgroundColor: '#FFE4E6',
+  heroPlaceholder: {
+    gap: 10,
   },
-  clearBtnText: { color: '#991B1B', fontWeight: '700' },
+  placeholderIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  heroIconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFFFFFD9',
+  },
+  placeholderCta: { color: '#111827', fontWeight: '700' },
+  heroMuted: {
+    fontSize: 15,
+  },
 
   previewFrame: {
     width: '100%',
@@ -240,7 +281,17 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  heroPreviewFrame: {
+    height: height * 0.39,
+    borderRadius: 24,
+    backgroundColor: '#EFE9E2',
+    borderWidth: 1,
+    borderColor: '#F2F0EC',
+  },
   preview: { width: '100%', height: '100%' },
+  heroPreview: {
+    borderRadius: 22,
+  },
   loaderOverlay: {
     position: 'absolute',
     right: 10,
@@ -248,6 +299,32 @@ const s = StyleSheet.create({
     backgroundColor: '#FFFFFFCC',
     borderRadius: 999,
     padding: 6,
+  },
+  heroButtonWrap: {
+    position: 'absolute',
+    bottom: 14,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  heroButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 999,
+    backgroundColor: '#FFFFFFF2',
+    shadowColor: '#111827',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  heroButtonText: {
+    color: '#374151',
+    fontSize: 15,
+    fontWeight: '700',
   },
   modalCard: {
     gap: 8,
