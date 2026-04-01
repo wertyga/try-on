@@ -29,8 +29,9 @@ export const UserBalance: FC<{
   resetsAt: string | null;
   freeDailyLeft: number;
   credits: number;
+  reservedCredits?: number;
   guestFreeLeft: number;
-}> = ({ resetsAt, credits, guestFreeLeft, freeDailyLeft }) => {
+}> = ({ resetsAt, credits, reservedCredits = 0, guestFreeLeft, freeDailyLeft }) => {
   const { t } = useTranslation();
   // const timeLeft = useMemo(() => formatTimeLeft(resetsAt, t), [resetsAt, t]);
 
@@ -50,6 +51,13 @@ export const UserBalance: FC<{
         <Text style={s.label}>Credits</Text>
         <Text style={s.value}>{credits ?? 0}</Text>
       </View>
+
+      {reservedCredits > 0 ? (
+        <View style={s.line}>
+          <Text style={s.label}>Reserved</Text>
+          <Text style={s.value}>{reservedCredits}</Text>
+        </View>
+      ) : null}
 
       {(guestFreeLeft ?? 0) > 0 ? (
         <View style={s.line}>

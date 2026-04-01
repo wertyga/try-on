@@ -45,7 +45,12 @@ const getTabs = ({
                 style={{ position: 'absolute' }}
               />
             )}
-            <MaterialIcons size={28} name="style" color={color} />
+            <MaterialIcons
+              size={28}
+              name="style"
+              color={color}
+              style={[isLoading && { opacity: 0 }]}
+            />
           </CustomOutfitTabIcon>
         );
       },
@@ -222,7 +227,11 @@ export default function TabLayout() {
 }
 
 const ProfileTabIcon = ({ color }: { color: string }) => {
-  const credits = useCreditsStore((s) => s.credits || s.guestFreeLeft || 0);
+  const credits = useCreditsStore((s) => {
+    const availablePaidCredits = s.getAvailablePaidCredits();
+
+    return availablePaidCredits || s.guestFreeLeft || 0;
+  });
   const label = `Credits: ${credits}`;
 
   return (

@@ -39,7 +39,7 @@ export default function TryOn() {
   }, []);
 
   const handleSampleSelect = (sample: TTryOnSample) => {
-    if (!userPhoto?.base64 || hasPendingTask) return;
+    if (!userPhoto?.base64) return;
 
     trackSampleClicked(sample._id);
 
@@ -52,6 +52,8 @@ export default function TryOn() {
 
           if (!credits.canGenerate(true)) return;
 
+          const reservationId = credits.beginGenerationReservation();
+
           try {
             setSelectedSample(sample);
 
@@ -62,14 +64,18 @@ export default function TryOn() {
             });
 
             const fingerprint = `${sample._id}|${hash(userPhoto.base64)}`;
-            addTask(getTryOnTaskFromTask(task, fingerprint, false));
+            const nextTask = getTryOnTaskFromTask(task, fingerprint, false);
+            nextTask.usesPaidCreditReservation = !!reservationId;
+
+            await credits.onGenerationStarted(reservationId, task._id);
+
+            addTask(nextTask);
             trackTaskCreated('sample', task._id);
             trackCreditSpent('sample', task._id);
 
-            await credits.onGenerationSuccess();
-
             router.push(`/task/${task._id}`);
           } catch (e: any) {
+            credits.releaseGenerationReservation(reservationId);
             Alert.alert(
               t('common.error'),
               e?.message || t('errors.failedToCreate'),
@@ -91,8 +97,8 @@ export default function TryOn() {
       <View style={{ marginRight: -16 }}>
         <TryOnSamplesList
           selectedSampleId={selectedSample?._id}
-          disabled={hasPendingTask}
-          isLoading={hasPendingTask}
+          // disabled={hasPendingTask}
+          // isLoading={hasPendingTask}
           loadingTitle={pendingTaskTitle}
           loadingSubtitle={pendingTaskSubtitle}
           onSelectSample={handleSampleSelect}

@@ -46,7 +46,6 @@ const pluginsConfig = [
       },
     },
   ],
-  // '/Users/alexejbronshtein/WebstormProjects/try-on/config/withFirebaseModularHeaders',
   [
     'expo-updates',
     {

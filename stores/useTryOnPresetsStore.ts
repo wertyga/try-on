@@ -60,6 +60,9 @@ export const useTryOnPresetsStore = create<TTryOnPresetsStore>((set, get) => ({
   createTaskWithPreset: async ({ presetId, image, presetImage, taskId }) => {
     set({ creatingPresetId: presetId, error: null });
 
+    const credits = useCreditsStore.getState();
+    const reservationId = credits.beginGenerationReservation();
+
     try {
       const payload = {
         presetId,
@@ -77,14 +80,17 @@ export const useTryOnPresetsStore = create<TTryOnPresetsStore>((set, get) => ({
         nextTask.assets.preset = presetImage;
       }
 
+      nextTask.usesPaidCreditReservation = !!reservationId;
+
+      await credits.onGenerationStarted(reservationId, task._id);
+
       useTryOnStore.getState().addTask(nextTask);
       trackTaskCreated('preset', task._id);
       trackCreditSpent('preset', task._id);
 
-      await useCreditsStore.getState().onGenerationSuccess();
-
       return task;
     } catch (e: any) {
+      credits.releaseGenerationReservation(reservationId);
       const { message } = buildAPIError(e, 'Failed to create preset try-on');
 
       set({ error: message });

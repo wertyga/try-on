@@ -50,6 +50,7 @@ export type TryOnTask = TTask & {
   isSaved: boolean;
   assets: TryOnTaskAssets;
   mode: GarmentMode;
+  usesPaidCreditReservation?: boolean;
 };
 
 export type TTryOnImagesKeys =
@@ -121,6 +122,18 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     ]);
 
     set({ userPhoto, tasks: tasks ?? [] });
+    useCreditsStore
+      .getState()
+      .syncTaskReservations(
+        (tasks ?? [])
+          .filter(
+            (task: TryOnTask) =>
+              task.usesPaidCreditReservation &&
+              (task.status === TaskStatus.running ||
+                task.status === TaskStatus.queued),
+          )
+          .map((task: TryOnTask) => task.id),
+      );
   },
 
   setConsent: (consent: boolean) => {
@@ -186,6 +199,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
 
   removeTask: async (id) => {
     const user = useUserStore.getState().user;
+    const removedTask = get().tasks.find((x) => x.id === id);
 
     if (user) {
       await removeTask(id);
@@ -194,12 +208,28 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     const updatedTaskList = get().tasks.filter((x) => x.id !== id);
 
     get().updateTasksState(updatedTaskList);
+
+    if (removedTask?.usesPaidCreditReservation) {
+      await useCreditsStore.getState().onGenerationSettled();
+    }
   },
 
   updateTasksState: (tasks: TryOnTask[]) => {
     set({ tasks });
 
     storage.set('tasks', tasks);
+    useCreditsStore
+      .getState()
+      .syncTaskReservations(
+        tasks
+          .filter(
+            (task) =>
+              task.usesPaidCreditReservation &&
+              (task.status === TaskStatus.running ||
+                task.status === TaskStatus.queued),
+          )
+          .map((task) => task.id),
+      );
   },
 
   addTasksList: (tasks: TryOnTask[]) => {
@@ -241,11 +271,28 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
         trackGenerationCompleted(id);
       }
 
+      if (prevTask?.usesPaidCreditReservation) {
+        nextTask.usesPaidCreditReservation = true;
+      }
+
       get().updateTask(id, nextTask);
 
-      await useCreditsStore.getState().onGenerationSuccess();
+      if (
+        prevTask?.usesPaidCreditReservation &&
+        (nextTask.status === TaskStatus.completed ||
+          nextTask.status === TaskStatus.failed)
+      ) {
+        await useCreditsStore.getState().onGenerationSettled();
+      } else if (!prevTask?.usesPaidCreditReservation) {
+        await useCreditsStore.getState().onGenerationSuccess();
+      }
     } catch (e: any) {
+      const prevTask = get().getTask(id);
       get().updateTask(id, { error: e.message, status: TaskStatus.failed });
+
+      if (prevTask?.usesPaidCreditReservation) {
+        await useCreditsStore.getState().onGenerationSettled();
+      }
     }
   },
 

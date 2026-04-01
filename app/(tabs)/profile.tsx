@@ -82,7 +82,7 @@ export default function UserScreen() {
           )}
         </View>
 
-        <UserCredits />
+        <UserCredits showReservedCredits={false} />
 
         <Button onPress={openPaywall} style={s.paywallLink} transparent>
           See paywall

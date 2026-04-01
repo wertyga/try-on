@@ -33,6 +33,8 @@ type TCreditsState = {
 
   resetsAt: string | null;
   autoRefillEnabled: boolean;
+  reservedTaskIds: string[];
+  pendingReservationIds: string[];
 
   isLoading: boolean;
   error: {
@@ -48,6 +50,15 @@ type TCreditsActions = {
   canGenerate: (showFallbackModal?: boolean) => boolean;
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
+  onGenerationSettled: () => Promise<void>;
+  beginGenerationReservation: () => string | null;
+  onGenerationStarted: (
+    reservationId: string | null,
+    taskId: string,
+  ) => Promise<void>;
+  releaseGenerationReservation: (reservationId: string | null) => void;
+  syncTaskReservations: (taskIds: string[]) => void;
+  getAvailablePaidCredits: () => number;
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
   fetchPacks: () => Promise<void>;
@@ -71,6 +82,8 @@ const initialState: TCreditsState = {
 
   resetsAt: null,
   autoRefillEnabled: false,
+  reservedTaskIds: [],
+  pendingReservationIds: [],
 
   isLoading: false,
   error: null,
@@ -214,7 +227,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
     const s = get();
 
     if ((s.freeDailyLeft ?? 0) > 0) return true;
-    if ((s.credits ?? 0) > 0) return true;
+    if (get().getAvailablePaidCredits() > 0) return true;
     if ((s.guestFreeLeft ?? 0) > 0) return true;
 
     if (showFallbackModal) {
@@ -237,13 +250,82 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
     const s = get();
     const parts: string[] = [];
     parts.push(`Free today: ${s.freeDailyLeft ?? 0}`);
-    parts.push(`Credits: ${s.credits ?? 0}`);
+    parts.push(`Credits: ${get().getAvailablePaidCredits()}`);
     if ((s.guestFreeLeft ?? 0) > 0)
       parts.push(`Guest free: ${s.guestFreeLeft}`);
     return parts.join(' • ');
   },
 
+  getAvailablePaidCredits: () => {
+    const s = get();
+
+    return Math.max(
+      (s.credits ?? 0) -
+        s.reservedTaskIds.length -
+        s.pendingReservationIds.length,
+      0,
+    );
+  },
+
+  beginGenerationReservation: () => {
+    const s = get();
+    const user = useUserStore.getState().user;
+
+    const shouldReservePaidCredit =
+      !!user &&
+      (s.freeDailyLeft ?? 0) <= 0 &&
+      (s.guestFreeLeft ?? 0) <= 0 &&
+      get().getAvailablePaidCredits() > 0;
+
+    if (!shouldReservePaidCredit) {
+      return null;
+    }
+
+    const reservationId = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    set((state) => ({
+      pendingReservationIds: [...state.pendingReservationIds, reservationId],
+    }));
+
+    return reservationId;
+  },
+
+  onGenerationStarted: async (reservationId, taskId) => {
+    if (!reservationId) {
+      await get().load();
+      return;
+    }
+
+    set((state) => ({
+      pendingReservationIds: state.pendingReservationIds.filter(
+        (id) => id !== reservationId,
+      ),
+      reservedTaskIds: state.reservedTaskIds.includes(taskId)
+        ? state.reservedTaskIds
+        : [...state.reservedTaskIds, taskId],
+    }));
+  },
+
+  releaseGenerationReservation: (reservationId) => {
+    if (!reservationId) return;
+
+    set((state) => ({
+      pendingReservationIds: state.pendingReservationIds.filter(
+        (id) => id !== reservationId,
+      ),
+      reservedTaskIds: state.reservedTaskIds.filter((id) => id !== reservationId),
+    }));
+  },
+
+  syncTaskReservations: (taskIds) => {
+    set({ reservedTaskIds: taskIds });
+  },
+
   onGenerationSuccess: async () => {
+    await get().load();
+  },
+
+  onGenerationSettled: async () => {
     await get().load();
   },
 }));

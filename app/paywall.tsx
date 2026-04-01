@@ -12,7 +12,6 @@ export default function PaywallScreen() {
   const {
     packs,
     freeDailyLeft,
-    credits,
     guestFreeLeft,
     guestFreeUsed,
     resetsAt,
@@ -23,6 +22,12 @@ export default function PaywallScreen() {
     fetchPacks,
   } = useCreditsStore();
   const isBuying = useCreditsStore((s) => s.isBuyingPack);
+  const availablePaidCredits = useCreditsStore((s) =>
+    s.getAvailablePaidCredits(),
+  );
+  const reservedCredits = useCreditsStore(
+    (s) => s.reservedTaskIds.length + s.pendingReservationIds.length,
+  );
 
   useEffect(() => {
     trackPaywallOpened('screen');
@@ -68,8 +73,15 @@ export default function PaywallScreen() {
 
             <View style={s.line}>
               <Text style={s.label}>Credits</Text>
-              <Text style={s.value}>{credits ?? 0}</Text>
+              <Text style={s.value}>{availablePaidCredits ?? 0}</Text>
             </View>
+
+            {reservedCredits > 0 ? (
+              <View style={s.line}>
+                <Text style={s.label}>Reserved</Text>
+                <Text style={s.value}>{reservedCredits}</Text>
+              </View>
+            ) : null}
 
             {(guestFreeLeft ?? 0) > 0 || (guestFreeUsed ?? 0) > 0 ? (
               <View style={s.line}>
@@ -79,7 +91,7 @@ export default function PaywallScreen() {
             ) : null}
 
             <Text style={s.hint}>
-              Free generations reset daily. Credits never expire.
+              Free generations reset daily. Reserved credits are temporarily held by queued or running tasks.
             </Text>
           </View>
 

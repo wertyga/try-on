@@ -157,6 +157,8 @@ export default function WardrobeDetailScreen() {
 
           if (!credits.canGenerate(true)) return;
 
+          const reservationId = credits.beginGenerationReservation();
+
           try {
             setCreatingSampleId(sample._id);
 
@@ -167,19 +169,23 @@ export default function WardrobeDetailScreen() {
             });
 
             addTask(
-              getTryOnTaskFromTask(
+              {
+                ...getTryOnTaskFromTask(
                 task,
                 `${sample._id}|${hash(item.imageUrl)}`,
                 false,
-              ),
+                ),
+                usesPaidCreditReservation: !!reservationId,
+              },
             );
+
+            await credits.onGenerationStarted(reservationId, task._id);
             trackTaskCreated('sample', task._id);
             trackCreditSpent('sample', task._id);
 
-            await credits.onGenerationSuccess();
-
             router.push(`/task/${task._id}`);
           } catch (e: any) {
+            credits.releaseGenerationReservation(reservationId);
             Alert.alert(
               t('common.error'),
               e?.message || t('errors.failedToCreate'),

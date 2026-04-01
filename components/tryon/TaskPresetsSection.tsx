@@ -34,7 +34,7 @@ export const TaskPresetsSection = ({
   const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
-    if (hasPendingTask) return;
+    // if (hasPendingTask) return;
 
     trackStudioPresetClicked(preset._id);
 
@@ -73,8 +73,8 @@ export const TaskPresetsSection = ({
     <PresetsList
       title={title}
       disabledPresetId={creatingPresetId}
-      disabled={hasPendingTask}
-      isLoading={hasPendingTask}
+      // disabled={hasPendingTask}
+      // isLoading={hasPendingTask}
       loadingTitle={loadingTitle}
       loadingSubtitle={loadingSubtitle}
       onSelectPreset={handlePresetSelect}

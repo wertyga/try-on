@@ -38,7 +38,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
   const isDisabled = getGenerateButtonDisabled({
     payload,
     creating,
-    hasPendingTask,
+    hasPendingTask: false,
   });
 
   async function tryCreateTask() {
@@ -47,6 +47,8 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
     await credits.load();
 
     if (!credits.canGenerate(true)) return;
+
+    const reservationId = credits.beginGenerationReservation();
 
     setCreating(true);
 
@@ -74,13 +76,18 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
             userBase64: payload.userBase64,
           });
 
-      addTask(getTryOnTaskFromTask(task, fingerPrint, false));
+      const nextTask = getTryOnTaskFromTask(task, fingerPrint, false);
+      nextTask.usesPaidCreditReservation = !!reservationId;
+
+      await credits.onGenerationStarted(reservationId, task._id);
+
+      addTask(nextTask);
       trackTaskCreated(selfUpload ? 'custom' : 'sample', task._id);
       trackCreditSpent(selfUpload ? 'custom' : 'sample', task._id);
 
-      await credits.onGenerationSuccess();
-
       router.push(`/task/${task._id}`);
+    } catch (e) {
+      credits.releaseGenerationReservation(reservationId);
     } finally {
       setCreating(false);
     }

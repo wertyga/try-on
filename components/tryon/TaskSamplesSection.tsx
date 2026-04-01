@@ -34,6 +34,9 @@ export const TaskSamplesSection = ({ image }: TTaskSamplesSectionProps) => {
 
           if (!useCreditsStore.getState().canGenerate(true)) return;
 
+          const reservationId =
+            useCreditsStore.getState().beginGenerationReservation();
+
           try {
             const { task } = await createTaskBySample({
               sampleId: sample._id,
@@ -42,14 +45,18 @@ export const TaskSamplesSection = ({ image }: TTaskSamplesSectionProps) => {
             });
 
             const fingerprint = `${sample._id}|${hash(image)}`;
-            addTask(getTryOnTaskFromTask(task, fingerprint, false));
+            const nextTask = getTryOnTaskFromTask(task, fingerprint, false);
+            nextTask.usesPaidCreditReservation = !!reservationId;
+
+            await credits.onGenerationStarted(reservationId, task._id);
+
+            addTask(nextTask);
             trackTaskCreated('sample', task._id);
             trackCreditSpent('sample', task._id);
 
-            await credits.onGenerationSuccess();
-
             router.push(`/task/${task._id}`);
           } catch (e: any) {
+            credits.releaseGenerationReservation(reservationId);
             Alert.alert(
               t('common.error'),
               e?.message || t('errors.failedToCreate'),
