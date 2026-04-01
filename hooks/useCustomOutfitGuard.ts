@@ -22,8 +22,8 @@ export const useCustomOutfitGuard = ({
   const checkCustomOutfitAccess = React.useCallback(async () => {
     if (!user) {
       router.replace({
-        pathname: '/(tabs)/login',
-        params: { redirectTo: '/(tabs)/custom-outfit' },
+        pathname: '/login',
+        params: { redirectTo: '/custom-outfit' },
       });
 
       return false;

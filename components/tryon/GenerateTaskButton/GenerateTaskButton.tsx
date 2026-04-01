@@ -80,7 +80,7 @@ export const GenerateTaskButton: FC<TGenerateTaskButtonProps> = ({
 
       await credits.onGenerationSuccess();
 
-      router.push(`/(tabs)/task/${task._id}`);
+      router.push(`/task/${task._id}`);
     } finally {
       setCreating(false);
     }

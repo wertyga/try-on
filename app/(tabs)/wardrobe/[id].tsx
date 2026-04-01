@@ -90,7 +90,6 @@ export default function WardrobeDetailScreen() {
     setItem(storeItem);
   }, [storeItem?._id]);
 
-  // fetch from backend if not in store
   useEffect(() => {
     let cancelled = false;
 
@@ -128,7 +127,7 @@ export default function WardrobeDetailScreen() {
     try {
       await removeItem(item._id);
 
-      router.replace('/(tabs)/wardrobe');
+      router.replace('/wardrobe');
     } catch (e: any) {
       Alert.alert(t('common.error'), e?.message || t('errors.failedToDelete'));
     }
@@ -179,7 +178,7 @@ export default function WardrobeDetailScreen() {
 
             await credits.onGenerationSuccess();
 
-            router.push(`/(tabs)/task/${task._id}`);
+            router.push(`/task/${task._id}`);
           } catch (e: any) {
             Alert.alert(
               t('common.error'),
@@ -215,7 +214,7 @@ export default function WardrobeDetailScreen() {
             });
 
             if (task) {
-              router.push(`/(tabs)/task/${task._id}`);
+              router.push(`/task/${task._id}`);
             }
           } catch (e: any) {
             Alert.alert(
@@ -268,7 +267,6 @@ export default function WardrobeDetailScreen() {
     >
       {item && (
         <View style={[s.content, { minHeight: minContentHeight }]}>
-          {/* Hero */}
           <View style={s.heroWrap}>
             <ImageZoom
               source={{ uri: item.imageUrl }}
@@ -301,7 +299,6 @@ export default function WardrobeDetailScreen() {
             {t('wardrobe.createdAt', { date: created })}
           </Text>
 
-          {/* Sources */}
           <View style={s.card}>
             <Text style={s.cardTitle}>{t('wardrobe.sources')}</Text>
 
@@ -358,66 +355,56 @@ const s = StyleSheet.create({
     gap: 12,
   },
   heroWrap: {
-    flex: 1,
-    minHeight: 260,
-    backgroundColor: Colors.light.disabledBg,
-    width: '100%',
-    position: 'relative',
-    borderRadius: 16,
-    overflow: 'hidden',
+    gap: 12,
   },
   heroImageWrap: {
     width: '100%',
-    height: '100%',
+    aspectRatio: 3 / 4,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
   },
   heroImage: {
-    objectFit: 'contain',
+    width: '100%',
+    height: '100%',
   },
-
-  muted: { color: '#6B7280' },
-
-  card: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    paddingVertical: 12,
-  },
-  cardTitle: { fontWeight: '800', marginBottom: 8 },
-
-  assetsRow: {
+  actions: {
     flexDirection: 'row',
     gap: 10,
-    paddingRight: 12,
-  },
-  asset: {
-    aspectRatio: 3 / 4,
-    borderRadius: 12,
-    minHeight: 172,
-    backgroundColor: '#E5E7EB',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  assetImg: { width: '100%', height: '100%', objectFit: 'cover' },
-  assetLabel: {
-    position: 'absolute',
-    bottom: -1,
-    textAlign: 'center',
-    fontSize: 12,
-    paddingTop: 2,
-    paddingBottom: 5,
-    color: '#111827',
-    backgroundColor: '#E5E7EB',
-    width: '100%',
-  },
-
-  actions: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    gap: 8,
   },
   actionButton: {
-    width: 50,
-    height: 50,
-    paddingHorizontal: 0,
+    flex: 1,
+  },
+  muted: {
+    color: Colors.light.textLight,
+    fontSize: 12,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 14,
+    gap: 12,
+  },
+  cardTitle: {
+    color: Colors.light.text,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  assetsRow: {
+    gap: 12,
+    paddingRight: 8,
+  },
+  asset: {
+    gap: 8,
+  },
+  assetImg: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 14,
+  },
+  assetLabel: {
+    color: Colors.light.text,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

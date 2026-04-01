@@ -67,7 +67,7 @@ export default function WardrobeScreen() {
           <Text style={s.emptyText}>{t('wardrobe.emptyText')}</Text>
           <Pressable
             style={s.primaryBtn}
-            onPress={() => router.push('/(tabs)/try-on')}
+            onPress={() => router.push('/try-on')}
           >
             <Text style={s.primaryBtnText}>{t('wardrobe.makeTryOn')}</Text>
           </Pressable>
@@ -78,7 +78,7 @@ export default function WardrobeScreen() {
             <Pressable
               key={item._id}
               style={[s.card, { width: card }]}
-              onPress={() => router.push(`/(tabs)/wardrobe/${item._id}`)}
+              onPress={() => router.push(`/wardrobe/${item._id}`)}
               onLongPress={() => askDelete(item._id)}
             >
               <Image source={{ uri: item.imageUrl }} style={s.thumb} />

@@ -20,6 +20,14 @@ export type TContainerProps = ScrollViewProps & {
   childrenStyle?: StyleProp<ViewStyle>;
 };
 
+const Header = ({ title }: { title: string }) => {
+  return (
+    <View style={s.header}>
+      <Text style={s.title}>{title}</Text>
+    </View>
+  );
+};
+
 const ScrollContent = ({
   style,
   contentContainerStyle,
@@ -52,11 +60,8 @@ export const Container = ({
 }: TContainerProps) => {
   return (
     <View style={s.container}>
-      {!!props.title && (
-        <View style={s.header}>
-          <Text style={s.title}>{props.title}</Text>
-        </View>
-      )}
+      {!!props.title && <Header title={props.title} />}
+
       <ScrollContent
         {...props}
         contentContainerStyle={[{ paddingBottom: 16 }, contentContainerStyle]}
@@ -74,11 +79,8 @@ const ScrollableContainerWithTabs: FC<TContainerProps> = ({
 }) => {
   return (
     <View style={s.container}>
-      {!!props.title && (
-        <View style={s.header}>
-          <Text style={s.title}>{props.title}</Text>
-        </View>
-      )}
+      {!!props.title && <Header title={props.title} />}
+
       <ScrollContent
         {...props}
         contentContainerStyle={Platform.select({

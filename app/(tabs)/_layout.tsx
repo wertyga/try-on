@@ -36,16 +36,15 @@ const getTabs = ({
       name: 'custom-outfit',
       title: 'Custom outfit',
       icon: (color: string, isLoading?: boolean) => {
-        if (isLoading) {
-          return (
-            <CustomOutfitTabIcon>
-              <ActivityIndicator size="small" color={color} />
-            </CustomOutfitTabIcon>
-          );
-        }
-
         return (
           <CustomOutfitTabIcon>
+            {isLoading && (
+              <ActivityIndicator
+                size="small"
+                color={color}
+                style={{ position: 'absolute' }}
+              />
+            )}
             <MaterialIcons size={28} name="style" color={color} />
           </CustomOutfitTabIcon>
         );
@@ -59,12 +58,14 @@ const getTabs = ({
       },
       hidden: true,
     },
+
     {
-      name: 'tasks-list',
-      title: 'List',
+      name: 'feedback',
+      title: 'Feedback',
       icon: (color: string) => {
-        return <MaterialIcons size={28} name="schedule" color={color} />;
+        return <MaterialIcons size={28} name="feedback" color={color} />;
       },
+      hidden: true,
     },
     {
       name: 'wardrobe/index',
@@ -75,11 +76,23 @@ const getTabs = ({
       withLogin: true,
     },
     {
-      name: 'feedback',
-      title: 'Feedback',
+      name: 'wardrobe/[id]',
+      title: 'wardrobe_id',
       icon: (color: string) => {
-        return <MaterialIcons size={28} name="feedback" color={color} />;
+        return <MaterialIcons size={28} name="account-circle" color={color} />;
       },
+      hidden: true,
+    },
+    {
+      name: 'task/index',
+      title: 'Task List',
+      icon: (color: string) => {
+        return <MaterialIcons size={28} name="schedule" color={color} />;
+      },
+    },
+    {
+      name: 'task/[id]',
+      title: 'task_id',
       hidden: true,
     },
     {
@@ -92,19 +105,6 @@ const getTabs = ({
     {
       name: 'login',
       title: 'User',
-      hidden: true,
-    },
-    {
-      name: 'wardrobe/[id]',
-      title: 'wardrobe_id',
-      icon: (color: string) => {
-        return <MaterialIcons size={28} name="account-circle" color={color} />;
-      },
-      hidden: true,
-    },
-    {
-      name: 'task/[id]',
-      title: 'task_id',
       hidden: true,
     },
   ];
@@ -126,7 +126,7 @@ export default function TabLayout() {
 
   const openLoginScreen = React.useCallback((redirectTo: string) => {
     router.push({
-      pathname: '/(tabs)/login',
+      pathname: '/login',
       params: { redirectTo },
     });
   }, []);
@@ -150,7 +150,7 @@ export default function TabLayout() {
       const hasAccess = await checkCustomOutfitAccess();
 
       if (hasAccess) {
-        router.push('/(tabs)/custom-outfit');
+        router.push('/custom-outfit');
       }
     },
     [checkCustomOutfitAccess],
@@ -258,7 +258,7 @@ const s = StyleSheet.create({
     top: -10,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 56,
+    minWidth: 58,
     height: 18,
     paddingHorizontal: 8,
     borderRadius: 999,

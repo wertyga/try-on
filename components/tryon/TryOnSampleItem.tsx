@@ -5,22 +5,27 @@ import { TTryOnSample } from '@/stores';
 
 type TTryOnSampleItemProps = {
   item: TTryOnSample;
+  disabled?: boolean;
   onPress: (sample: TTryOnSample) => void;
 };
 
 export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
   item,
+  disabled,
   onPress,
 }) => {
   return (
     <Pressable
-      style={[s.item]}
+      style={[s.item, disabled && s.itemDisabled]}
       onPress={() => onPress(item)}
+      disabled={disabled}
       hitSlop={8}
       pressRetentionOffset={20}
     >
       <Image source={{ uri: item.image }} style={s.image} resizeMode="cover" />
-      <Text style={[s.itemTitle]}>{item.title}</Text>
+      <Text style={[s.itemTitle]} numberOfLines={1}>
+        {item.title}
+      </Text>
     </Pressable>
   );
 };
@@ -28,6 +33,9 @@ export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
 const s = StyleSheet.create({
   item: {
     width: 114,
+  },
+  itemDisabled: {
+    opacity: 0.6,
   },
   image: {
     width: '100%',

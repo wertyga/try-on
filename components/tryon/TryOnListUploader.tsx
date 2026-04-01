@@ -41,30 +41,38 @@ export const TryOnListUploader = () => {
       },
     ];
 
-    if (mode === 'dress') {
-      return [
+    const items =
+      mode === 'dress'
+        ? [
         {
           key: 'dress',
           title: t('garnet.cardDress'),
           uris: [dress?.uri],
         },
         ...commonItems,
-      ];
-    }
+      ]
+        : [
+            {
+              key: 'upper',
+              title: t('garnet.cardTop'),
+              uris: [upper?.uri],
+            },
+            {
+              key: 'lower',
+              title: t('garnet.cardBottom'),
+              uris: [lower?.uri],
+            },
+            ...commonItems,
+          ];
 
-    return [
-      {
-        key: 'upper',
-        title: t('garnet.cardTop'),
-        uris: [upper?.uri],
-      },
-      {
-        key: 'lower',
-        title: t('garnet.cardBottom'),
-        uris: [lower?.uri],
-      },
-      ...commonItems,
-    ];
+    return [...items].sort((a, b) => {
+      const aFilled = Boolean(a.uris[0]);
+      const bFilled = Boolean(b.uris[0]);
+
+      if (aFilled === bFilled) return 0;
+
+      return aFilled ? -1 : 1;
+    });
   }, [
     accessories?.uri,
     dress?.uri,

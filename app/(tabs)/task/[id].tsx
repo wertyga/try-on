@@ -40,7 +40,7 @@ export default function TaskDetailScreen() {
     try {
       await removeTask(taskId);
 
-      router.replace('/(tabs)/tasks-list');
+      router.replace('/task');
     } catch (e) {
     } finally {
       setTaskLoading('');
@@ -90,7 +90,7 @@ export default function TaskDetailScreen() {
             isLoading={taskLoading === task.id}
             onRetry={handleRetryTask}
             onRemove={handleRemoveTask}
-            onSaveSuccess={() => router.replace('/(tabs)/wardrobe')}
+            onSaveSuccess={() => router.replace('/wardrobe')}
           />
 
           {isRenderPresets && (

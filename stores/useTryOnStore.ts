@@ -96,6 +96,7 @@ type TryOnState = TTryOnImages & {
   init: () => Promise<void>;
 
   getTask: (id: string) => TryOnTask | undefined;
+  hasPendingTask: () => boolean;
 };
 
 export const useTryOnStore = create<TryOnState>((set, get) => ({
@@ -150,6 +151,12 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
 
   getTask: (id) => {
     return get().tasks.find((task) => task.id === id);
+  },
+
+  hasPendingTask: () => {
+    return get().tasks.some(
+      (t) => t.status === TaskStatus.running || t.status === TaskStatus.queued,
+    );
   },
 
   resetInputs: () => {

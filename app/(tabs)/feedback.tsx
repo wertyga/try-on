@@ -45,7 +45,7 @@ export default function FeedbackScreen() {
       },
       email: {
         pattern: {
-          value: /\S+@\S+\.\S+/, // basic email validation
+          value: /\S+@\S+\.\S+/,
           message: t('feedback.validation.email'),
         },
       },
@@ -74,7 +74,6 @@ export default function FeedbackScreen() {
         email: user?.email ?? '',
       });
     } catch (e) {
-      // Error is handled in baseQuery
     } finally {
       setIsSubmitting(false);
     }
@@ -114,7 +113,6 @@ export default function FeedbackScreen() {
               placeholder={t('feedback.emailPlaceholder')}
               keyboardType="email-address"
               autoCapitalize="none"
-              // @ts-ignore
               inputStyle={{ height: 42 }}
               error={errors.email?.message}
             />
@@ -147,9 +145,6 @@ const s = StyleSheet.create({
   label: {
     fontWeight: '700',
     color: Colors.light.text,
-  },
-  input: {
-    height: 42,
   },
   messageInput: {
     minHeight: 120,

@@ -40,7 +40,7 @@ export default function UserScreen() {
         style: 'destructive',
         onPress: () => {
           logout();
-          router.replace('/(tabs)/try-on');
+          router.replace('/try-on');
         },
       },
     ]);
@@ -55,7 +55,6 @@ export default function UserScreen() {
   return (
     <Container title={t('profile.title')} childrenStyle={s.containerBody}>
       <View>
-        {/* Header */}
         <View style={s.header}>
           {avatarUrl ? (
             <Image source={{ uri: avatarUrl }} style={s.avatar} />
@@ -71,7 +70,6 @@ export default function UserScreen() {
           </View>
         </View>
 
-        {/* Info */}
         <View style={s.card}>
           <Text style={s.cardTitle}>{t('profile.title')}</Text>
           <Row icon="person.fill" label={t('profile.name')} value={name} />
@@ -91,7 +89,6 @@ export default function UserScreen() {
         </Button>
       </View>
 
-      {/* Actions */}
       <View style={s.actions}>
         <Pressable style={s.primaryBtn} onPress={onFeedback}>
           <Text style={s.btnText}>{t('profile.sendFeedback')}</Text>
@@ -150,15 +147,6 @@ const s = StyleSheet.create({
   avatarText: { fontSize: 20, fontWeight: '800', color: '#111827' },
   name: { fontSize: 20, fontWeight: '800' },
   email: { color: '#6B7280' },
-  iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F3F4F6',
-  },
-
   card: {
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
@@ -166,25 +154,10 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: { fontWeight: '800', marginBottom: 8 },
-
-  statsRow: { flexDirection: 'row', gap: 10 },
-  statBox: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-    gap: 2,
-  },
-  statNum: { fontSize: 18, fontWeight: '800' },
-  statLabel: { color: '#6B7280', fontSize: 12 },
-
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
   rowLabel: { marginLeft: 8, color: '#111827' },
   rowValue: { color: '#374151', maxWidth: '60%' },
-
   containerBody: { justifyContent: 'space-between' },
-
   actions: { gap: 10, marginTop: 40, marginBottom: 10 },
   btnText: { color: '#fff', fontWeight: '700' },
   primaryBtn: {
@@ -200,9 +173,6 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   outlineBtnText: { color: '#111827', fontWeight: '700' },
-
-  muted: { color: '#9CA3AF', textAlign: 'center', marginTop: 6 },
-
   paywallLink: {
     marginTop: 20,
     marginBottom: 6,

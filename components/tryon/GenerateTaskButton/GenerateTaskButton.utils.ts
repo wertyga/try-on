@@ -2,10 +2,8 @@ import {
   GarmentMode,
   GarmentImage,
   TryOnPayload,
-  TryOnTask,
   UserPhoto,
 } from '@/stores/useTryOnStore';
-import { TaskStatus } from '@/types/task';
 import { TTryOnSample } from '@/stores';
 
 type TBuildPayloadArgs = {
@@ -59,14 +57,6 @@ export function buildTryOnPayload({
     hairstyleBase64: hairstyle?.base64,
     accessoriesBase64: accessories?.base64,
   };
-}
-
-export function hasPendingTryOnTask(tasks: TryOnTask[]) {
-  return (
-    tasks?.some(
-      (t) => t.status === TaskStatus.running || t.status === TaskStatus.queued,
-    ) ?? []
-  );
 }
 
 export function getGenerateButtonDisabled({

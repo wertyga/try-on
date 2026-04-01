@@ -7,10 +7,7 @@ import {
   useUserStore,
 } from '@/stores';
 import { fingerprintFromPayload } from '@/utils/hash';
-import {
-  buildTryOnPayload,
-  hasPendingTryOnTask,
-} from './GenerateTaskButton.utils';
+import { buildTryOnPayload } from './GenerateTaskButton.utils';
 
 export function useGenerateTaskData(
   selectedSample?: TTryOnSample | null,
@@ -27,12 +24,11 @@ export function useGenerateTaskData(
     glasses,
     hairstyle,
     accessories,
+    hasPendingTask,
   } = useTryOnStore();
   const { fetchCategoriesForImages } = useProductsStore();
   const { user } = useUserStore();
   const credits = useCreditsStore();
-
-  const hasPendingTask = useMemo(() => hasPendingTryOnTask(tasks), [tasks]);
 
   const { payload, fingerPrint } = useMemo(() => {
     const payload = buildTryOnPayload({
@@ -72,6 +68,6 @@ export function useGenerateTaskData(
     credits,
     payload,
     fingerPrint,
-    hasPendingTask,
+    hasPendingTask: hasPendingTask(),
   };
 }

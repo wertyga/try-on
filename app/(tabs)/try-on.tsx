@@ -14,7 +14,6 @@ import { useTryOnStore, useUserStore } from '@/stores';
 import { createTaskBySample } from '@/api';
 import { getTryOnTaskFromTask } from '@/utils';
 import { hash } from '@/utils/hash';
-import { hasPendingTryOnTask } from '@/components/tryon/GenerateTaskButton/GenerateTaskButton.utils';
 import {
   trackCreditSpent,
   trackSampleClicked,
@@ -25,14 +24,15 @@ export default function TryOn() {
   const credits = useCreditsStore();
   const user = useUserStore((s) => s.user);
   const userPhoto = useTryOnStore((s) => s.userPhoto);
-  const tasks = useTryOnStore((s) => s.tasks);
+  const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
   const addTask = useTryOnStore((s) => s.addTask);
   const [selectedSample, setSelectedSample] = useState<TTryOnSample | null>(
     null,
   );
   const { t } = useTranslation();
-
-  const hasPendingTask = useMemo(() => hasPendingTryOnTask(tasks), [tasks]);
+  const pendingTaskTitle = 'Task in queue';
+  const pendingTaskSubtitle =
+    'Wait until the current task is finished before choosing another sample or preset.';
 
   useFocus(() => {
     credits.load();
@@ -68,7 +68,7 @@ export default function TryOn() {
 
             await credits.onGenerationSuccess();
 
-            router.push(`/(tabs)/task/${task._id}`);
+            router.push(`/task/${task._id}`);
           } catch (e: any) {
             Alert.alert(
               t('common.error'),
@@ -91,6 +91,10 @@ export default function TryOn() {
       <View style={{ marginRight: -16 }}>
         <TryOnSamplesList
           selectedSampleId={selectedSample?._id}
+          disabled={hasPendingTask}
+          isLoading={hasPendingTask}
+          loadingTitle={pendingTaskTitle}
+          loadingSubtitle={pendingTaskSubtitle}
           onSelectSample={handleSampleSelect}
         />
       </View>
@@ -100,6 +104,8 @@ export default function TryOn() {
           <TaskPresetsSection
             image={userPhoto.base64}
             title={t('presets.sectionTitle')}
+            loadingTitle={pendingTaskTitle}
+            loadingSubtitle={pendingTaskSubtitle}
           />
         </View>
       )}

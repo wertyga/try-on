@@ -23,7 +23,7 @@ const androidConfig = (version) => {
       backgroundColor: '#0F172A',
       monochromeImage: './assets/icon.png',
     },
-    googleServicesFile: './google-services.json',
+    // googleServicesFile: './google-services.json',
     edgeToEdgeEnabled: true,
     permissions: [
       'CAMERA',
@@ -37,23 +37,16 @@ const androidConfig = (version) => {
 
 const pluginsConfig = [
   ['expo-apple-authentication'],
-  ['@react-native-firebase/app'],
   ['expo-iap'],
   [
     'expo-build-properties',
     {
       ios: {
         useFrameworks: 'static',
-        buildReactNativeFromSource: true,
-        forceStaticLinking: [
-          'FirebaseCore',
-          'FirebaseCoreExtension',
-          'FirebaseCoreInternal',
-          'GoogleUtilities',
-        ],
       },
     },
   ],
+  // '/Users/alexejbronshtein/WebstormProjects/try-on/config/withFirebaseModularHeaders',
   [
     'expo-updates',
     {

@@ -105,7 +105,7 @@ export default function TryOnQueueScreen() {
           onRemove={handleRemoveTask}
           onOpen={
             item.status === TaskStatus.completed
-              ? () => router.push(`/(tabs)/task/${item.id}`)
+              ? () => router.push(`/task/${item.id}`)
               : undefined
           }
         />

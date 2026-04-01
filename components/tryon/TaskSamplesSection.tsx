@@ -48,7 +48,7 @@ export const TaskSamplesSection = ({ image }: TTaskSamplesSectionProps) => {
 
             await credits.onGenerationSuccess();
 
-            router.push(`/(tabs)/task/${task._id}`);
+            router.push(`/task/${task._id}`);
           } catch (e: any) {
             Alert.alert(
               t('common.error'),

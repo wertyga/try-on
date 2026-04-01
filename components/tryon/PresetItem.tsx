@@ -23,7 +23,9 @@ export const PresetItem: FC<TPresetItemProps> = ({
       pressRetentionOffset={20}
     >
       <Image source={{ uri: item.image }} style={s.image} resizeMode="cover" />
-      <Text style={[s.itemTitle]}>{item.title}</Text>
+      <Text style={[s.itemTitle]} numberOfLines={1}>
+        {item.title}
+      </Text>
     </Pressable>
   );
 };

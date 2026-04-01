@@ -11,7 +11,7 @@ const Login = () => {
   const redirectTo = Array.isArray(params.redirectTo)
     ? params.redirectTo[0]
     : params.redirectTo;
-  const nextRoute = (redirectTo || '/(tabs)/try-on') as Href;
+  const nextRoute = (redirectTo || '/try-on') as Href;
 
   return (
     <Container.WithTabBar title={t('profile.titleLogin')}>

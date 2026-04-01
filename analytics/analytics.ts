@@ -1,5 +1,4 @@
-import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
-import { getApp } from '@react-native-firebase/app';
+import { customEvent, identifyDevice, vexo } from 'vexo-analytics';
 
 type EventName =
   | 'sample_clicked'
@@ -16,8 +15,8 @@ type EventName =
   | 'custom_generation_started';
 
 type EventParams = Record<string, string | number | boolean | null | undefined>;
-
-const analytics = () => getAnalytics(getApp());
+const VEXO_API_KEY = process.env.EXPO_PUBLIC_VEXO_API_KEY;
+let isInitialized = false;
 
 const sanitize = (params?: EventParams) => {
   if (!params) return undefined;
@@ -34,8 +33,24 @@ const sanitize = (params?: EventParams) => {
   return out;
 };
 
+const isEnabled = () => Boolean(VEXO_API_KEY);
+
 export const Analytics = {
+  init: () => {
+    if (!VEXO_API_KEY || isInitialized) return;
+
+    vexo(VEXO_API_KEY);
+
+    isInitialized = true;
+  },
+  identify: async (deviceId: string | null) => {
+    if (!isEnabled()) return;
+
+    await identifyDevice(deviceId);
+  },
   event: async (name: EventName, params?: EventParams) => {
-    await logEvent(analytics(), name, sanitize(params));
+    if (!isEnabled()) return;
+
+    customEvent(name, sanitize(params) ?? {});
   },
 };

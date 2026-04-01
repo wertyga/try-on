@@ -1,28 +1,33 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '@/constants/Colors';
 import {
   TTryOnSample,
   useTryOnSamplesStore,
 } from '@/stores/useTryOnSamplesStore';
 import { useFocus } from '@/hooks';
 import { TryOnSampleItem } from './TryOnSampleItem';
+import { ThumbsContainer } from '@/components/ui/ThumbsContainer';
 
 type TTryOnSamplesListProps = {
   selectedSampleId?: string;
+  disabled?: boolean;
+  isLoading?: boolean;
+  loadingTitle?: string;
+  loadingSubtitle?: string;
   onSelectSample: (sample: TTryOnSample) => void;
 };
 
 export const TryOnSamplesList = ({
   selectedSampleId,
+  disabled = false,
+  isLoading = false,
+  loadingTitle,
+  loadingSubtitle,
   onSelectSample,
 }: TTryOnSamplesListProps) => {
-  const { samples, isLoading, fetchSamples } = useTryOnSamplesStore();
+  const { samples, fetchSamples } = useTryOnSamplesStore();
 
   useFocus(() => {
-    if (!isLoading) {
-      fetchSamples();
-    }
+    fetchSamples();
   }, []);
 
   if (!samples.length) {
@@ -30,47 +35,22 @@ export const TryOnSamplesList = ({
   }
 
   return (
-    <View style={s.card}>
-      <Text style={s.cardTitle}>Popular styles</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={s.list}
-      >
-        {samples.map((item) => {
-          return (
-            <TryOnSampleItem
-              key={item._id}
-              item={item}
-              onPress={onSelectSample}
-            />
-          );
-        })}
-      </ScrollView>
-    </View>
+    <ThumbsContainer
+      title="Popular styles"
+      isLoading={isLoading}
+      loadingTitle={loadingTitle}
+      loadingSubtitle={loadingSubtitle}
+    >
+      {samples.map((item) => {
+        return (
+          <TryOnSampleItem
+            key={item._id}
+            item={item}
+            disabled={disabled}
+            onPress={onSelectSample}
+          />
+        );
+      })}
+    </ThumbsContainer>
   );
 };
-
-const s = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.light.cardBg,
-    paddingTop: 4,
-    marginBottom: 16,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-  },
-  cardTitle: {
-    marginLeft: 16,
-    color: Colors.light.text,
-    fontSize: 15,
-    fontWeight: '800',
-    paddingHorizontal: 0,
-  },
-  list: {
-    paddingHorizontal: 16,
-    gap: 10,
-    paddingBottom: 14,
-    paddingTop: 10,
-  },
-});

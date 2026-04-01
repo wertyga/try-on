@@ -18,29 +18,41 @@ import { StatusBox } from '@/components/ui/StatusBox';
 import { useAppStore } from '@/stores/appStore';
 import { ModalsList } from '@/components/ModalsList';
 import { sendLogs } from '@/api';
+import { Analytics } from '@/analytics';
+import { useUserStore } from '@/stores/useUserStore';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 SplashScreen.preventAutoHideAsync();
+
+Analytics.init();
 
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-
   const { getDeviceId, appDeviceId } = useAppStore();
+  const getUserSelf = useUserStore((s) => s.getUserSelf);
 
   useEffect(() => {
     const hasDeviceId = appDeviceId !== null;
-
     if (loaded && hasDeviceId) {
       SplashScreen.hideAsync();
     }
   }, [loaded, appDeviceId]);
 
   useEffect(() => {
-    getDeviceId();
-  }, []);
+    getDeviceId().then(() => {
+      return getUserSelf();
+    });
+  }, [getDeviceId, getUserSelf]);
 
-  if (!loaded) return null;
+  useEffect(() => {
+    if (appDeviceId === null) return;
+
+    Analytics.identify(appDeviceId);
+  }, [appDeviceId]);
+
+  if (!loaded) return <LoadingScreen />;
 
   return (
     <SafeAreaProvider>
@@ -51,9 +63,13 @@ export default function RootLayout() {
       >
         <StripeProvider>
           <GestureHandlerRootView>
-            <Stack initialRouteName="index">
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack>
 
             <StatusBar style="auto" />

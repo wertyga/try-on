@@ -42,7 +42,7 @@ export const SaveLooksGate: React.FC<Props> = ({
   if (user) return null;
 
   const goLogin = () => {
-    router.push('/(tabs)/login');
+    router.push('/login');
   };
 
   return (

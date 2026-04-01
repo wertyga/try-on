@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { TTryOnPreset, useTryOnPresetsStore } from '@/stores';
+import { TTryOnPreset, useTryOnPresetsStore, useTryOnStore } from '@/stores';
 import { useCreditsStore } from '@/stores/creditStore';
 import { trackStudioPresetClicked } from '@/analytics';
 
@@ -13,12 +13,16 @@ type TTaskPresetsSectionProps = {
   image: string;
   taskId?: string;
   title?: string;
+  loadingTitle?: string;
+  loadingSubtitle?: string;
 };
 
 export const TaskPresetsSection = ({
   image,
   taskId,
   title,
+  loadingTitle,
+  loadingSubtitle,
 }: TTaskPresetsSectionProps) => {
   const { t } = useTranslation();
 
@@ -27,8 +31,11 @@ export const TaskPresetsSection = ({
   const createTaskWithPreset = useTryOnPresetsStore(
     (s) => s.createTaskWithPreset,
   );
+  const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
+    if (hasPendingTask) return;
+
     trackStudioPresetClicked(preset._id);
 
     Alert.alert(t('presets.confirmTitle'), t('presets.confirmText'), [
@@ -49,7 +56,7 @@ export const TaskPresetsSection = ({
             });
 
             if (task) {
-              router.push(`/(tabs)/task/${task._id}`);
+              router.push(`/task/${task._id}`);
             }
           } catch (e: any) {
             Alert.alert(
@@ -66,6 +73,10 @@ export const TaskPresetsSection = ({
     <PresetsList
       title={title}
       disabledPresetId={creatingPresetId}
+      disabled={hasPendingTask}
+      isLoading={hasPendingTask}
+      loadingTitle={loadingTitle}
+      loadingSubtitle={loadingSubtitle}
       onSelectPreset={handlePresetSelect}
     />
   );

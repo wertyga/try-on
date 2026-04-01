@@ -86,7 +86,7 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
 
       useTryOnStore.getState().removeTask(task.id);
 
-      router.push('/(tabs)/wardrobe');
+      router.push('/wardrobe');
     } catch (e) {
       throw e;
     } finally {
