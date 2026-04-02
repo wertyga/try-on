@@ -1,30 +1,26 @@
-import React, { FC } from 'react';
 import { Image, Pressable, StyleSheet, Text } from 'react-native';
+import React from 'react';
 import { Colors } from '@/constants/Colors';
-import { TTryOnSample } from '@/stores';
 
-type TTryOnSampleItemProps = {
-  item: TTryOnSample;
+export type TThumbProps = {
+  title: string;
+  image: string;
   disabled?: boolean;
-  onPress: (sample: TTryOnSample) => void;
+  onPress?: () => void;
 };
 
-export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
-  item,
-  disabled,
-  onPress,
-}) => {
+export const Thumb = ({ title, image, disabled, onPress }: TThumbProps) => {
   return (
     <Pressable
       style={[s.item, disabled && s.itemDisabled]}
-      onPress={() => onPress(item)}
+      onPress={onPress}
       disabled={disabled}
       hitSlop={8}
       pressRetentionOffset={20}
     >
-      <Image source={{ uri: item.image }} style={s.image} resizeMode="cover" />
+      <Image source={{ uri: image }} style={s.image} resizeMode="cover" />
       <Text style={[s.itemTitle]} numberOfLines={1}>
-        {item.title}
+        {title}
       </Text>
     </Pressable>
   );
@@ -32,7 +28,7 @@ export const TryOnSampleItem: FC<TTryOnSampleItemProps> = ({
 
 const s = StyleSheet.create({
   item: {
-    width: 120,
+    width: 114,
   },
   itemDisabled: {
     opacity: 0.6,

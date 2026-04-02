@@ -112,6 +112,21 @@ const getTabs = ({
       title: 'User',
       hidden: true,
     },
+    {
+      name: 'signin',
+      title: 'Sign in',
+      hidden: true,
+    },
+    {
+      name: 'signup',
+      title: 'Sign up',
+      hidden: true,
+    },
+    {
+      name: 'recovery-password',
+      title: 'Recovery password',
+      hidden: true,
+    },
   ];
 };
 
@@ -131,7 +146,7 @@ export default function TabLayout() {
 
   const openLoginScreen = React.useCallback((redirectTo: string) => {
     router.push({
-      pathname: '/login',
+      pathname: '/signin',
       params: { redirectTo },
     });
   }, []);

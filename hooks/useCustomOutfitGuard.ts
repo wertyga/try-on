@@ -1,5 +1,5 @@
 import React from 'react';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 
 import { fetchHasSucceededPayment } from '@/stores/creditStore';
 import { useModalsStore, useUserStore } from '@/stores';
@@ -13,6 +13,7 @@ export const useCustomOutfitGuard = ({
   useOnFocus,
 }: TUseCustomOutfitGuardOptions = {}) => {
   const isCheckingAccessRef = React.useRef(false);
+  // const pathname = usePathname();
 
   const [isCheckingAccess, setIsCheckingAccess] = React.useState(false);
 
@@ -22,8 +23,8 @@ export const useCustomOutfitGuard = ({
   const checkCustomOutfitAccess = React.useCallback(async () => {
     if (!user) {
       router.replace({
-        pathname: '/login',
-        params: { redirectTo: '/custom-outfit' },
+        pathname: '/signin',
+        // params: { redirectTo: '/custom-outfit' },
       });
 
       return false;

@@ -41,15 +41,16 @@ export const ThumbsContainer = ({
 const s = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.cardBg,
-    paddingHorizontal: 16,
     paddingBottom: 14,
     paddingTop: 10,
     marginBottom: 16,
     borderTopLeftRadius: 16,
     borderBottomLeftRadius: 16,
     overflow: 'hidden',
+    marginRight: -16,
   },
   cardTitle: {
+    marginLeft: 16,
     marginBottom: 8,
     color: Colors.light.text,
     fontSize: 15,
@@ -58,5 +59,7 @@ const s = StyleSheet.create({
   },
   list: {
     gap: 10,
+    paddingRight: 16,
+    paddingLeft: 16,
   },
 });

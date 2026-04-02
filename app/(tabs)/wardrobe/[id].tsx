@@ -26,6 +26,7 @@ import {
   TTryOnSample,
   useTryOnPresetsStore,
   useTryOnStore,
+  useUserStore,
 } from '@/stores';
 import { useCreditsStore } from '@/stores/creditStore';
 import { getTryOnTaskFromTask } from '@/utils';
@@ -36,6 +37,7 @@ import {
   trackStudioPresetClicked,
   trackTaskCreated,
 } from '@/analytics';
+import { ThumbsContainer } from '@/components/ui/ThumbsContainer';
 
 type WardrobeItem = {
   _id: string;
@@ -71,6 +73,7 @@ export default function WardrobeDetailScreen() {
   const { height: windowHeight } = useWindowDimensions();
   const credits = useCreditsStore();
   const addTask = useTryOnStore((s) => s.addTask);
+  const isUserLoggeIn = useUserStore((s) => !!s.user);
   const creatingPresetId = useTryOnPresetsStore((s) => s.creatingPresetId);
   const createTaskWithPreset = useTryOnPresetsStore(
     (s) => s.createTaskWithPreset,
@@ -91,27 +94,23 @@ export default function WardrobeDetailScreen() {
   }, [storeItem?._id]);
 
   useEffect(() => {
-    let cancelled = false;
+    if (!isUserLoggeIn) return;
 
     async function fetchOne() {
       try {
         setLoading(true);
+
         const it = await getWardrobeItem(id);
-        if (!cancelled) setItem(it);
+        setItem(it);
       } catch {
-        if (!cancelled)
-          Alert.alert(t('common.error'), t('errors.failedToLoad'));
+        Alert.alert(t('common.error'), t('errors.failedToLoad'));
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     }
 
     if (!storeItem) fetchOne();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, storeItem, t]);
+  }, [id, storeItem, t, isUserLoggeIn]);
 
   const created = useMemo(() => {
     try {
@@ -168,16 +167,14 @@ export default function WardrobeDetailScreen() {
               userBase64: item.imageUrl,
             });
 
-            addTask(
-              {
-                ...getTryOnTaskFromTask(
+            addTask({
+              ...getTryOnTaskFromTask(
                 task,
                 `${sample._id}|${hash(item.imageUrl)}`,
                 false,
-                ),
-                usesPaidCreditReservation: !!reservationId,
-              },
-            );
+              ),
+              usesPaidCreditReservation: !!reservationId,
+            });
 
             await credits.onGenerationStarted(reservationId, task._id);
             trackTaskCreated('sample', task._id);
@@ -305,19 +302,11 @@ export default function WardrobeDetailScreen() {
             {t('wardrobe.createdAt', { date: created })}
           </Text>
 
-          <View style={s.card}>
-            <Text style={s.cardTitle}>{t('wardrobe.sources')}</Text>
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={s.assetsRow}
-            >
-              {assets.map(([image, label]) => {
-                return <AssetThumb key={image} label={label} uri={image} />;
-              })}
-            </ScrollView>
-          </View>
+          <ThumbsContainer title={t('wardrobe.sources')}>
+            {assets.map(([image, label]) => {
+              return <AssetThumb key={image} label={label} uri={image} />;
+            })}
+          </ThumbsContainer>
 
           <TryOnSamplesList
             selectedSampleId={creatingSampleId ?? undefined}
@@ -339,11 +328,11 @@ function AssetThumb({ label, uri }: { label: string; uri: string }) {
   const { width: windowWidth } = useWindowDimensions();
 
   return (
-    <View style={[s.asset, { width: windowWidth / 3 - 30 }]}>
+    <View style={[s.asset]}>
       <ImageZoom
         source={{ uri }}
         imageStyle={s.assetImg}
-        style={{ borderRadius: 0 }}
+        style={{ marginBottom: 30, position: 'static' }}
       />
       <Text numberOfLines={1} style={s.assetLabel}>
         {label}
@@ -391,26 +380,23 @@ const s = StyleSheet.create({
     padding: 14,
     gap: 12,
   },
-  cardTitle: {
-    color: Colors.light.text,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  assetsRow: {
-    gap: 12,
-    paddingRight: 8,
-  },
   asset: {
     gap: 8,
+    height: 220,
+    width: 150,
+    backgroundColor: Colors.light.disabledBg,
+    overflow: 'hidden',
+    borderRadius: 12,
   },
   assetImg: {
     width: '100%',
-    aspectRatio: 1,
-    borderRadius: 14,
   },
   assetLabel: {
     color: Colors.light.text,
     fontSize: 12,
     fontWeight: '600',
+    position: 'absolute',
+    bottom: 10,
+    left: 12,
   },
 });

@@ -54,7 +54,7 @@ export const useStripeStore = create((set: any, get: any): TStripeStore => {
 
       while (Date.now() - started < WAIT_PAYMENT_TIMEOUT_MS) {
         const res = await fetchPayment(paymentId);
-        console.log({ res });
+
         if (res.status === PaymentStatus.succeeded) {
           return true;
         }

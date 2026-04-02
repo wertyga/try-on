@@ -94,26 +94,22 @@ export default function TryOn() {
     >
       <UserPhotoUploader variant="hero" />
 
-      <View style={{ marginRight: -16 }}>
-        <TryOnSamplesList
-          selectedSampleId={selectedSample?._id}
-          // disabled={hasPendingTask}
-          // isLoading={hasPendingTask}
-          loadingTitle={pendingTaskTitle}
-          loadingSubtitle={pendingTaskSubtitle}
-          onSelectSample={handleSampleSelect}
-        />
-      </View>
+      <TryOnSamplesList
+        selectedSampleId={selectedSample?._id}
+        // disabled={hasPendingTask}
+        // isLoading={hasPendingTask}
+        loadingTitle={pendingTaskTitle}
+        loadingSubtitle={pendingTaskSubtitle}
+        onSelectSample={handleSampleSelect}
+      />
 
       {!!user && !!userPhoto?.base64 && (
-        <View style={{ marginRight: -16 }}>
-          <TaskPresetsSection
-            image={userPhoto.base64}
-            title={t('presets.sectionTitle')}
-            loadingTitle={pendingTaskTitle}
-            loadingSubtitle={pendingTaskSubtitle}
-          />
-        </View>
+        <TaskPresetsSection
+          image={userPhoto.base64}
+          title={t('presets.sectionTitle')}
+          loadingTitle={pendingTaskTitle}
+          loadingSubtitle={pendingTaskSubtitle}
+        />
       )}
 
       <ReccomendationProducts />

@@ -50,7 +50,7 @@ export default function UserScreen() {
     loadCredits();
   }, []);
 
-  if (!user) return <Redirect href="/login" />;
+  if (!user) return <Redirect href="/signin" />;
 
   return (
     <Container title={t('profile.title')} childrenStyle={s.containerBody}>
@@ -84,7 +84,7 @@ export default function UserScreen() {
 
         <UserCredits showReservedCredits={false} />
 
-        <Button onPress={openPaywall} style={s.paywallLink} transparent>
+        <Button onPress={() => openPaywall()} style={s.paywallLink} transparent>
           See paywall
         </Button>
       </View>

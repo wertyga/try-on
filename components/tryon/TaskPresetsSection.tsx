@@ -31,7 +31,7 @@ export const TaskPresetsSection = ({
   const createTaskWithPreset = useTryOnPresetsStore(
     (s) => s.createTaskWithPreset,
   );
-  const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
+  // const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
     // if (hasPendingTask) return;
