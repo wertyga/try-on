@@ -9,6 +9,7 @@ import React, { useEffect } from 'react';
 import { UpdateBanner } from '@/updates';
 import { Toast } from '@/components/Toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SplashScreen as SplashScreenComponent } from '@/components/SplashScreen';
 
 import 'react-native-reanimated';
 import '@/i18n';
@@ -21,10 +22,13 @@ import { sendLogs } from '@/api';
 import { Analytics } from '@/analytics';
 import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
+import { useWatchUpdate } from '@/updates/useWatchUpdate';
 
 SplashScreen.preventAutoHideAsync();
 
-Analytics.init();
+if (!__DEV__) {
+  Analytics.init();
+}
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -33,26 +37,42 @@ export default function RootLayout() {
   const { getDeviceId, appDeviceId } = useAppStore();
   const getUserSelf = useUserStore((s) => s.getUserSelf);
 
-  useEffect(() => {
-    const hasDeviceId = appDeviceId !== null;
-    if (loaded && hasDeviceId) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, appDeviceId]);
+  const { hasChecked, updateMode, onDismiss } = useWatchUpdate();
 
   useEffect(() => {
+    if (appDeviceId && hasChecked) {
+      SplashScreen.hideAsync();
+    }
+  }, [appDeviceId, hasChecked]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
     getDeviceId().then(() => {
       return getUserSelf();
     });
-  }, [getDeviceId, getUserSelf]);
+  }, [loaded]);
 
   useEffect(() => {
-    if (appDeviceId === null) return;
+    if (!appDeviceId || __DEV__) return;
 
     Analytics.identify(appDeviceId);
   }, [appDeviceId]);
 
-  if (!loaded) return <LoadingScreen />;
+  if (!loaded || appDeviceId === null || !hasChecked) {
+    return <LoadingScreen />;
+  }
+
+  if (updateMode === 'critical') {
+    return (
+      <>
+        <SplashScreenComponent />
+        <GestureHandlerRootView>
+          <UpdateBanner mode={updateMode} onDismiss={onDismiss} />
+        </GestureHandlerRootView>
+      </>
+    );
+  }
 
   return (
     <SafeAreaProvider>
@@ -73,7 +93,7 @@ export default function RootLayout() {
             </Stack>
 
             <StatusBar style="auto" />
-            <UpdateBanner />
+            <UpdateBanner mode={updateMode} onDismiss={onDismiss} />
             <ModalsList />
             <Toast />
           </GestureHandlerRootView>
@@ -92,7 +112,7 @@ export function ErrorBoundary({
 }) {
   useEffect(() => {
     sendLogs(error);
-  }, []);
+  }, [error]);
 
   return (
     <SafeAreaProvider>

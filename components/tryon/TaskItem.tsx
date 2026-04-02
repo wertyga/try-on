@@ -18,6 +18,7 @@ import { ImageZoom } from '@/components/ImageZoom';
 import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 import { useErrorMessage } from '@/utils/errors';
 import { DownloadImageButton } from '@/components/DownloadImageButton';
+import { HeroImage } from '@/components/ui/HeroImage';
 
 export function TaskItem({
   task,
@@ -78,11 +79,20 @@ export function TaskItem({
 
       <View style={s.mediaWrap}>
         {isCompleted ? (
-          <ImageZoom
-            source={{ uri: task.resultImageUrl }}
-            style={mediaStyle}
-            imageStyle={{ objectFit: 'contain' }}
-          />
+          isLargeImage ? (
+            <View style={mediaStyle}>
+              <HeroImage
+                imageUri={task.resultImageUrl!}
+                backgroundVariant="gray"
+              />
+            </View>
+          ) : (
+            <ImageZoom
+              source={{ uri: task.resultImageUrl }}
+              style={mediaStyle}
+              imageStyle={{ objectFit: 'contain' }}
+            />
+          )
         ) : (
           <View style={placeholderStyle}>
             {isError ? (
@@ -186,8 +196,9 @@ const s = StyleSheet.create({
   },
   resultLarge: {
     borderRadius: 12,
-    backgroundColor: '#E5E7EB',
-    height: 420,
+    // backgroundColor: '#E5E7EB',
+    alignItems: 'center',
+    // height: 420,
   },
   actions: {
     position: 'absolute',

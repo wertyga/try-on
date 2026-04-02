@@ -5,11 +5,14 @@ import { useCustomOutfitGuard } from '@/hooks';
 import { TryOnListUploader } from '@/components/tryon/TryOnListUploader';
 import { GenerateTaskButton, UserPhotoUploader } from '@/components/tryon';
 import { trackCustomUploadOpened } from '@/analytics';
+import { useTranslation } from 'react-i18next';
 
 export default function CustomOutfitScreen() {
   const { isCheckingAccess } = useCustomOutfitGuard({
     useOnFocus: true,
   });
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     trackCustomUploadOpened();
@@ -17,7 +20,7 @@ export default function CustomOutfitScreen() {
 
   return (
     <Container.WithTabBar title="Custom outfit" isLoading={isCheckingAccess}>
-      <UserPhotoUploader />
+      <UserPhotoUploader title={t('home.yourPhoto')} />
       <TryOnListUploader />
 
       <GenerateTaskButton selfUpload />

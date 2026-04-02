@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Alert, View, StyleSheet } from 'react-native';
+import { Alert, View, StyleSheet, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';
@@ -90,9 +90,8 @@ export default function TryOn() {
     <Container.WithTabBar
       keyboardShouldPersistTaps="handled"
       title={t('home.title')}
-      contentContainerStyle={s.content}
     >
-      <UserPhotoUploader variant="hero" />
+      <UserPhotoUploader />
 
       <TryOnSamplesList
         selectedSampleId={selectedSample?._id}
@@ -116,9 +115,3 @@ export default function TryOn() {
     </Container.WithTabBar>
   );
 }
-
-const s = StyleSheet.create({
-  content: {
-    paddingBottom: 28,
-  },
-});

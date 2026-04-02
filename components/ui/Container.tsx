@@ -7,6 +7,7 @@ import {
   StyleProp,
   ViewStyle,
   Platform,
+  Dimensions,
 } from 'react-native';
 import React, { FC, ReactNode } from 'react';
 import { Colors } from '@/constants/Colors';
@@ -105,6 +106,10 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.light.background,
   },
+  content: {
+    paddingHorizontal: 16,
+    flexGrow: 1,
+  },
   header: {
     backgroundColor: Colors.light.cardBg,
     borderBottomWidth: 1,
@@ -117,6 +122,7 @@ const s = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     textAlign: 'center',
+    width: Dimensions.get('screen').width,
   },
   scroll: {
     flex: 1,
@@ -124,5 +130,4 @@ const s = StyleSheet.create({
     paddingHorizontal: 0,
     backgroundColor: Colors.light.background,
   },
-  content: { paddingHorizontal: 16, flexGrow: 1 },
 });

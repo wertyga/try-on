@@ -41,7 +41,7 @@ export default function TaskDetailScreen() {
       await removeTask(taskId);
 
       router.replace('/task');
-    } catch (e) {
+    } catch {
     } finally {
       setTaskLoading('');
     }
@@ -88,6 +88,7 @@ export default function TaskDetailScreen() {
           <TaskItem
             task={task}
             isLoading={taskLoading === task.id}
+            isLargeImage
             onRetry={handleRetryTask}
             onRemove={handleRemoveTask}
             onSaveSuccess={() => router.replace('/wardrobe')}

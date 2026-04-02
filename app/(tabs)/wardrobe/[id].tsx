@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
-  ScrollView,
   View,
   Text,
   StyleSheet,
@@ -38,6 +37,7 @@ import {
   trackTaskCreated,
 } from '@/analytics';
 import { ThumbsContainer } from '@/components/ui/ThumbsContainer';
+import { HeroImage } from '@/components/ui/HeroImage';
 
 type WardrobeItem = {
   _id: string;
@@ -91,7 +91,7 @@ export default function WardrobeDetailScreen() {
 
   useEffect(() => {
     setItem(storeItem);
-  }, [storeItem?._id]);
+  }, [storeItem]);
 
   useEffect(() => {
     if (!isUserLoggeIn) return;
@@ -271,8 +271,9 @@ export default function WardrobeDetailScreen() {
       {item && (
         <View style={[s.content, { minHeight: minContentHeight }]}>
           <View style={s.heroWrap}>
-            <ImageZoom
-              source={{ uri: item.imageUrl }}
+            <HeroImage
+              imageUri={item.imageUrl}
+              backgroundVariant="gray"
               style={s.heroImageWrap}
               imageStyle={s.heroImage}
             />
@@ -325,8 +326,6 @@ export default function WardrobeDetailScreen() {
 }
 
 function AssetThumb({ label, uri }: { label: string; uri: string }) {
-  const { width: windowWidth } = useWindowDimensions();
-
   return (
     <View style={[s.asset]}>
       <ImageZoom
@@ -351,6 +350,7 @@ const s = StyleSheet.create({
   },
   heroWrap: {
     gap: 12,
+    alignItems: 'center',
   },
   heroImageWrap: {
     width: '100%',
