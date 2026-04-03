@@ -33,16 +33,16 @@ export function AuthRouteCard({
       <View style={s.header}>
         {!!subtitle && <Text style={s.subtitle}>{subtitle}</Text>}
 
-        {!!primarySwitchLabel && onPrimarySwitchPress ? (
+        {!!primarySwitchLabel && !!onPrimarySwitchPress && (
           <Button transparent flexEnd onPress={onPrimarySwitchPress}>
             {primarySwitchLabel}
           </Button>
-        ) : null}
+        )}
       </View>
 
       {children}
 
-      {!!secondarySwitchLabel && onSecondarySwitchPress ? (
+      {!!secondarySwitchLabel && !!onSecondarySwitchPress && (
         <Button
           transparent
           flexEnd
@@ -51,14 +51,14 @@ export function AuthRouteCard({
         >
           {secondarySwitchLabel}
         </Button>
-      ) : null}
+      )}
 
-      {showOauth ? (
+      {showOauth && (
         <View style={s.oauth}>
           {Platform.OS === 'ios' && <OauthApple onSuccess={onAuthSuccess} />}
           <OauthGoogle onSuccess={onAuthSuccess} />
         </View>
-      ) : null}
+      )}
     </Container.WithTabBar>
   );
 }

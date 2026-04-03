@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Container } from '@/components/ui/Container';
 import { useTranslation } from 'react-i18next';

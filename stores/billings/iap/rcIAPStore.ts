@@ -41,10 +41,8 @@ export const useIapStore = create<TIAPStore>((set, get) => ({
   init: async () => {
     if (Platform.OS !== 'ios' && Platform.OS !== 'android') return;
 
-    const { apiKey } = await fetchIAPConfig();
-
     Purchases.setLogLevel(LOG_LEVEL.ERROR);
-    Purchases.configure({ apiKey });
+    Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_IAP_API_KEY! });
   },
 
   fetchPacks: async (): Promise<TRcPack[]> => {
@@ -67,7 +65,7 @@ export const useIapStore = create<TIAPStore>((set, get) => ({
         };
       })
       .sort((a, b) => parseInt(a.title) - parseInt(b.title));
-
+    console.log({ packs });
     set({ packs });
 
     return packs;
