@@ -100,10 +100,9 @@ export default function WardrobeDetailScreen() {
       try {
         setLoading(true);
 
-        const it = await getWardrobeItem(id);
+        const it = await getWardrobeItem(id, true);
         setItem(it);
-      } catch {
-        Alert.alert(t('common.error'), t('errors.failedToLoad'));
+      } catch (_) {
       } finally {
         setLoading(false);
       }
@@ -230,35 +229,37 @@ export default function WardrobeDetailScreen() {
     ]);
   };
 
+  const assets = useMemo<string[][]>(() => {
+    let result: string[][] = [[]];
+
+    if (!item) {
+      return result;
+    }
+
+    if (item?.sample?.image) {
+      result = [[item.sample.image, item.sample.title || t('wardrobe.sample')]];
+    } else if (item?.preset?.image) {
+      result = [[item.preset.image, item.preset.title || t('wardrobe.preset')]];
+    } else {
+      result = [
+        [item?.assets?.outfit, t('wardrobe.outfit')],
+        [item?.assets?.dress, t('wardrobe.dress')],
+        [item?.assets?.upper, t('wardrobe.top')],
+        [item?.assets?.lower, t('wardrobe.bottom')],
+        [item?.assets?.glasses, t('wardrobe.glasses')],
+        [item?.assets?.hairstyle, t('wardrobe.hairstyle')],
+        [item?.assets?.accessories, t('wardrobe.accessories')],
+      ].filter(([image]) => !!image) as string[][];
+    }
+
+    if (item?.assets?.model) {
+      result.unshift([item.assets.model, t('wardrobe.model')]);
+    }
+
+    return result;
+  }, [item]);
+
   if (!id) return null;
-
-  const assets: string[][] = [
-    [item?.assets?.outfit, t('wardrobe.outfit')],
-    [item?.assets?.dress, t('wardrobe.dress')],
-    [item?.assets?.upper, t('wardrobe.top')],
-    [item?.assets?.lower, t('wardrobe.bottom')],
-    [item?.assets?.glasses, t('wardrobe.glasses')],
-    [item?.assets?.hairstyle, t('wardrobe.hairstyle')],
-    [item?.assets?.accessories, t('wardrobe.accessories')],
-  ].filter(([image]) => !!image) as string[][];
-
-  if (item?.assets?.model) {
-    assets.unshift([item.assets.model, t('wardrobe.model')]);
-  }
-
-  if (item?.sample?.image) {
-    assets.splice(1, 0, [
-      item.sample.image,
-      item.sample.title || t('wardrobe.sample'),
-    ]);
-  }
-
-  if (item?.preset?.image) {
-    assets.splice(2, 0, [
-      item.preset.image,
-      item.preset.title || t('wardrobe.preset'),
-    ]);
-  }
 
   const minContentHeight = Math.max(420, windowHeight - 240);
 

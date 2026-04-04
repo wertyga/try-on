@@ -65,7 +65,7 @@ export const useIapStore = create<TIAPStore>((set, get) => ({
         };
       })
       .sort((a, b) => parseInt(a.title) - parseInt(b.title));
-    console.log({ packs });
+
     set({ packs });
 
     return packs;

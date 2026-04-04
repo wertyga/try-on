@@ -19,14 +19,14 @@ import { StatusBox } from '@/components/ui/StatusBox';
 import { useAppStore } from '@/stores/appStore';
 import { ModalsList } from '@/components/ModalsList';
 import { sendLogs } from '@/api';
-import { Analytics } from '@/analytics';
+import { Analytics, isAnalyticEnabled } from '@/analytics';
 import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useWatchUpdate } from '@/updates/useWatchUpdate';
 
 SplashScreen.preventAutoHideAsync();
 
-if (!__DEV__) {
+if (isAnalyticEnabled()) {
   Analytics.init();
 }
 
@@ -54,7 +54,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    if (!appDeviceId || __DEV__) return;
+    if (!appDeviceId) return;
 
     Analytics.identify(appDeviceId);
   }, [appDeviceId]);

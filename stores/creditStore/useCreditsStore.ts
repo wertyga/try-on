@@ -313,7 +313,9 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       pendingReservationIds: state.pendingReservationIds.filter(
         (id) => id !== reservationId,
       ),
-      reservedTaskIds: state.reservedTaskIds.filter((id) => id !== reservationId),
+      reservedTaskIds: state.reservedTaskIds.filter(
+        (id) => id !== reservationId,
+      ),
     }));
   },
 

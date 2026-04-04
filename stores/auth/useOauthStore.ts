@@ -11,6 +11,7 @@ import { TUser } from '@/types';
 
 type TAuthStore = {
   appleLogout: () => Promise<void>;
+  clear: () => Promise<void>;
   getAppleCredential: () => Promise<AppleAuthentication.AppleAuthenticationCredential>;
   getGoogleUser: () => Promise<TGoogle['user']>;
   googleLogout: () => Promise<void>;
@@ -85,4 +86,9 @@ export const useOAuthStore = create<TAuthStore>((set, get) => ({
   },
 
   appleLogout: async () => {},
+
+  clear: async () => {
+    await useOAuthStore.getState().appleLogout();
+    await useOAuthStore.getState().googleLogout();
+  },
 }));

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { useUserStore } from '@/stores/useUserStore';
 import { router } from 'expo-router';
-import { sendLogs } from '@/api';
+import { requestUserDataDeletion, sendLogs } from '@/api';
 import Toast from 'react-native-toast-message';
 import { storage } from '@/utils';
 import { useTryOnStore } from '@/stores/useTryOnStore';
@@ -21,6 +21,7 @@ type TAuthStore = {
   signInWithApple: (callback?: () => void) => Promise<void>;
   signInWithGoogle: (callback?: () => void) => Promise<void>;
   logout: () => void;
+  requestUserDataDeletion: (password: string) => Promise<void>;
   updateUser: (user: TUser) => Promise<void>;
   signInByEmail: (
     ...params: Parameters<TAuthEmailStore['signIn']>
@@ -86,11 +87,6 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     } catch (e: any) {
       sendLogs(e.message);
 
-      Toast.show({
-        type: 'error',
-        text1: e.message,
-      });
-
       return false;
     } finally {
       set({ isLoading: false });
@@ -98,14 +94,18 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
   },
 
   logout: async () => {
-    await useOAuthStore.getState().appleLogout();
-    await useOAuthStore.getState().googleLogout();
+    await useOAuthStore.getState().clear();
+    await useUserStore.getState().dropUser();
 
-    useUserStore.getState().dropUser();
     useTryOnStore.getState().clear();
     useWardrobeStore.getState().clear();
     useUsageStore.getState().reset();
 
     await useCreditsStore.getState().load();
+  },
+
+  requestUserDataDeletion: async (password: string) => {
+    await requestUserDataDeletion(password);
+    await get().logout();
   },
 }));

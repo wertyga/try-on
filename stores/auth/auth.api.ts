@@ -15,7 +15,6 @@ export const signInRequest = async (
     method: 'post',
     url: '/auth/signin',
     data,
-    silentError: true,
   });
 
   return response;

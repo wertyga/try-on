@@ -27,3 +27,15 @@ export const oauthAppleRegister = async (data: {
 
   return response;
 };
+
+export const requestUserDataDeletion = async (
+  password: string,
+): Promise<void> => {
+  await baseQuery({
+    method: 'post',
+    url: '/auth/remove-data',
+    data: {
+      password,
+    },
+  });
+};

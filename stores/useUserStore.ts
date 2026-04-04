@@ -17,12 +17,12 @@ export type TUserStoreState = {
 
 export type TUserStoreActions = {
   setUser: (u: TUser | null) => void;
-  dropUser: () => void; // logout: очищает storage и user
+  dropUser: () => Promise<void>; // logout: очищает storage и user
   updateUserCategories: (categories?: string[]) => void; // logout: очищает storage и user
 
-  getUserSelf: () => Promise<void>;
+  getUserSelf: (withTaskListReplace?: boolean) => Promise<void>;
 
-  updateUserTasks: () => void;
+  updateUserTasks: (withTaskListReplace?: boolean) => void;
 };
 
 type TUserStore = TUserStoreState & TUserStoreActions & {};
@@ -62,23 +62,27 @@ export const useUserStore = create<TUserStore>((set, get) => ({
     }
   },
 
-  dropUser: () => {
-    storage.delete?.('token');
+  dropUser: async () => {
+    await storage.delete?.('token');
 
     set({ user: null, error: null, status: 'ready' });
   },
 
-  updateUserTasks: () => {
+  updateUserTasks: (withTaskListReplace?: boolean) => {
     const user = get().user;
 
     if (!user) return;
 
-    useTryOnStore
-      .getState()
-      .addTasksList(user.tasks.map((t) => getTryOnTaskFromTask(t, t._id)));
+    const newTaskList = user.tasks.map((t) => getTryOnTaskFromTask(t, t._id));
+
+    if (withTaskListReplace) {
+      useTryOnStore.getState().updateTasksState(newTaskList);
+    } else {
+      useTryOnStore.getState().addTasksList(newTaskList);
+    }
   },
 
-  getUserSelf: async () => {
+  getUserSelf: async (withTaskListReplace?: boolean) => {
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });
@@ -91,7 +95,7 @@ export const useUserStore = create<TUserStore>((set, get) => ({
       useAppStore.getState().updateDeviceId(deviceId);
 
       if (user) {
-        get().updateUserTasks();
+        get().updateUserTasks(withTaskListReplace);
         get().updateUserCategories();
       }
 

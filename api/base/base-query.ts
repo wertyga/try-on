@@ -70,7 +70,6 @@ export const baseQuery = async <R = any>({
         text1: message,
       });
     }
-
     throw e;
   }
 };

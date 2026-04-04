@@ -20,8 +20,16 @@ export async function addWardrobeItem(
   return data.item;
 }
 
-export async function getWardrobeItem(id: string): Promise<WardrobeItem> {
-  const { data } = await baseQuery({ method: 'get', url: `/wardrobe/${id}` });
+export async function getWardrobeItem(
+  id: string,
+  silentError?: boolean,
+): Promise<WardrobeItem> {
+  const { data } = await baseQuery({
+    method: 'get',
+    url: `/wardrobe/${id}`,
+    silentError,
+  });
+
   return data.item;
 }
 

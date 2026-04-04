@@ -91,6 +91,7 @@ type TryOnState = TTryOnImages & {
   removeTask: (id: string) => Promise<void>;
   addTask: (t: TryOnTask) => void;
   updateTask: (id: string, patch: Partial<TryOnTask>) => void;
+  syncTaskReservations: (tasks?: TryOnTask[]) => void;
 
   clear: () => void;
 
@@ -122,18 +123,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     ]);
 
     set({ userPhoto, tasks: tasks ?? [] });
-    useCreditsStore
-      .getState()
-      .syncTaskReservations(
-        (tasks ?? [])
-          .filter(
-            (task: TryOnTask) =>
-              task.usesPaidCreditReservation &&
-              (task.status === TaskStatus.running ||
-                task.status === TaskStatus.queued),
-          )
-          .map((task: TryOnTask) => task.id),
-      );
+    get().syncTaskReservations(tasks ?? []);
   },
 
   setConsent: (consent: boolean) => {
@@ -218,6 +208,10 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
     set({ tasks });
 
     storage.set('tasks', tasks);
+    get().syncTaskReservations(tasks);
+  },
+
+  syncTaskReservations: (tasks = get().tasks) => {
     useCreditsStore
       .getState()
       .syncTaskReservations(
@@ -241,6 +235,7 @@ export const useTryOnStore = create<TryOnState>((set, get) => ({
   clear: () => {
     set({ tasks: [] });
     get().resetInputs();
+    get().setUserPhoto(null);
 
     storage.set('tasks', []);
   },

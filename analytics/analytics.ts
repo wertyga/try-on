@@ -33,7 +33,7 @@ const sanitize = (params?: EventParams) => {
   return out;
 };
 
-const isEnabled = () => Boolean(VEXO_API_KEY);
+export const isAnalyticEnabled = () => Boolean(VEXO_API_KEY) && !__DEV__;
 
 export const Analytics = {
   init: () => {
@@ -44,12 +44,12 @@ export const Analytics = {
     isInitialized = true;
   },
   identify: async (deviceId: string | null) => {
-    if (!isEnabled()) return;
+    if (!isAnalyticEnabled()) return;
 
     await identifyDevice(deviceId);
   },
   event: async (name: EventName, params?: EventParams) => {
-    if (!isEnabled()) return;
+    if (!isAnalyticEnabled()) return;
 
     customEvent(name, sanitize(params) ?? {});
   },
