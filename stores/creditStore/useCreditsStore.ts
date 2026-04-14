@@ -62,6 +62,7 @@ type TCreditsActions = {
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
   fetchPacks: () => Promise<void>;
+  initialize: () => Promise<void>;
 
   _loadStripePacks: () => Promise<TCreditPack[]>;
   _loadIapPacks: () => Promise<TCreditPack[]>;
@@ -96,6 +97,12 @@ const isIOS = Platform.OS === 'ios';
 export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   ...initialState,
 
+  initialize: async () => {
+    if (isIOS) {
+      await useIapStore.getState().initialize();
+    }
+  },
+
   buyPack: async (priceId: string) => {
     set({ isBuyingPack: true, error: null });
 
@@ -111,7 +118,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       useModalsStore.getState().closePaywall();
     } catch (e: any) {
       const { message = 'Payment failed', status, code } = buildAPIError(e);
-
+      console.log({ e });
       if (status === 403) {
         await useAuthStore.getState().logout();
       } else {

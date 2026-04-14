@@ -24,7 +24,7 @@ export default function TryOn() {
   const credits = useCreditsStore();
   const user = useUserStore((s) => s.user);
   const userPhoto = useTryOnStore((s) => s.userPhoto);
-  const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
+  // const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
   const addTask = useTryOnStore((s) => s.addTask);
   const [selectedSample, setSelectedSample] = useState<TTryOnSample | null>(
     null,

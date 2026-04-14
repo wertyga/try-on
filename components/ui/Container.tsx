@@ -111,6 +111,7 @@ const s = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
+    alignItems: 'center',
     backgroundColor: Colors.light.cardBg,
     borderBottomWidth: 1,
     borderBottomColor: Colors.light.border,

@@ -13,7 +13,6 @@ export const useCustomOutfitGuard = ({
   useOnFocus,
 }: TUseCustomOutfitGuardOptions = {}) => {
   const isCheckingAccessRef = React.useRef(false);
-  // const pathname = usePathname();
 
   const [isCheckingAccess, setIsCheckingAccess] = React.useState(false);
 
@@ -24,7 +23,6 @@ export const useCustomOutfitGuard = ({
     if (!user) {
       router.replace({
         pathname: '/signin',
-        // params: { redirectTo: '/custom-outfit' },
       });
 
       return false;

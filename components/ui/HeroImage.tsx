@@ -9,10 +9,12 @@ import {
   ViewStyle,
   ImageStyle,
 } from 'react-native';
+import { ImageZoom } from '@/components/ImageZoom';
 
 type HeroImageProps = {
   imageUri: string;
   isLoading?: boolean;
+  isZoomImage?: boolean;
   backgroundVariant?: 'warm' | 'gray';
   style?: StyleProp<ViewStyle>;
   imageStyle?: StyleProp<ImageStyle>;
@@ -23,10 +25,13 @@ const { height } = Dimensions.get('window');
 export function HeroImage({
   imageUri,
   isLoading = false,
+  isZoomImage = false,
   backgroundVariant = 'warm',
   style,
   imageStyle,
 }: HeroImageProps) {
+  const imageSource = { uri: imageUri };
+
   return (
     <View
       style={[
@@ -35,11 +40,20 @@ export function HeroImage({
         style,
       ]}
     >
-      <Image
-        source={{ uri: imageUri }}
-        style={[s.preview, imageStyle]}
-        resizeMode="contain"
-      />
+      {isZoomImage ? (
+        <ImageZoom
+          source={imageSource}
+          style={s.zoomWrap}
+          imageStyle={[s.preview, imageStyle]}
+          resizeMode="contain"
+        />
+      ) : (
+        <Image
+          source={imageSource}
+          style={[s.preview, imageStyle]}
+          resizeMode="contain"
+        />
+      )}
 
       {isLoading && (
         <View style={s.loaderOverlay}>
@@ -72,6 +86,10 @@ const s = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 22,
+  },
+  zoomWrap: {
+    width: '100%',
+    height: '100%',
   },
   loaderOverlay: {
     position: 'absolute',

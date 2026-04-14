@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '../stores/billings/stripe';
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { UpdateBanner } from '@/updates';
 import { Toast } from '@/components/Toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -23,6 +23,7 @@ import { Analytics, isAnalyticEnabled } from '@/analytics';
 import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useWatchUpdate } from '@/updates/useWatchUpdate';
+import { useCreditsStore } from '@/stores';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +37,7 @@ export default function RootLayout() {
   });
   const { getDeviceId, appDeviceId } = useAppStore();
   const getUserSelf = useUserStore((s) => s.getUserSelf);
+  const initializeCreditStore = useCreditsStore((s) => s.initialize);
 
   const { hasChecked, updateMode, onDismiss } = useWatchUpdate();
 
@@ -48,6 +50,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loaded) return;
 
+    initializeCreditStore();
     getDeviceId().then(() => {
       return getUserSelf();
     });

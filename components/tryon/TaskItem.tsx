@@ -84,6 +84,7 @@ export function TaskItem({
               <HeroImage
                 imageUri={task.resultImageUrl!}
                 backgroundVariant="gray"
+                isZoomImage
               />
             </View>
           ) : (

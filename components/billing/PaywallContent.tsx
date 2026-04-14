@@ -15,7 +15,7 @@ export function PaywallContent() {
       {/* Balance */}
       <UserCredits />
 
-      {!isDeclinedError && (
+      {isDeclinedError && (
         <StatusBox
           message={error?.message}
           variant="error"

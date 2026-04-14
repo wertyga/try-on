@@ -32,7 +32,7 @@ export const PresetItem: FC<TPresetItemProps> = ({
 
 const s = StyleSheet.create({
   item: {
-    width: 114,
+    width: 120,
   },
   itemDisabled: {
     opacity: 0.6,

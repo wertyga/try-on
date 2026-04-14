@@ -277,6 +277,7 @@ export default function WardrobeDetailScreen() {
               backgroundVariant="gray"
               style={s.heroImageWrap}
               imageStyle={s.heroImage}
+              isZoomImage
             />
 
             <View style={s.actions}>
@@ -350,12 +351,12 @@ const s = StyleSheet.create({
     gap: 12,
   },
   heroWrap: {
+    width: '100%',
     gap: 12,
     alignItems: 'center',
   },
   heroImageWrap: {
     width: '100%',
-    aspectRatio: 3 / 4,
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#F3F4F6',
