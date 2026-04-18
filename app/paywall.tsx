@@ -11,10 +11,8 @@ import { trackPaywallOpened } from '@/analytics';
 export default function PaywallScreen() {
   const {
     packs,
-    freeDailyLeft,
     guestFreeLeft,
     guestFreeUsed,
-    resetsAt,
     isLoading,
     error,
     load,
@@ -22,9 +20,7 @@ export default function PaywallScreen() {
     fetchPacks,
   } = useCreditsStore();
   const isBuying = useCreditsStore((s) => s.isBuyingPack);
-  const availablePaidCredits = useCreditsStore((s) =>
-    s.getAvailablePaidCredits(),
-  );
+  const displayCredits = useCreditsStore((s) => s.getAvailableCredits());
   const reservedCredits = useCreditsStore(
     (s) => s.reservedTaskIds.length + s.pendingReservationIds.length,
   );
@@ -34,8 +30,6 @@ export default function PaywallScreen() {
     load();
     fetchPacks();
   }, [load]);
-
-  const timeLeft = useMemo(() => formatTimeLeft(resetsAt), [resetsAt]);
 
   return (
     <>
@@ -48,7 +42,7 @@ export default function PaywallScreen() {
         {/* Error */}
         {error && (
           <Pressable onPress={clearError} style={s.errorBox}>
-            <Text style={s.errorText}>{error}</Text>
+            <Text style={s.errorText}>{error.message}</Text>
             <Text style={s.errorHint}>Tap to dismiss</Text>
           </Pressable>
         )}
@@ -59,21 +53,15 @@ export default function PaywallScreen() {
             <Pressable onPress={() => router.back()} style={s.backBtn}>
               <Text style={s.backText}>Back</Text>
             </Pressable>
-            {!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}
           </View>
 
           {/* Status card */}
           <View style={s.card}>
             <Text style={s.title}>Your balance</Text>
 
-            <View style={s.line}>
-              <Text style={s.label}>Free today</Text>
-              <Text style={s.value}>{freeDailyLeft ?? 0}</Text>
-            </View>
-
-            <View style={s.line}>
+            <View style={[s.line, { marginBottom: 8 }]}>
               <Text style={s.label}>Credits</Text>
-              <Text style={s.value}>{availablePaidCredits ?? 0}</Text>
+              <Text style={s.value}>{displayCredits ?? 0}</Text>
             </View>
 
             {reservedCredits > 0 ? (
@@ -85,13 +73,14 @@ export default function PaywallScreen() {
 
             {(guestFreeLeft ?? 0) > 0 || (guestFreeUsed ?? 0) > 0 ? (
               <View style={s.line}>
-                <Text style={s.label}>Guest free</Text>
+                <Text style={s.label}>Free credits</Text>
                 <Text style={s.value}>{guestFreeLeft ?? 0}</Text>
               </View>
             ) : null}
 
             <Text style={s.hint}>
-              Free generations reset daily. Reserved credits are temporarily held by queued or running tasks.
+              Free generations reset daily. Reserved credits are temporarily
+              held by queued or running tasks.
             </Text>
           </View>
 

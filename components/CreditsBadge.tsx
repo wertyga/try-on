@@ -11,9 +11,7 @@ type Props = {
 export function CreditsBadge({ variant = 'compact' }: Props) {
   const freeDailyLeft = useCreditsStore((s) => s.freeDailyLeft);
   const guestFreeLeft = useCreditsStore((s) => s.guestFreeLeft);
-  const availablePaidCredits = useCreditsStore((s) =>
-    s.getAvailablePaidCredits(),
-  );
+  const displayCredits = useCreditsStore((s) => s.getDisplayCredits());
 
   const parts: string[] = [];
 
@@ -21,11 +19,11 @@ export function CreditsBadge({ variant = 'compact' }: Props) {
     parts.push(`Free today: ${freeDailyLeft}`);
   }
 
-  if (availablePaidCredits > 0) {
-    parts.push(`Credits: ${availablePaidCredits}`);
+  if (displayCredits > 0) {
+    parts.push(`Credits: ${displayCredits}`);
   }
 
-  if (freeDailyLeft <= 0 && availablePaidCredits <= 0 && guestFreeLeft > 0) {
+  if (freeDailyLeft <= 0 && displayCredits <= 0 && guestFreeLeft > 0) {
     parts.push(`Free: ${guestFreeLeft}`);
   }
 

@@ -102,14 +102,12 @@ export default function TryOn() {
         onSelectSample={handleSampleSelect}
       />
 
-      {!!user && !!userPhoto?.base64 && (
-        <TaskPresetsSection
-          image={userPhoto.base64}
-          title={t('presets.sectionTitle')}
-          loadingTitle={pendingTaskTitle}
-          loadingSubtitle={pendingTaskSubtitle}
-        />
-      )}
+      <TaskPresetsSection
+        image={userPhoto?.base64}
+        title={t('presets.sectionTitle')}
+        loadingTitle={pendingTaskTitle}
+        loadingSubtitle={pendingTaskSubtitle}
+      />
 
       <ReccomendationProducts />
     </Container.WithTabBar>

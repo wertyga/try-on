@@ -5,10 +5,12 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  StyleProp,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
+  ViewStyle,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -26,6 +28,7 @@ type BottomModalProps = {
   onClose: () => void;
   children: ReactNode;
   isLoading?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 const CLOSE_DISTANCE = 80;
@@ -37,6 +40,7 @@ export const BottomModal: FC<BottomModalProps> = ({
   onClose,
   children,
   isLoading = false,
+  style,
 }) => {
   const { t } = useTranslation();
   const { height } = useWindowDimensions();
@@ -99,7 +103,7 @@ export const BottomModal: FC<BottomModalProps> = ({
       animationType="none"
       onRequestClose={isLoading ? undefined : onClose}
     >
-      <View style={[s.root]}>
+      <View style={[s.root, style]}>
         <Pressable
           style={s.backdrop}
           onPress={isLoading ? undefined : onClose}

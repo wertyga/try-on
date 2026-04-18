@@ -26,10 +26,15 @@ type TAuthStore = {
   signInByEmail: (
     ...params: Parameters<TAuthEmailStore['signIn']>
   ) => Promise<boolean>;
+  taskIds: () => string[];
 };
 
 export const useAuthStore = create<TAuthStore>((set, get) => ({
   isLoading: false,
+
+  taskIds: () => {
+    return useTryOnStore.getState().tasks.map(({ id }) => id);
+  },
 
   updateUser: async (user: TUser) => {
     await storage.set('token', user.token);
@@ -41,7 +46,9 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      const user = await useOAuthStore.getState().signInWithApple();
+      const user = await useOAuthStore
+        .getState()
+        .signInWithApple({ taskIds: get().taskIds() });
 
       await get().updateUser(user);
 
@@ -59,7 +66,9 @@ export const useAuthStore = create<TAuthStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      const user = await useOAuthStore.getState().signInWithGoogle();
+      const user = await useOAuthStore
+        .getState()
+        .signInWithGoogle({ taskIds: get().taskIds() });
 
       await get().updateUser(user);
 

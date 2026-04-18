@@ -11,6 +11,7 @@ import { useIapStore } from '@/stores/billings/iap';
 import { TCreditPack } from './credit.types';
 import { useModalsStore } from '@/stores/useModalsStore';
 import { useUserStore } from '@/stores/useUserStore';
+import { isIOS } from '@/stores/appStore';
 
 export enum PaymentCode {
   Canceled = 'Canceled',
@@ -25,14 +26,10 @@ type TCreditsState = {
   // guest
   guestFreeUsed: number;
   guestFreeLeft: number;
+  guestCredits: number;
+  paidCredits: number;
+  totalAvailable: number;
 
-  // user
-  freeDailyUsed: number;
-  freeDailyLeft: number;
-  credits: number;
-
-  resetsAt: string | null;
-  autoRefillEnabled: boolean;
   reservedTaskIds: string[];
   pendingReservationIds: string[];
 
@@ -58,7 +55,7 @@ type TCreditsActions = {
   ) => Promise<void>;
   releaseGenerationReservation: (reservationId: string | null) => void;
   syncTaskReservations: (taskIds: string[]) => void;
-  getAvailablePaidCredits: () => number;
+  getAvailableCredits: () => number;
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
   fetchPacks: () => Promise<void>;
@@ -76,13 +73,11 @@ const initialState: TCreditsState = {
 
   guestFreeUsed: 0,
   guestFreeLeft: 0,
+  guestCredits: 0,
 
-  freeDailyUsed: 0,
-  freeDailyLeft: 0,
-  credits: 0,
+  paidCredits: 0,
+  totalAvailable: 0,
 
-  resetsAt: null,
-  autoRefillEnabled: false,
   reservedTaskIds: [],
   pendingReservationIds: [],
 
@@ -91,8 +86,6 @@ const initialState: TCreditsState = {
 
   isBuyingPack: false,
 };
-
-const isIOS = Platform.OS === 'ios';
 
 export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   ...initialState,
@@ -118,8 +111,10 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       useModalsStore.getState().closePaywall();
     } catch (e: any) {
       const { message = 'Payment failed', status, code } = buildAPIError(e);
-      console.log({ e });
-      if (status === 403) {
+
+      const user = useUserStore.getState().user;
+
+      if (status === 403 && user) {
         await useAuthStore.getState().logout();
       } else {
         set({
@@ -200,18 +195,11 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       const state = await fetchBillingState();
 
       set({
-        settings: state.settings ?? null,
-
         guestFreeUsed: state.guestFreeUsed ?? 0,
         guestFreeLeft: state.guestFreeLeft ?? 0,
-
-        freeDailyUsed: state.freeDailyUsed ?? 0,
-        freeDailyLeft: state.freeDailyLeft ?? 0,
-
-        credits: state.credits ?? 0,
-
-        resetsAt: state.resetsAt ?? null,
-        autoRefillEnabled: state.autoRefillEnabled ?? false,
+        guestCredits: state.guestCredits ?? 0,
+        paidCredits: state.paidCredits ?? 0,
+        totalAvailable: (state.guestFreeLeft ?? 0) + (state.paidCredits ?? 0),
       });
     } catch (e: any) {
       const {
@@ -233,8 +221,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   canGenerate: (showFallbackModal = false) => {
     const s = get();
 
-    if ((s.freeDailyLeft ?? 0) > 0) return true;
-    if (get().getAvailablePaidCredits() > 0) return true;
+    if (get().getAvailableCredits() > 0) return true;
     if ((s.guestFreeLeft ?? 0) > 0) return true;
 
     if (showFallbackModal) {
@@ -243,10 +230,10 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
 
       modals.closeAllModals();
 
-      if (user) {
-        modals.openPaywall();
-      } else {
+      if (!user && !isIOS) {
         modals.openLogin();
+      } else {
+        modals.openPaywall();
       }
     }
 
@@ -256,22 +243,29 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   getBalanceLabel: () => {
     const s = get();
     const parts: string[] = [];
-    parts.push(`Free today: ${s.freeDailyLeft ?? 0}`);
-    parts.push(`Credits: ${get().getAvailablePaidCredits()}`);
-    if ((s.guestFreeLeft ?? 0) > 0)
-      parts.push(`Guest free: ${s.guestFreeLeft}`);
+
+    parts.push(`Credits: ${s.getAvailableCredits()}`);
+
+    if ((s.guestFreeLeft ?? 0) > 0) {
+      parts.push(`Free credits: ${s.guestFreeLeft}`);
+    }
+
     return parts.join(' • ');
   },
 
-  getAvailablePaidCredits: () => {
+  getAvailableCredits: () => {
     const s = get();
 
     return Math.max(
-      (s.credits ?? 0) -
+      (s.totalAvailable ?? 0) -
         s.reservedTaskIds.length -
         s.pendingReservationIds.length,
       0,
     );
+  },
+
+  getDisplayCredits: () => {
+    return get().getAvailableCredits();
   },
 
   beginGenerationReservation: () => {
@@ -279,10 +273,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
     const user = useUserStore.getState().user;
 
     const shouldReservePaidCredit =
-      !!user &&
-      (s.freeDailyLeft ?? 0) <= 0 &&
-      (s.guestFreeLeft ?? 0) <= 0 &&
-      get().getAvailablePaidCredits() > 0;
+      !!user && (s.guestFreeLeft ?? 0) <= 0 && get().getAvailableCredits() > 0;
 
     if (!shouldReservePaidCredit) {
       return null;

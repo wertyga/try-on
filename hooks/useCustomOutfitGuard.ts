@@ -1,9 +1,11 @@
 import React from 'react';
-import { router, usePathname } from 'expo-router';
+import { Platform } from 'react-native';
+import { router } from 'expo-router';
 
 import { fetchHasSucceededPayment } from '@/stores/creditStore';
 import { useModalsStore, useUserStore } from '@/stores';
 import { useFocus } from './useFocus';
+import { isIOS } from '@/stores/appStore';
 
 type TUseCustomOutfitGuardOptions = {
   useOnFocus?: boolean;
@@ -21,11 +23,20 @@ export const useCustomOutfitGuard = ({
 
   const checkCustomOutfitAccess = React.useCallback(async () => {
     if (!user) {
-      router.replace({
-        pathname: '/signin',
-      });
+      if (!isIOS) {
+        router.replace({
+          pathname: '/signin',
+        });
 
-      return false;
+        return false;
+      }
+
+      // openPaywall({
+      //   titleKey: 'paywall.customOutfit.title',
+      //   subtitleKey: 'paywall.customOutfit.subtitle',
+      // });
+      //
+      // return false;
     }
 
     if (isCheckingAccessRef.current) {

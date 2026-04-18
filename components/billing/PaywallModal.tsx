@@ -45,13 +45,13 @@ export const PaywallModal: FC<PaywallModalProps> = ({
         </View>
       </View>
 
-      <ScrollView
+      <View
         style={s.scroll}
-        contentContainerStyle={s.content}
-        showsVerticalScrollIndicator={false}
+        // contentContainerStyle={s.content}
+        // showsVerticalScrollIndicator={false}
       >
         <PaywallContent />
-      </ScrollView>
+      </View>
     </BottomModal>
   );
 };
@@ -81,7 +81,7 @@ const s = StyleSheet.create({
     color: '#6B7280',
   },
   scroll: {
-    flexShrink: 1,
+    paddingBottom: 80,
   },
   content: {
     paddingTop: 12,

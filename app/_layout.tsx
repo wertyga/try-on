@@ -50,9 +50,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loaded) return;
 
-    initializeCreditStore();
-    getDeviceId().then(() => {
-      return getUserSelf();
+    getDeviceId().then(async () => {
+      await Promise.all([initializeCreditStore(), getUserSelf()]);
     });
   }, [loaded]);
 

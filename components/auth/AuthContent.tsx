@@ -94,21 +94,24 @@ export const AuthContent: FC<AuthContentProps> = ({
       contentContainerStyle={s.content}
       showsVerticalScrollIndicator={false}
     >
-      <View style={s.topRow}>
-        <Button style={s.switchButton} onPress={toggleFormState} transparent>
-          {state === 'signin' ? 'Register' : 'Login'}
-        </Button>
-      </View>
+      {/*<View style={s.topRow}>*/}
+      {/*  <Button style={s.switchButton} onPress={toggleFormState} transparent>*/}
+      {/*    {state === 'signin' ? 'Register' : 'Login'}*/}
+      {/*  </Button>*/}
+      {/*</View>*/}
 
-      {state === 'signup' && (
-        <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
-      )}
-      {state === 'signin' && (
-        <SignInForm onSubmit={onSignIn} isLoading={isLoading} />
-      )}
-      {state === 'recovery-password' && (
-        <RecoveryPasswordForm onSubmit={onRecoveryPassword} codeSent={codeSent} />
-      )}
+      {/*{state === 'signup' && (*/}
+      {/*  <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />*/}
+      {/*)}*/}
+      {/*{state === 'signin' && (*/}
+      {/*  <SignInForm onSubmit={onSignIn} isLoading={isLoading} />*/}
+      {/*)}*/}
+      {/*{state === 'recovery-password' && (*/}
+      {/*  <RecoveryPasswordForm*/}
+      {/*    onSubmit={onRecoveryPassword}*/}
+      {/*    codeSent={codeSent}*/}
+      {/*  />*/}
+      {/*)}*/}
 
       {!hideOauth && (
         <View style={s.oauth}>
@@ -117,13 +120,13 @@ export const AuthContent: FC<AuthContentProps> = ({
         </View>
       )}
 
-      <Button
-        transparent
-        style={s.forgotButton}
-        onPress={() => setState('recovery-password')}
-      >
-        Forgot password?
-      </Button>
+      {/*<Button*/}
+      {/*  transparent*/}
+      {/*  style={s.forgotButton}*/}
+      {/*  onPress={() => setState('recovery-password')}*/}
+      {/*>*/}
+      {/*  Forgot password?*/}
+      {/*</Button>*/}
 
       {showMaybeLater && onMaybeLaterPress ? (
         <Button transparent style={s.laterButton} onPress={onMaybeLaterPress}>

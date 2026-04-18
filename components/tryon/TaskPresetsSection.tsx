@@ -10,7 +10,7 @@ import { trackStudioPresetClicked } from '@/analytics';
 import { PresetsList } from './PresetsList';
 
 type TTaskPresetsSectionProps = {
-  image: string;
+  image?: string;
   taskId?: string;
   title?: string;
   loadingTitle?: string;
@@ -34,7 +34,7 @@ export const TaskPresetsSection = ({
   // const hasPendingTask = useTryOnStore((s) => s.hasPendingTask());
 
   const handlePresetSelect = (preset: TTryOnPreset) => {
-    // if (hasPendingTask) return;
+    if (!image) return;
 
     trackStudioPresetClicked(preset._id);
 

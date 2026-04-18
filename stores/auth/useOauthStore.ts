@@ -15,12 +15,12 @@ type TAuthStore = {
   getAppleCredential: () => Promise<AppleAuthentication.AppleAuthenticationCredential>;
   getGoogleUser: () => Promise<TGoogle['user']>;
   googleLogout: () => Promise<void>;
-  signInWithApple: () => Promise<TUser>;
-  signInWithGoogle: () => Promise<TUser>;
+  signInWithApple: (data?: Record<string, any>) => Promise<TUser>;
+  signInWithGoogle: (data?: Record<string, any>) => Promise<TUser>;
 };
 
 export const useOAuthStore = create<TAuthStore>((set, get) => ({
-  signInWithApple: async () => {
+  signInWithApple: async (additionalData = {}) => {
     const appleUser = await get().getAppleCredential();
 
     if (!appleUser.identityToken) {
@@ -30,17 +30,19 @@ export const useOAuthStore = create<TAuthStore>((set, get) => ({
     const { user } = await oauthAppleRegister({
       authorizationCode: appleUser.authorizationCode ?? '',
       identityToken: appleUser.identityToken,
+      ...additionalData,
     });
 
     return user;
   },
 
-  signInWithGoogle: async () => {
+  signInWithGoogle: async (additionalData = {}) => {
     const gUser = await get().getGoogleUser();
 
     const { user } = await oauthGoogleRegister({
       email: gUser.email,
       username: gUser.name ?? '',
+      ...additionalData,
     });
 
     return user;

@@ -11,12 +11,8 @@ type UserCreditsProps = {
 export const UserCredits: FC<UserCreditsProps> = ({
   showReservedCredits = true,
 }) => {
-  const resetsAt = useCreditsStore((s) => s.resetsAt);
-  const freeDailyLeft = useCreditsStore((s) => s.freeDailyLeft);
   const guestFreeLeft = useCreditsStore((s) => s.guestFreeLeft);
-  const availablePaidCredits = useCreditsStore((s) =>
-    s.getAvailablePaidCredits(),
-  );
+  const availableCredits = useCreditsStore((s) => s.getAvailableCredits());
   const reservedCredits = useCreditsStore(
     (s) => s.reservedTaskIds.length + s.pendingReservationIds.length,
   );
@@ -24,10 +20,8 @@ export const UserCredits: FC<UserCreditsProps> = ({
   return (
     <View style={s.card}>
       <UserBalance
-        resetsAt={resetsAt}
-        credits={availablePaidCredits}
+        availableCredits={availableCredits}
         reservedCredits={showReservedCredits ? reservedCredits : 0}
-        freeDailyLeft={freeDailyLeft}
         guestFreeLeft={guestFreeLeft}
       />
     </View>

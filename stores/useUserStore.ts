@@ -20,7 +20,7 @@ export type TUserStoreActions = {
   dropUser: () => Promise<void>; // logout: очищает storage и user
   updateUserCategories: (categories?: string[]) => void; // logout: очищает storage и user
 
-  getUserSelf: (withTaskListReplace?: boolean) => Promise<void>;
+  getUserSelf: () => Promise<void>;
 
   updateUserTasks: (withTaskListReplace?: boolean) => void;
 };
@@ -82,7 +82,7 @@ export const useUserStore = create<TUserStore>((set, get) => ({
     }
   },
 
-  getUserSelf: async (withTaskListReplace?: boolean) => {
+  getUserSelf: async () => {
     if (get().status === 'loading') return;
 
     set({ status: 'loading', error: null });
@@ -95,7 +95,7 @@ export const useUserStore = create<TUserStore>((set, get) => ({
       useAppStore.getState().updateDeviceId(deviceId);
 
       if (user) {
-        get().updateUserTasks(withTaskListReplace);
+        get().updateUserTasks(true);
         get().updateUserCategories();
       }
 

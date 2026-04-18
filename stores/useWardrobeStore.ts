@@ -84,7 +84,7 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
 
       trackSaveToWardrobe(task.id);
 
-      await useUserStore.getState().getUserSelf(true);
+      await useUserStore.getState().getUserSelf();
 
       router.push('/wardrobe');
     } catch (e) {

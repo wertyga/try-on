@@ -33,25 +33,25 @@ export function AuthRouteCard({
       <View style={s.header}>
         {!!subtitle && <Text style={s.subtitle}>{subtitle}</Text>}
 
-        {!!primarySwitchLabel && !!onPrimarySwitchPress && (
-          <Button transparent flexEnd onPress={onPrimarySwitchPress}>
-            {primarySwitchLabel}
-          </Button>
-        )}
+        {/*{!!primarySwitchLabel && !!onPrimarySwitchPress && (*/}
+        {/*  <Button transparent flexEnd onPress={onPrimarySwitchPress}>*/}
+        {/*    {primarySwitchLabel}*/}
+        {/*  </Button>*/}
+        {/*)}*/}
       </View>
 
-      {children}
+      {/*{children}*/}
 
-      {!!secondarySwitchLabel && !!onSecondarySwitchPress && (
-        <Button
-          transparent
-          flexEnd
-          style={s.secondaryButton}
-          onPress={onSecondarySwitchPress}
-        >
-          {secondarySwitchLabel}
-        </Button>
-      )}
+      {/*{!!secondarySwitchLabel && !!onSecondarySwitchPress && (*/}
+      {/*  <Button*/}
+      {/*    transparent*/}
+      {/*    flexEnd*/}
+      {/*    style={s.secondaryButton}*/}
+      {/*    onPress={onSecondarySwitchPress}*/}
+      {/*  >*/}
+      {/*    {secondarySwitchLabel}*/}
+      {/*  </Button>*/}
+      {/*)}*/}
 
       {showOauth && (
         <View style={s.oauth}>

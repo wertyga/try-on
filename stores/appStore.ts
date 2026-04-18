@@ -13,6 +13,8 @@ export type TAppStoreActions = {
 
 export type TAppStore = TAppStoreState & TAppStoreActions & {};
 
+export const isIOS = Platform.OS === 'ios';
+
 export const useAppStore = create<TAppStore>((set, get) => {
   return {
     appDeviceId: null,
@@ -26,7 +28,7 @@ export const useAppStore = create<TAppStore>((set, get) => {
 
       if (Platform.OS === 'android') {
         appDeviceId = Application.getAndroidId();
-      } else if (Platform.OS === 'ios') {
+      } else if (isIOS) {
         appDeviceId = (await Application.getIosIdForVendorAsync()) as string;
       }
 
