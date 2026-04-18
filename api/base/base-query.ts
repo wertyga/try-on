@@ -6,9 +6,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { storage } from '@/utils';
 import { buildAPIError } from './base-query.utils';
 import Constants from 'expo-constants';
-import { Analytics } from '@/analytics';
-import { deviceId } from '@/utils/hash';
 import { inAppConfig } from '@/config';
+import { useAppStore } from '@/stores/appStore';
 
 const buildNumber = Constants.expoConfig?.extra?.buildNumber;
 
@@ -40,7 +39,7 @@ export const baseQuery = async <R = any>({
   try {
     const [token, dvId] = await Promise.all([
       storage.get('token'),
-      deviceId.get(),
+      useAppStore.getState().appDeviceId,
     ]);
 
     const authHeader: AxiosRequestConfig['headers'] = {};
@@ -66,14 +65,11 @@ export const baseQuery = async <R = any>({
     const { message, status } = buildAPIError(e);
 
     if (!silentError && status !== 403) {
-      Analytics.event('error', { place: 'tryon_poll', message });
-
       Toast.show({
         type: 'error',
         text1: message,
       });
     }
-
     throw e;
   }
 };

@@ -1,4 +1,4 @@
-export const iosConfig = (version) => ({
+const iosConfig = (version) => ({
   bundleIdentifier: 'com.wertyga.tryon',
   supportsTablet: true,
   usesAppleSignIn: true,
@@ -15,7 +15,7 @@ export const iosConfig = (version) => ({
   },
 });
 
-export const androidConfig = (version) => {
+const androidConfig = (version) => {
   return {
     versionCode: version,
     adaptiveIcon: {
@@ -23,7 +23,7 @@ export const androidConfig = (version) => {
       backgroundColor: '#0F172A',
       monochromeImage: './assets/icon.png',
     },
-    googleServicesFile: './google-services.json',
+    // googleServicesFile: './google-services.json',
     edgeToEdgeEnabled: true,
     permissions: [
       'CAMERA',
@@ -35,19 +35,14 @@ export const androidConfig = (version) => {
   };
 };
 
-export const pluginsConfig = [
+const pluginsConfig = [
   ['expo-apple-authentication'],
-  ['@react-native-firebase/app'],
   ['expo-iap'],
   [
     'expo-build-properties',
     {
       ios: {
         useFrameworks: 'static',
-        extraPods: [
-          { name: 'GoogleUtilities', modular_headers: true },
-          { name: 'FirebaseCoreInternal', modular_headers: true },
-        ],
       },
     },
   ],
@@ -67,3 +62,9 @@ export const pluginsConfig = [
     },
   ],
 ];
+
+module.exports = {
+  iosConfig,
+  pluginsConfig,
+  androidConfig,
+};

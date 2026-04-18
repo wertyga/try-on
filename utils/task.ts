@@ -16,6 +16,8 @@ export const getTryOnTaskFromTask = (
       dress: task.dressImageUrl,
       upper: task.upperImageUrl,
       lower: task.lowerImageUrl,
+      outfit: task.outfitImageUrl,
+      preset: (task as any).presetImageUrl,
     },
   };
 };

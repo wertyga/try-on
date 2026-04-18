@@ -5,6 +5,7 @@ import { UserResponse } from '@/types';
 export const oauthGoogleRegister = async (data: {
   email: string;
   username: string;
+  taskIds?: string[];
 }): Promise<UserResponse> => {
   const { data: response } = await baseQuery({
     method: 'post',
@@ -18,6 +19,7 @@ export const oauthGoogleRegister = async (data: {
 export const oauthAppleRegister = async (data: {
   authorizationCode: string;
   identityToken: string;
+  taskIds?: string[];
 }): Promise<UserResponse> => {
   const { data: response } = await baseQuery({
     method: 'post',
@@ -26,4 +28,16 @@ export const oauthAppleRegister = async (data: {
   });
 
   return response;
+};
+
+export const requestUserDataDeletion = async (
+  password: string,
+): Promise<void> => {
+  await baseQuery({
+    method: 'post',
+    url: '/auth/remove-data',
+    data: {
+      password,
+    },
+  });
 };

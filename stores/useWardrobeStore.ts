@@ -9,11 +9,16 @@ import {
 } from '@/api/wardrobe';
 import { useUserStore } from '@/stores/useUserStore';
 import { TryOnTask, useTryOnStore } from '@/stores/useTryOnStore';
+import { TaskStatus } from '@/types/task';
+import { router } from 'expo-router';
+import { trackSaveToWardrobe } from '@/analytics';
 
 type WardrobeState = {
   items: WardrobeItem[];
   error: string | null;
   isLoading: boolean;
+  isFetching: boolean;
+  isSaving: boolean;
 
   // derived
   count: number;
@@ -31,15 +36,17 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
   items: [],
   error: null,
   isLoading: false,
+  isFetching: false,
+  isSaving: false,
 
   get count() {
     return get().items.length;
   },
 
   async fetchMine() {
-    if (get().isLoading) return;
+    if (get().isFetching) return;
 
-    set({ isLoading: true, error: null });
+    set({ isFetching: true, error: null });
     try {
       const data = await fetchWardrobeMine();
 
@@ -47,7 +54,7 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
     } catch (e: any) {
       set({ error: e?.message ?? 'Failed to load wardrobe' });
     } finally {
-      set({ isLoading: false });
+      set({ isFetching: false });
     }
   },
 
@@ -59,25 +66,31 @@ export const useWardrobeStore = create<WardrobeState>((set, get) => ({
     set({ items: [], error: null });
   },
 
-  async add(task: TryOnTask, meta?: { title: string }) {
+  async add(task: TryOnTask) {
     try {
-      set({ isLoading: true });
+      set({ isSaving: true });
+
+      if (task.status !== TaskStatus.completed || !task.id) {
+        throw new Error('Only completed tasks can be saved to wardrobe');
+      }
 
       const real = await addWardrobeItem({
-        imageUrl: task.resultImageUrl as string,
-        assets: task.assets,
-        title: meta?.title,
+        taskId: task.id,
       });
 
       set((s) => ({
         items: [real, ...s.items],
       }));
 
-      useTryOnStore.getState().removeTask(task.id);
+      trackSaveToWardrobe(task.id);
+
+      await useUserStore.getState().getUserSelf();
+
+      router.push('/wardrobe');
     } catch (e) {
       throw e;
     } finally {
-      set({ isLoading: false });
+      set({ isSaving: false });
     }
   },
 

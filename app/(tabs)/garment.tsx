@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   Pressable,
-  Image,
   Alert,
   ActivityIndicator,
   Platform,
@@ -15,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Container } from '@/components/ui/Container';
 import { TTryOnImagesKeys, useTryOnStore } from '@/stores/useTryOnStore';
-import { Analytics } from '@/analytics';
 import { ReccomendationProducts } from '@/components/ReccomendationProducts';
 import { UploadItem } from '@/components/UploadItem';
 
@@ -38,14 +36,11 @@ export default function Garment() {
   const [busy, setBusy] = useState(false);
 
   const clear = (slot: TTryOnImagesKeys) => {
-    Analytics.event('garment_clear', { slot });
     clearImage(slot);
   };
 
   async function pick(slot: TTryOnImagesKeys) {
     try {
-      Analytics.event('garment_pick_start', { slot });
-
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (perm.status !== 'granted') {
         Alert.alert(
@@ -77,11 +72,7 @@ export default function Garment() {
         uri: manip.uri,
         base64: `data:image/jpeg;base64,${manip.base64!}`,
       });
-
-      Analytics.event('garment_pick_success', { slot });
     } catch (e: any) {
-      Analytics.event('garment_pick_error', { slot });
-
       Alert.alert(
         t('common.error'),
         e?.message || t('errors.pickImageFallback'),
@@ -92,9 +83,7 @@ export default function Garment() {
   }
 
   return (
-    <Container.WithTabBar>
-      <Text style={s.title}>{t('garnet.title')}</Text>
-
+    <Container.WithTabBar title={t('garnet.title')}>
       {/* Mode switch */}
       <View style={s.switchRow}>
         <Pressable
@@ -169,53 +158,8 @@ export default function Garment() {
   );
 }
 
-function Card({
-  title,
-  imageUri,
-  onPick,
-  onClear,
-}: {
-  title: string;
-  imageUri?: string;
-  onPick: () => void;
-  onClear: () => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <View style={s.card}>
-      <Text style={s.cardTitle}>{title}</Text>
-
-      {imageUri ? (
-        <View style={s.previewFrame}>
-          <Image
-            source={{ uri: imageUri }}
-            style={s.preview}
-            resizeMode="contain"
-          />
-        </View>
-      ) : (
-        <Text style={s.muted}>{t('garnet.noImage')}</Text>
-      )}
-
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <Pressable style={s.primaryBtn} onPress={onPick}>
-          <Text style={s.primaryBtnText}>
-            {imageUri ? t('garnet.replace') : t('garnet.upload')}
-          </Text>
-        </Pressable>
-        {imageUri && (
-          <Pressable style={s.clearBtn} onPress={onClear}>
-            <Text style={s.clearBtnText}>{t('garnet.clear')}</Text>
-          </Pressable>
-        )}
-      </View>
-    </View>
-  );
-}
-
 const s = StyleSheet.create({
   container: { padding: 16, paddingBottom: 24 },
-  title: { fontSize: 24, fontWeight: '800', marginBottom: 8 },
   switchRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   switchBtn: {
     flex: 1,

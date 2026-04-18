@@ -1,46 +1,80 @@
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
-import { Stack, usePathname } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { StripeProvider } from '../stores/billings/stripe';
-import { installGlobalErrorHandlers } from '@/utils/errors';
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { UpdateBanner } from '@/updates';
-import { Analytics } from '@/analytics';
 import { Toast } from '@/components/Toast';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SplashScreen as SplashScreenComponent } from '@/components/SplashScreen';
 
 import 'react-native-reanimated';
 import '@/i18n';
 
 import { Button } from '@/components/ui/button';
-import { ErrorBox } from '@/components/ui/ErrorBox';
+import { StatusBox } from '@/components/ui/StatusBox';
+import { useAppStore } from '@/stores/appStore';
+import { ModalsList } from '@/components/ModalsList';
+import { sendLogs } from '@/api';
+import { Analytics, isAnalyticEnabled } from '@/analytics';
+import { useUserStore } from '@/stores/useUserStore';
+import { LoadingScreen } from '@/components/LoadingScreen';
+import { useWatchUpdate } from '@/updates/useWatchUpdate';
+import { useCreditsStore } from '@/stores';
 
 SplashScreen.preventAutoHideAsync();
 
+if (isAnalyticEnabled()) {
+  Analytics.init();
+}
+
 export default function RootLayout() {
-  const pathname = usePathname();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const { getDeviceId, appDeviceId } = useAppStore();
+  const getUserSelf = useUserStore((s) => s.getUserSelf);
+  const initializeCreditStore = useCreditsStore((s) => s.initialize);
+
+  const { hasChecked, updateMode, onDismiss } = useWatchUpdate();
 
   useEffect(() => {
-    if (loaded) {
+    if (appDeviceId && hasChecked) {
       SplashScreen.hideAsync();
     }
+  }, [appDeviceId, hasChecked]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    getDeviceId().then(async () => {
+      await Promise.all([initializeCreditStore(), getUserSelf()]);
+    });
   }, [loaded]);
 
   useEffect(() => {
-    Analytics.screen(pathname);
-  }, [pathname]);
+    if (!appDeviceId) return;
 
-  useEffect(() => {
-    installGlobalErrorHandlers();
-  }, []);
+    Analytics.identify(appDeviceId);
+  }, [appDeviceId]);
 
-  if (!loaded) return null;
+  if (!loaded || appDeviceId === null || !hasChecked) {
+    return <LoadingScreen />;
+  }
+
+  if (updateMode === 'critical') {
+    return (
+      <>
+        <SplashScreenComponent />
+        <GestureHandlerRootView>
+          <UpdateBanner mode={updateMode} onDismiss={onDismiss} />
+        </GestureHandlerRootView>
+      </>
+    );
+  }
 
   return (
     <SafeAreaProvider>
@@ -51,15 +85,19 @@ export default function RootLayout() {
       >
         <StripeProvider>
           <GestureHandlerRootView>
-            <Stack initialRouteName="index">
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="welcome" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                }}
+              />
             </Stack>
 
             <StatusBar style="auto" />
+            <UpdateBanner mode={updateMode} onDismiss={onDismiss} />
+            <ModalsList />
             <Toast />
-            <UpdateBanner />
           </GestureHandlerRootView>
         </StripeProvider>
       </SafeAreaView>
@@ -74,6 +112,10 @@ export function ErrorBoundary({
   error: Error;
   retry: () => void;
 }) {
+  useEffect(() => {
+    sendLogs(error);
+  }, [error]);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView
@@ -83,9 +125,9 @@ export function ErrorBoundary({
         }}
       >
         <View style={{ padding: 16 }}>
-          <View style={{ marginBottom: 16 }}>
-            <ErrorBox error={String(error?.message)} />
-          </View>
+          <ScrollView style={{ marginBottom: 16 }}>
+            <StatusBox message={String(error?.message)} variant="error" />
+          </ScrollView>
 
           <Button onPress={retry} dark>
             Repeat

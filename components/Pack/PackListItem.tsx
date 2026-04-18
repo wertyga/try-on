@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Platform } from 'react-native';
 import React, { FC } from 'react';
 import { useAuthStore, useUserStore } from '@/stores';
 import { Colors } from '@/constants/Colors';
@@ -9,13 +9,13 @@ export const PackListItem: FC<{ pack: TCreditPack }> = ({ pack }) => {
   const { t } = useTranslation();
 
   const user = useUserStore((s) => s.user);
-  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
+  const isBuying = useCreditsStore((s) => s.isBuyingPack);
   const { buyPack } = useCreditsStore();
   const { signInWithGoogle } = useAuthStore();
 
   const onBuy = async () => {
-    if (!user) {
-      signInWithGoogle();
+    if (!user && Platform.OS !== 'ios') {
+      await signInWithGoogle();
       return;
     }
 

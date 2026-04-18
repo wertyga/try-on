@@ -6,29 +6,25 @@ import {
   Image,
   Pressable,
   useWindowDimensions,
-  RefreshControl,
   Alert,
 } from 'react-native';
 import { Container } from '@/components/ui/Container';
 import { useWardrobeStore } from '@/stores/useWardrobeStore';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Analytics } from '@/analytics';
 
 export default function WardrobeScreen() {
   const { t } = useTranslation();
 
   const {
     items,
-    isLoading,
+    isFetching,
     fetchMine,
     remove: removeItem,
   } = useWardrobeStore();
 
   useEffect(() => {
     if (!items?.length) fetchMine().catch(() => {});
-
-    Analytics.event('wardrobe_open');
   }, []);
 
   const { width } = useWindowDimensions();
@@ -50,12 +46,8 @@ export default function WardrobeScreen() {
         text: t('common.delete'),
         style: 'destructive',
         onPress: () => {
-          Analytics.event('wardrobe_item_delete_click', { item_id: id });
-
           removeItem(id)
-            .then(() => {
-              Analytics.event('wardrobe_item_delete_success', { item_id: id });
-            })
+            .then(() => {})
             .catch((e) =>
               Alert.alert(
                 t('common.error'),
@@ -68,20 +60,14 @@ export default function WardrobeScreen() {
   };
 
   return (
-    <Container.WithTabBar
-      title={t('wardrobe.title')}
-      isLoading={isLoading}
-      refreshControl={
-        <RefreshControl refreshing={!!isLoading} onRefresh={onRefresh} />
-      }
-    >
-      {items.length === 0 && !isLoading ? (
+    <Container.WithTabBar title={t('wardrobe.title')} isLoading={isFetching}>
+      {items.length === 0 && !isFetching ? (
         <View style={s.empty}>
           <Text style={s.emptyTitle}>{t('wardrobe.emptyTitle')}</Text>
           <Text style={s.emptyText}>{t('wardrobe.emptyText')}</Text>
           <Pressable
             style={s.primaryBtn}
-            onPress={() => router.push('/(tabs)/try-on')}
+            onPress={() => router.push('/try-on')}
           >
             <Text style={s.primaryBtnText}>{t('wardrobe.makeTryOn')}</Text>
           </Pressable>
@@ -92,7 +78,7 @@ export default function WardrobeScreen() {
             <Pressable
               key={item._id}
               style={[s.card, { width: card }]}
-              onPress={() => router.push(`/(tabs)/wardrobe/${item._id}`)}
+              onPress={() => router.push(`/wardrobe/${item._id}`)}
               onLongPress={() => askDelete(item._id)}
             >
               <Image source={{ uri: item.imageUrl }} style={s.thumb} />
@@ -120,7 +106,7 @@ function formatDate(d?: string) {
 const s = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   card: {
-    aspectRatio: 1,
+    aspectRatio: 3 / 4,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#F3F4F6',

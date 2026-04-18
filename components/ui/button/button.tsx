@@ -82,7 +82,7 @@ export const Button: FC<TButtonProps> = ({
 
 const s = StyleSheet.create({
   container: {
-    minHeight: 40,
+    minHeight: 50,
     paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -91,7 +91,7 @@ const s = StyleSheet.create({
   },
 
   solid: { backgroundColor: Colors.light.btnBg },
-  transparent: { backgroundColor: 'transparent' },
+  transparent: { backgroundColor: 'transparent', minHeight: 30 },
 
   fullWidth: { width: '100%' },
   flexEnd: { justifyContent: 'flex-end' },

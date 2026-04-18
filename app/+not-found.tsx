@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
         {t('notFound.path', { path })}
       </Text>
 
-      <Link href="/welcome" asChild>
+      <Link href="/try-on" asChild>
         <Pressable
           style={{ backgroundColor: '#111827', padding: 12, borderRadius: 12 }}
         >

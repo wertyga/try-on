@@ -26,39 +26,34 @@ function formatTimeLeft(
 }
 
 export const UserBalance: FC<{
-  resetsAt: string | null;
-  freeDailyLeft: number;
-  credits: number;
+  availableCredits: number;
+  reservedCredits?: number;
   guestFreeLeft: number;
-}> = ({ resetsAt, credits, guestFreeLeft, freeDailyLeft }) => {
-  const { t } = useTranslation();
-  const timeLeft = useMemo(() => formatTimeLeft(resetsAt, t), [resetsAt, t]);
-
+}> = ({ availableCredits, reservedCredits = 0, guestFreeLeft }) => {
   return (
     <View>
       <View style={s.rowBetween}>
         <Text style={s.title}>Your balance</Text>
-        {!!timeLeft && <Text style={s.muted}>{timeLeft}</Text>}
       </View>
 
-      <View style={s.line}>
-        <Text style={s.label}>Free today</Text>
-        <Text style={s.value}>{freeDailyLeft ?? 0}</Text>
+      <View style={[s.line, { paddingBottom: 8 }]}>
+        <Text style={s.label}>Total available credits</Text>
+        <Text style={s.value}>{availableCredits ?? 0}</Text>
       </View>
 
-      <View style={s.line}>
-        <Text style={s.label}>Credits</Text>
-        <Text style={s.value}>{credits ?? 0}</Text>
-      </View>
-
-      {(guestFreeLeft ?? 0) > 0 ? (
+      {reservedCredits > 0 ? (
         <View style={s.line}>
-          <Text style={s.label}>Guest free</Text>
-          <Text style={s.value}>{guestFreeLeft ?? 0}</Text>
+          <Text style={s.label}>Reserved</Text>
+          <Text style={s.value}>{reservedCredits}</Text>
         </View>
       ) : null}
 
-      <Text style={s.hint}>Free resets daily. Credits never expire.</Text>
+      {(guestFreeLeft ?? 0) > 0 ? (
+        <View style={s.line}>
+          <Text style={s.label}>Free Credits</Text>
+          <Text style={s.value}>{guestFreeLeft ?? 0}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -79,7 +74,7 @@ const s = StyleSheet.create({
   line: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: Colors.light.border,
   },

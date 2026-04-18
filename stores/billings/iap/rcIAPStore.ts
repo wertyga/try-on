@@ -9,6 +9,7 @@ import {
   checkIAPTransaction,
   fetchIAPConfig,
 } from '@/stores/billings/iap/rc.api';
+import { sendLogs } from '@/api';
 
 export type TRcPack = {
   id: string; // package.identifier или productIdentifier
@@ -26,7 +27,7 @@ type TIapState = {
 };
 
 type TIapActions = {
-  init: () => Promise<void>;
+  initialize: () => Promise<void>;
   fetchPacks: () => Promise<TRcPack[]>;
   buyPack: (packId: string) => Promise<void>;
 };
@@ -38,18 +39,23 @@ export const useIapStore = create<TIAPStore>((set, get) => ({
   customerInfo: null,
   packs: [],
 
-  init: async () => {
-    if (Platform.OS !== 'ios' && Platform.OS !== 'android') return;
+  initialize: async () => {
+    if (get().configured) return;
 
-    const { apiKey } = await fetchIAPConfig();
+    try {
+      const { apiKey } = await fetchIAPConfig();
 
-    Purchases.setLogLevel(LOG_LEVEL.ERROR);
-    Purchases.configure({ apiKey });
+      await Purchases.setLogLevel(LOG_LEVEL.ERROR);
+      Purchases.configure({ apiKey });
+
+      set({ configured: true });
+    } catch (e: any) {
+      e.POINT = 'useIapStore.initialize';
+      sendLogs(e);
+    }
   },
 
   fetchPacks: async (): Promise<TRcPack[]> => {
-    await get().init();
-
     const offerings = await Purchases.getOfferings();
     const current = offerings.current;
     if (!current) throw new Error('No current offering in RevenueCat');
@@ -74,8 +80,6 @@ export const useIapStore = create<TIAPStore>((set, get) => ({
   },
 
   buyPack: async (packId: string) => {
-    await get().init();
-
     const packs = await get().fetchPacks();
 
     const pack = packs.find((p) => p.productIdentifier === packId);

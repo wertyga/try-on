@@ -1,27 +1,32 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useCreditsStore } from '@/stores/creditStore';
+import { PaymentCode, useCreditsStore } from '@/stores/creditStore';
 import { PackList } from '@/components/Pack';
 import { UserCredits } from '@/components/user/UserCredits/UserCredits';
-import { ErrorBox } from '@/components/ui/ErrorBox';
-import { useFocus } from '@/hooks';
+import { StatusBox } from '@/components/ui/StatusBox';
 
-export default function PaywallContent() {
-  const { fetchPacks, isLoading, error, clearError, packs } =
-    useCreditsStore();
+export function PaywallContent() {
+  const { isLoading, error, clearError, packs } = useCreditsStore();
 
-  useFocus(() => {
-    fetchPacks();
-  });
+  const isDeclinedError = error?.code === PaymentCode.Canceled;
 
   return (
     <View style={{ gap: 12 }}>
       {/* Balance */}
       <UserCredits />
 
-      <PackList packs={packs} isLoading={isLoading} />
+      {isDeclinedError && (
+        <StatusBox
+          message={error?.message}
+          variant="error"
+          hint="Tap to dismiss"
+          onPress={clearError}
+        />
+      )}
 
-      <ErrorBox error={error} clearError={clearError} />
+      <PackList packs={packs} isLoading={isLoading} />
     </View>
   );
 }
+
+export default PaywallContent;

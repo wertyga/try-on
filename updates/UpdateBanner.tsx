@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Animated, {
@@ -13,24 +13,17 @@ import {
   GestureDetector,
 } from 'react-native-gesture-handler';
 
-import {
-  watchUpdates,
-  openStorePage,
-  dismissBinaryUpdate,
-} from './update.utils';
+import { openStorePage } from './update.utils';
 
-const VISIBLE_TIMEOUT = 2000;
+export type UpdateBannerMode = 'none' | 'binary' | 'critical';
 
-type Mode = 'hidden' | 'ota' | 'binary' | 'critical';
+type UpdateBannerProps = {
+  mode: UpdateBannerMode;
+  onDismiss?: () => void | Promise<void>;
+};
 
-export function UpdateBanner() {
+export function UpdateBanner({ mode, onDismiss }: UpdateBannerProps) {
   const { t } = useTranslation();
-
-  const [mode, setMode] = useState<Mode>('hidden');
-  const restartRef = useRef<() => void>(() => {});
-
-  // ✅ нужен, чтобы dismiss записывать на конкретную recommended версию
-  const recommendedBuildRef = useRef<number>(0);
 
   const translateX = useSharedValue(0);
 
@@ -38,70 +31,46 @@ export function UpdateBanner() {
   const isClickable = mode === 'binary' || mode === 'critical';
 
   const title = useMemo(() => {
-    if (mode === 'ota') return t('updates.ota');
     if (mode === 'critical') return t('updates.critical.title');
     if (mode === 'binary') return t('updates.binary.title');
+
     return '';
   }, [mode, t]);
 
   const subtitle = useMemo(() => {
     if (mode === 'critical') return t('updates.critical.subtitle');
     if (mode === 'binary') return t('updates.binary.subtitle');
+
     return '';
   }, [mode, t]);
 
-  const hide = () => {
-    setMode('hidden');
-  };
-
-  const dismiss = async () => {
-    if (!isDismissable) return;
-
-    // ✅ пишем dismiss именно для текущей recommended версии
-    await dismissBinaryUpdate(recommendedBuildRef.current);
-
-    hide();
-  };
-
-  // reset animation when showing
   useEffect(() => {
     translateX.value = 0;
-  }, [mode]);
-
-  useEffect(() => {
-    const stop = watchUpdates({
-      onBinary: ({ isCritical, recommendedBuild }) => {
-        recommendedBuildRef.current = recommendedBuild ?? 0;
-        setMode(isCritical ? 'critical' : 'binary');
-      },
-      onReady: (restart) => {
-        restartRef.current = restart;
-        setMode('ota');
-        setTimeout(() => restartRef.current(), VISIBLE_TIMEOUT);
-      },
-    });
-
-    return stop;
-  }, []);
+  }, [mode, translateX]);
 
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
 
-  // ✅ swipe right to dismiss (only for binary)
   const flingRight = useMemo(() => {
+    const handleDismiss = async () => {
+      if (!isDismissable) return;
+
+      await onDismiss?.();
+    };
+
     return Gesture.Fling()
-      .enabled(isDismissable) // ✅ только binary
+      .enabled(isDismissable)
       .direction(Directions.RIGHT)
       .numberOfPointers(1)
       .onEnd(() => {
         translateX.value = withTiming(1000, { duration: 180 }, () => {
-          runOnJS(dismiss)();
+          runOnJS(handleDismiss)();
         });
       });
-  }, [isDismissable]);
+  }, [isDismissable, onDismiss, translateX]);
 
-  if (mode === 'hidden') return null;
+  if (mode === 'none') return null;
 
   return (
     <View style={s.wrap} pointerEvents="box-none">
@@ -110,7 +79,6 @@ export function UpdateBanner() {
           <Pressable
             style={s.card}
             onPress={() => {
-              // critical/binary → store
               if (!isClickable) return;
               openStorePage();
             }}

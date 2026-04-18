@@ -1,10 +1,14 @@
 import * as Updates from 'expo-updates';
 import { AppState, AppStateStatus, Linking, Platform } from 'react-native';
 import Constants from 'expo-constants';
+import type { MutableRefObject } from 'react';
+
+import type { UpdateBannerMode } from './UpdateBanner';
 
 import { storage } from '@/utils';
 import { fetchSettings } from '@/api/settings.api';
 import { TSettings } from '@/types';
+import { sendLogs } from '@/api';
 
 const SETTINGS_CACHE_KEY = 'app_settings_cache_v1';
 
@@ -13,11 +17,13 @@ const DISMISSED_KEY_PREFIX = 'dismissed_binary_update_v_';
 
 // Android package / iOS app id
 const ANDROID_PACKAGE = 'com.wertyga.tryon';
-const IOS_APP_ID = 'YOUR_APP_ID';
+const IOS_APP_ID = 'com.wertyga.tryon';
 
 export function openStorePage() {
   if (Platform.OS === 'android') {
-    return Linking.openURL(`market://details?id=${ANDROID_PACKAGE}`);
+    return Linking.openURL(
+      `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`,
+    );
   }
   return Linking.openURL(`itms-apps://apps.apple.com/app/id${IOS_APP_ID}`);
 }
@@ -36,13 +42,14 @@ async function getSettings(): Promise<TSettings | null> {
     const s = await fetchSettings();
     await storage.set(SETTINGS_CACHE_KEY, s);
     return s;
-  } catch (e) {
+  } catch {
     return (await storage.get(SETTINGS_CACHE_KEY)) as TSettings | null;
   }
 }
 
 function getMinBuild(settings: TSettings | null): number {
   if (!settings) return 0;
+
   return Platform.OS === 'android'
     ? Number(settings.minAndroidVersion ?? 0)
     : Number(settings.minIosVersion ?? 0);
@@ -50,6 +57,7 @@ function getMinBuild(settings: TSettings | null): number {
 
 function getRecommendedBuild(settings: TSettings | null): number {
   if (!settings) return 0;
+
   return Platform.OS === 'android'
     ? Number(settings.recommendedAndroidVersion ?? 0)
     : Number(settings.recommendedIosVersion ?? 0);
@@ -66,6 +74,7 @@ export function getBinaryUpdateStatusFromSettings(
 
   if (min > 0 && current < min) return 'critical';
   if (rec > 0 && current < rec) return 'binary';
+
   return 'none';
 }
 
@@ -86,14 +95,40 @@ export async function dismissBinaryUpdate(recommendedBuild: number) {
   await storage.set(`${DISMISSED_KEY_PREFIX}${recommendedBuild}`, true);
 }
 
+export function createBinaryUpdateHandler(
+  recommendedBuildRef: MutableRefObject<number>,
+  setUpdateMode: (mode: UpdateBannerMode) => void,
+) {
+  return ({
+    isCritical,
+    recommendedBuild,
+  }: {
+    isCritical: boolean;
+    recommendedBuild: number;
+  }) => {
+    recommendedBuildRef.current = recommendedBuild ?? 0;
+    setUpdateMode(isCritical ? 'critical' : 'binary');
+  };
+}
+
 export type WatchUpdatesOpts = {
   onReady?: (restart: () => void) => void; // OTA ready
   onBinary?: (p: { isCritical: boolean; recommendedBuild: number }) => void; // binary update banner
 };
 
-export async function checkAndApplyUpdate(opts: WatchUpdatesOpts = {}) {
+export type CheckAndApplyUpdateResult = {
+  isCritical: boolean;
+  isUpdateAvailable: boolean;
+  recommendedBuild?: number;
+};
+
+export async function checkAndApplyUpdate(
+  opts: WatchUpdatesOpts = {},
+): Promise<CheckAndApplyUpdateResult> {
   try {
-    if (__DEV__) return;
+    if (__DEV__) {
+      return { isCritical: false, isUpdateAvailable: false };
+    }
 
     const settings = await getSettings();
 
@@ -105,32 +140,39 @@ export async function checkAndApplyUpdate(opts: WatchUpdatesOpts = {}) {
     // critical
     if (min > 0 && current < min) {
       opts.onBinary?.({ isCritical: true, recommendedBuild: rec });
-      return { isCritical: true };
+
+      return { isCritical: true, isUpdateAvailable: false };
     }
 
     // recommended (dismissable)
     if (rec > 0 && current < rec) {
       const dismissed = await isBinaryDismissed(rec);
       if (!dismissed) {
-        opts.onBinary?.({ isCritical: false, recommendedBuild: rec });
+        return {
+          isCritical: false,
+          recommendedBuild: rec,
+          isUpdateAvailable: false,
+        };
+      } else {
+        return { isCritical: false, isUpdateAvailable: false };
       }
     }
 
-    // 1) OTA updates
-    if (!Updates.isEnabled || Platform.OS === 'web') {
-      return { isCritical: false };
+    const result = await Updates.checkForUpdateAsync();
+
+    if (!result.isAvailable) {
+      return { isCritical: false, isUpdateAvailable: false };
     }
 
-    const result = await Updates.checkForUpdateAsync();
-    if (!result.isAvailable) return { isCritical: false };
-
     await Updates.fetchUpdateAsync();
-    opts.onReady?.(() => Updates.reloadAsync());
+    await Updates.reloadAsync();
 
-    return { isCritical: false };
-  } catch (e) {
-    console.log('[updates] error', e);
-    return { isCritical: false };
+    return { isCritical: false, isUpdateAvailable: true };
+  } catch (e: any) {
+    e.POINT = '[updates] error';
+    sendLogs(e);
+
+    return { isCritical: false, isUpdateAvailable: false };
   }
 }
 

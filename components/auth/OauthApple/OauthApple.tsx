@@ -5,7 +5,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 
 import { useAuthStore } from '@/stores';
 
-const OauthApple = () => {
+const OauthApple = ({ onSuccess }: { onSuccess?: () => void }) => {
   const { isLoading, signInWithApple } = useAuthStore();
   const [isAvailable, setIsAvailable] = useState(false);
 
@@ -16,7 +16,7 @@ const OauthApple = () => {
   }, []);
 
   const signIn = async () => {
-    await signInWithApple();
+    await signInWithApple(onSuccess);
   };
 
   if (!isAvailable) {

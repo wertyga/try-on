@@ -1,16 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-  Alert,
-  useWindowDimensions,
-} from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, Text, Image, StyleSheet, Pressable, Alert } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, useUserStore } from '@/stores';
+import Toast from 'react-native-toast-message';
+import { useAuthStore, useModalsStore, useUserStore } from '@/stores';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Container } from '@/components/ui/Container';
 import { useCreditsStore } from '@/stores/creditStore';
@@ -18,14 +11,16 @@ import { useFocus } from '@/hooks';
 import { BinaryUpdateButton } from '@/updates/BinaryUpdateButton';
 import { Button } from '@/components/ui/button';
 import { UserCredits } from '@/components/user/UserCredits/UserCredits';
+import { ButtonWithConfirm } from '@/components/ButtonWithConfirm';
 
 export default function UserScreen() {
   const { t } = useTranslation();
+  const [isDeleteRequestLoading, setIsDeleteRequestLoading] = useState(false);
 
   const { user } = useUserStore();
   const { load: loadCredits } = useCreditsStore();
-  const { logout } = useAuthStore();
-  const isBuying = useCreditsStore((s) => !!s.isBuyingPackId);
+  const { logout, requestUserDataDeletion } = useAuthStore();
+  const { openPaywall } = useModalsStore();
 
   const name = user?.username ?? '';
   const email = user?.email ?? '';
@@ -46,24 +41,43 @@ export default function UserScreen() {
       {
         text: t('profile.logout'),
         style: 'destructive',
-        onPress: () => {
-          logout();
-          router.replace('/welcome');
+        onPress: async () => {
+          await logout();
+
+          router.replace('/try-on');
         },
       },
     ]);
-  }, []);
+  }, [logout, t]);
+
+  const onRequestDataDeletion = useCallback(
+    async (password?: string) => {
+      try {
+        setIsDeleteRequestLoading(true);
+        await requestUserDataDeletion(password || '');
+
+        Toast.show({
+          type: 'success',
+          text1: t('profile.dataDeletionRequested'),
+        });
+
+        router.replace('/try-on');
+      } finally {
+        setIsDeleteRequestLoading(false);
+      }
+    },
+    [requestUserDataDeletion, t],
+  );
 
   useFocus(() => {
     loadCredits();
   }, []);
 
-  if (!user) return <Redirect href="/login" />;
+  if (!user) return <Redirect href="/signin" />;
 
   return (
-    <Container isLoading={isBuying} childrenStyle={s.containerBody}>
+    <Container title={t('profile.title')} childrenStyle={s.containerBody}>
       <View>
-        {/* Header */}
         <View style={s.header}>
           {avatarUrl ? (
             <Image source={{ uri: avatarUrl }} style={s.avatar} />
@@ -79,7 +93,6 @@ export default function UserScreen() {
           </View>
         </View>
 
-        {/* Info */}
         <View style={s.card}>
           <Text style={s.cardTitle}>{t('profile.title')}</Text>
           <Row icon="person.fill" label={t('profile.name')} value={name} />
@@ -91,27 +104,52 @@ export default function UserScreen() {
             />
           )}
         </View>
-        <UserCredits />
 
-        <Button
-          onPress={() => router.push('/paywall')}
-          style={s.paywallLink}
-          transparent
-        >
+        <UserCredits showReservedCredits={false} />
+
+        <Button onPress={() => openPaywall()} style={s.paywallLink} transparent>
           See paywall
         </Button>
       </View>
 
-      {/* Actions */}
       <View style={s.actions}>
         <Pressable style={s.primaryBtn} onPress={onFeedback}>
           <Text style={s.btnText}>{t('profile.sendFeedback')}</Text>
         </Pressable>
+
         <Pressable style={s.outlineBtn} onPress={onLogout}>
           <Text style={s.outlineBtnText}>{t('profile.logout')}</Text>
         </Pressable>
 
-        <BinaryUpdateButton style={{ marginTop: 100 }} />
+        <View style={s.footerActions}>
+          <BinaryUpdateButton style={{ marginTop: 100 }} />
+        </View>
+      </View>
+
+      <View style={s.accountSection}>
+        <Text style={s.accountTitle}>{t('profile.accountSectionTitle')}</Text>
+        <Text style={s.accountSubtitle}>
+          {t('profile.accountSectionBadge')}
+        </Text>
+        <Text style={s.accountDescription}>
+          {t('profile.accountSectionDescription')}
+        </Text>
+        <ButtonWithConfirm
+          onPress={onRequestDataDeletion}
+          isLoading={isDeleteRequestLoading}
+          style={s.deleteBtn}
+          transparent
+          alertText={t('profile.confirmDataDeletionTitle')}
+          alertDescription={t('profile.confirmDataDeletionText')}
+          confirmText={t('profile.requestDataDeletion')}
+          requirePassword
+          passwordPlaceholder={t('profile.deleteDataPasswordPlaceholder')}
+          passwordErrorText={t('profile.deleteDataPasswordRequired')}
+        >
+          <Text style={s.deleteBtnText}>
+            {t('profile.requestDataDeletion')}
+          </Text>
+        </ButtonWithConfirm>
       </View>
     </Container>
   );
@@ -161,15 +199,6 @@ const s = StyleSheet.create({
   avatarText: { fontSize: 20, fontWeight: '800', color: '#111827' },
   name: { fontSize: 20, fontWeight: '800' },
   email: { color: '#6B7280' },
-  iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F3F4F6',
-  },
-
   card: {
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
@@ -177,26 +206,12 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: { fontWeight: '800', marginBottom: 8 },
-
-  statsRow: { flexDirection: 'row', gap: 10 },
-  statBox: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-    gap: 2,
-  },
-  statNum: { fontSize: 18, fontWeight: '800' },
-  statLabel: { color: '#6B7280', fontSize: 12 },
-
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
   rowLabel: { marginLeft: 8, color: '#111827' },
   rowValue: { color: '#374151', maxWidth: '60%' },
-
   containerBody: { justifyContent: 'space-between' },
-
-  actions: { gap: 10, marginTop: 40, marginBottom: 10 },
+  actions: { gap: 10, marginTop: 40, marginBottom: 16 },
+  footerActions: { marginBottom: 10 },
   btnText: { color: '#fff', fontWeight: '700' },
   primaryBtn: {
     backgroundColor: '#111827',
@@ -211,9 +226,6 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   outlineBtnText: { color: '#111827', fontWeight: '700' },
-
-  muted: { color: '#9CA3AF', textAlign: 'center', marginTop: 6 },
-
   paywallLink: {
     marginTop: 20,
     marginBottom: 6,
@@ -221,5 +233,42 @@ const s = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     backgroundColor: '#EEF2FF',
+  },
+  accountSection: {
+    marginTop: 8,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: '#FFF7F7',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    gap: 10,
+  },
+  accountTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  accountSubtitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: '#B91C1C',
+  },
+  accountDescription: {
+    color: '#7F1D1D',
+    lineHeight: 20,
+  },
+  deleteBtn: {
+    minHeight: 44,
+    borderWidth: 1,
+    borderColor: '#DC2626',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteBtnText: {
+    color: '#DC2626',
+    fontWeight: '700',
   },
 });

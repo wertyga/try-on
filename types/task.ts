@@ -12,12 +12,22 @@ export type TTask = {
   owner?: TUser | string;
   status: TaskStatus;
   _id: string;
+  preset?: {
+    title: string;
+    image: string;
+    presetId: string;
+  };
+  sample?: {
+    title: string;
+    image: string;
+    sampleId: string;
+  };
   userImageUrl: string;
   dressImageUrl?: string;
   upperImageUrl?: string;
   lowerImageUrl?: string;
   resultImageUrl?: string;
-  isByDescription?: boolean;
+  outfitImageUrl?: string;
   message?: string;
   error?: string;
   createdAt: string;

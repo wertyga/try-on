@@ -26,6 +26,9 @@ export type TStripeActionsSlice = {
 
 export type TStripeStore = TStripeSliceState & TStripeActionsSlice & {};
 
+const WAIT_PAYMENT_TIMEOUT_MS = 30000;
+const WAIT_PAYMENT_INTERVAL_MS = 1000;
+
 export const useStripeStore = create((set: any, get: any): TStripeStore => {
   return {
     publishableKey: '',
@@ -46,10 +49,10 @@ export const useStripeStore = create((set: any, get: any): TStripeStore => {
       set({ publishableKey: cfg.publishableKey });
     },
 
-    waitPayment: async (paymentId: string, timeoutMs = 25000) => {
+    waitPayment: async (paymentId: string) => {
       const started = Date.now();
 
-      while (Date.now() - started < timeoutMs) {
+      while (Date.now() - started < WAIT_PAYMENT_TIMEOUT_MS) {
         const res = await fetchPayment(paymentId);
 
         if (res.status === PaymentStatus.succeeded) {
@@ -60,7 +63,7 @@ export const useStripeStore = create((set: any, get: any): TStripeStore => {
           throw new Error('Payment failed');
         }
 
-        await new Promise((r) => setTimeout(r, 1200));
+        await new Promise((r) => setTimeout(r, WAIT_PAYMENT_INTERVAL_MS));
       }
 
       throw new Error('Payment confirmation timeout');
@@ -78,13 +81,13 @@ export const useStripeStore = create((set: any, get: any): TStripeStore => {
       });
 
       if (init.error) {
-        throw new Error(init.error.message);
+        throw init.error;
       }
 
       const present = await presentPaymentSheet();
 
       if (present.error) {
-        throw new Error(present.error.message);
+        throw present.error;
       }
 
       await get().waitPayment(ps.paymentId);

@@ -1,2 +1,2 @@
 export * from './analytics';
-export * from './analytics.events';
+export * from './event';

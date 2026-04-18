@@ -1,20 +1,5 @@
-import { useEffect } from 'react';
-import { router } from 'expo-router';
-import { useUserStore } from '@/stores/useUserStore';
-import { LoadingScreen } from '@/components/LoadingScreen';
+import { Redirect } from 'expo-router';
 
 export default function Boot() {
-  const { status, user, getUserSelf } = useUserStore();
-
-  useEffect(() => {
-    getUserSelf();
-  }, [getUserSelf]);
-
-  useEffect(() => {
-    if (status !== 'ready') return;
-
-    router.replace(user ? '/(tabs)/try-on' : '/welcome');
-  }, [status, user]);
-
-  return <LoadingScreen />;
+  return <Redirect href="/try-on" />;
 }

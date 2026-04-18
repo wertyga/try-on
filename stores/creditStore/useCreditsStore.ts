@@ -9,6 +9,14 @@ import { useAuthStore } from '@/stores/auth/useAuthStore';
 import { useStripeStore } from '@/stores/billings/stripe';
 import { useIapStore } from '@/stores/billings/iap';
 import { TCreditPack } from './credit.types';
+import { useModalsStore } from '@/stores/useModalsStore';
+import { useUserStore } from '@/stores/useUserStore';
+import { isIOS } from '@/stores/appStore';
+
+export enum PaymentCode {
+  Canceled = 'Canceled',
+  Failed = 'Failed',
+}
 
 type TCreditsState = {
   settings: TSettings | null;
@@ -18,29 +26,40 @@ type TCreditsState = {
   // guest
   guestFreeUsed: number;
   guestFreeLeft: number;
+  guestCredits: number;
+  paidCredits: number;
+  totalAvailable: number;
 
-  // user
-  freeDailyUsed: number;
-  freeDailyLeft: number;
-  credits: number;
-
-  resetsAt: string | null;
-  autoRefillEnabled: boolean;
+  reservedTaskIds: string[];
+  pendingReservationIds: string[];
 
   isLoading: boolean;
-  error: string | null;
+  error: {
+    message: string;
+    code: PaymentCode;
+  } | null;
 
-  isBuyingPackId: string | null;
+  isBuyingPack: boolean;
 };
 
 type TCreditsActions = {
   load: () => Promise<void>;
-  canGenerate: () => boolean;
+  canGenerate: (showFallbackModal?: boolean) => boolean;
   getBalanceLabel: () => string;
   onGenerationSuccess: () => Promise<void>;
+  onGenerationSettled: () => Promise<void>;
+  beginGenerationReservation: () => string | null;
+  onGenerationStarted: (
+    reservationId: string | null,
+    taskId: string,
+  ) => Promise<void>;
+  releaseGenerationReservation: (reservationId: string | null) => void;
+  syncTaskReservations: (taskIds: string[]) => void;
+  getAvailableCredits: () => number;
   clearError: () => void;
   buyPack: (packId: string) => Promise<void>;
   fetchPacks: () => Promise<void>;
+  initialize: () => Promise<void>;
 
   _loadStripePacks: () => Promise<TCreditPack[]>;
   _loadIapPacks: () => Promise<TCreditPack[]>;
@@ -54,27 +73,31 @@ const initialState: TCreditsState = {
 
   guestFreeUsed: 0,
   guestFreeLeft: 0,
+  guestCredits: 0,
 
-  freeDailyUsed: 0,
-  freeDailyLeft: 0,
-  credits: 0,
+  paidCredits: 0,
+  totalAvailable: 0,
 
-  resetsAt: null,
-  autoRefillEnabled: false,
+  reservedTaskIds: [],
+  pendingReservationIds: [],
 
   isLoading: false,
   error: null,
 
-  isBuyingPackId: null,
+  isBuyingPack: false,
 };
-
-const isIOS = Platform.OS === 'ios';
 
 export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   ...initialState,
 
+  initialize: async () => {
+    if (isIOS) {
+      await useIapStore.getState().initialize();
+    }
+  },
+
   buyPack: async (priceId: string) => {
-    set({ isBuyingPackId: priceId, error: null });
+    set({ isBuyingPack: true, error: null });
 
     try {
       const buyMethod = isIOS
@@ -84,19 +107,25 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
       await buyMethod(priceId);
 
       await get().load();
-    } catch (e: any) {
-      const { message = 'Payment failed', status } = buildAPIError(e);
 
-      if (status === 403) {
+      useModalsStore.getState().closePaywall();
+    } catch (e: any) {
+      const { message = 'Payment failed', status, code } = buildAPIError(e);
+
+      const user = useUserStore.getState().user;
+
+      if (status === 403 && user) {
         await useAuthStore.getState().logout();
       } else {
         set({
-          error: message,
+          error: {
+            message,
+            code,
+          },
         });
-        throw e;
       }
     } finally {
-      set({ isBuyingPackId: null });
+      set({ isBuyingPack: false });
     }
   },
 
@@ -141,45 +170,72 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
 
       set({ packs });
     } catch (e: any) {
-      set({ error: e?.message || 'Failed to load packs' });
+      const { message = 'Failed to load packs', code = PaymentCode.Failed } =
+        buildAPIError(e);
+
+      set({
+        error: {
+          message,
+          code,
+        },
+      });
     } finally {
       set({ isLoading: false });
     }
   },
 
   load: async () => {
+    if (get().isLoading) {
+      return;
+    }
+
     set({ isLoading: true, error: null });
 
     try {
       const state = await fetchBillingState();
 
       set({
-        settings: state.settings ?? null,
-
         guestFreeUsed: state.guestFreeUsed ?? 0,
         guestFreeLeft: state.guestFreeLeft ?? 0,
-
-        freeDailyUsed: state.freeDailyUsed ?? 0,
-        freeDailyLeft: state.freeDailyLeft ?? 0,
-
-        credits: state.credits ?? 0,
-
-        resetsAt: state.resetsAt ?? null,
-        autoRefillEnabled: state.autoRefillEnabled ?? false,
+        guestCredits: state.guestCredits ?? 0,
+        paidCredits: state.paidCredits ?? 0,
+        totalAvailable: (state.guestFreeLeft ?? 0) + (state.paidCredits ?? 0),
       });
     } catch (e: any) {
-      set({ error: e?.message || 'Failed to load billing state' });
+      const {
+        message = 'Failed to load billing state',
+        code = PaymentCode.Failed,
+      } = buildAPIError(e);
+
+      set({
+        error: {
+          message,
+          code,
+        },
+      });
     } finally {
       set({ isLoading: false });
     }
   },
 
-  canGenerate: () => {
+  canGenerate: (showFallbackModal = false) => {
     const s = get();
 
-    if ((s.freeDailyLeft ?? 0) > 0) return true;
-    if ((s.credits ?? 0) > 0) return true;
+    if (get().getAvailableCredits() > 0) return true;
     if ((s.guestFreeLeft ?? 0) > 0) return true;
+
+    if (showFallbackModal) {
+      const modals = useModalsStore.getState();
+      const user = useUserStore.getState().user;
+
+      modals.closeAllModals();
+
+      if (!user && !isIOS) {
+        modals.openLogin();
+      } else {
+        modals.openPaywall();
+      }
+    }
 
     return false;
   },
@@ -187,14 +243,89 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
   getBalanceLabel: () => {
     const s = get();
     const parts: string[] = [];
-    parts.push(`Free today: ${s.freeDailyLeft ?? 0}`);
-    parts.push(`Credits: ${s.credits ?? 0}`);
-    if ((s.guestFreeLeft ?? 0) > 0)
-      parts.push(`Guest free: ${s.guestFreeLeft}`);
+
+    parts.push(`Credits: ${s.getAvailableCredits()}`);
+
+    if ((s.guestFreeLeft ?? 0) > 0) {
+      parts.push(`Free credits: ${s.guestFreeLeft}`);
+    }
+
     return parts.join(' • ');
   },
 
+  getAvailableCredits: () => {
+    const s = get();
+
+    return Math.max(
+      (s.totalAvailable ?? 0) -
+        s.reservedTaskIds.length -
+        s.pendingReservationIds.length,
+      0,
+    );
+  },
+
+  getDisplayCredits: () => {
+    return get().getAvailableCredits();
+  },
+
+  beginGenerationReservation: () => {
+    const s = get();
+    const user = useUserStore.getState().user;
+
+    const shouldReservePaidCredit =
+      !!user && (s.guestFreeLeft ?? 0) <= 0 && get().getAvailableCredits() > 0;
+
+    if (!shouldReservePaidCredit) {
+      return null;
+    }
+
+    const reservationId = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    set((state) => ({
+      pendingReservationIds: [...state.pendingReservationIds, reservationId],
+    }));
+
+    return reservationId;
+  },
+
+  onGenerationStarted: async (reservationId, taskId) => {
+    if (!reservationId) {
+      await get().load();
+      return;
+    }
+
+    set((state) => ({
+      pendingReservationIds: state.pendingReservationIds.filter(
+        (id) => id !== reservationId,
+      ),
+      reservedTaskIds: state.reservedTaskIds.includes(taskId)
+        ? state.reservedTaskIds
+        : [...state.reservedTaskIds, taskId],
+    }));
+  },
+
+  releaseGenerationReservation: (reservationId) => {
+    if (!reservationId) return;
+
+    set((state) => ({
+      pendingReservationIds: state.pendingReservationIds.filter(
+        (id) => id !== reservationId,
+      ),
+      reservedTaskIds: state.reservedTaskIds.filter(
+        (id) => id !== reservationId,
+      ),
+    }));
+  },
+
+  syncTaskReservations: (taskIds) => {
+    set({ reservedTaskIds: taskIds });
+  },
+
   onGenerationSuccess: async () => {
+    await get().load();
+  },
+
+  onGenerationSettled: async () => {
     await get().load();
   },
 }));

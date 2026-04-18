@@ -7,10 +7,10 @@ export const Toast = () => {
   return (
     <ToastExternal
       config={{
-        success: props => (
+        success: (props) => (
           <SuccessToast
             {...props}
-            style={{ height: 50, borderLeftColor: 'green' }}
+            style={{ height: 50, borderLeftColor: 'green', zIndex: 100 }}
             contentContainerStyle={{ paddingLeft: 5 }}
             text1Style={{
               fontSize: 12,
@@ -21,7 +21,7 @@ export const Toast = () => {
             }}
           />
         ),
-        error: props => (
+        error: (props) => (
           <ErrorToast
             {...props}
             style={{

@@ -9,6 +9,7 @@ import {
   recoveryPassword as recoveryPasswordApi,
 } from './auth.api';
 import { TUser } from '@/types';
+import { trackSignupBonusGranted, trackSignupCompleted } from '@/analytics';
 
 export type TAuthEmailStore = {
   isLoading: boolean;
@@ -43,6 +44,9 @@ export const useAuthEmailStore = create<TAuthEmailStore>((set, get) => ({
       const isSuccess = await signUpRequest(...data);
 
       if (isSuccess) {
+        trackSignupCompleted();
+        trackSignupBonusGranted();
+
         Toast.show({
           type: 'success',
           text1: 'Check your e-mail for confirmation',
