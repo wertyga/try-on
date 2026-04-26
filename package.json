@@ -19,7 +19,8 @@
     "build:ios:development:local": "eas build -p ios --profile development --local",
     "build:ios:development:local:device": "eas build -p ios --profile development_device --local",
     "build:ios:development:device": "eas build -p ios --profile development_device",
-    "build:ios:production": "eas build -p ios --profile production"
+    "build:ios:production": "eas build -p ios --profile production",
+    "build:all:production": "eas build --profile production"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
