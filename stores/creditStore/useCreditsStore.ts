@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Platform } from 'react-native';
 
 import { TSettings } from '@/types';
 
@@ -12,6 +11,8 @@ import { TCreditPack } from './credit.types';
 import { useModalsStore } from '@/stores/useModalsStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { isIOS } from '@/stores/appStore';
+import { useTryOnPresetsStore } from '@/stores/useTryOnPresetsStore';
+import { useTryOnSamplesStore } from '@/stores/useTryOnSamplesStore';
 
 export enum PaymentCode {
   Canceled = 'Canceled',
@@ -60,6 +61,7 @@ type TCreditsActions = {
   buyPack: (packId: string) => Promise<void>;
   fetchPacks: () => Promise<void>;
   initialize: () => Promise<void>;
+  onSuccessPayment: () => Promise<void>;
 
   _loadStripePacks: () => Promise<TCreditPack[]>;
   _loadIapPacks: () => Promise<TCreditPack[]>;
@@ -96,6 +98,13 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
     }
   },
 
+  onSuccessPayment: async () => {
+    await get().load();
+    useModalsStore.getState().closePaywall();
+    useTryOnPresetsStore.getState().fetchPresets();
+    useTryOnSamplesStore.getState().fetchSamples();
+  },
+
   buyPack: async (priceId: string) => {
     set({ isBuyingPack: true, error: null });
 
@@ -106,9 +115,7 @@ export const useCreditsStore = create<TCreditsStore>((set, get) => ({
 
       await buyMethod(priceId);
 
-      await get().load();
-
-      useModalsStore.getState().closePaywall();
+      await get().onSuccessPayment();
     } catch (e: any) {
       const { message = 'Payment failed', status, code } = buildAPIError(e);
 
