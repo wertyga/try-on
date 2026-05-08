@@ -29,6 +29,7 @@ type BottomModalProps = {
   children: ReactNode;
   isLoading?: boolean;
   style?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
 };
 
 const CLOSE_DISTANCE = 80;
@@ -41,6 +42,7 @@ export const BottomModal: FC<BottomModalProps> = ({
   children,
   isLoading = false,
   style,
+  contentContainerStyle,
 }) => {
   const { t } = useTranslation();
   const { height } = useWindowDimensions();
@@ -123,7 +125,12 @@ export const BottomModal: FC<BottomModalProps> = ({
                 <View style={s.handle} />
               </View>
 
-              <ScrollView style={s.content}>{children}</ScrollView>
+              <ScrollView
+                style={s.content}
+                contentContainerStyle={contentContainerStyle}
+              >
+                {children}
+              </ScrollView>
 
               {isLoading ? (
                 <View style={s.loadingOverlay}>

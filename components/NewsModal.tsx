@@ -15,13 +15,19 @@ export const NewsModal: FC<NewsModalProps> = ({ visible, news, onClose }) => {
   if (!news) return null;
 
   return (
-    <BottomModal visible={visible} onClose={onClose}>
-      <View style={s.header}>
-        <Text style={s.label}>News</Text>
-        <Text style={s.title}>{news.title}</Text>
-      </View>
+    <BottomModal
+      visible={visible}
+      onClose={onClose}
+      contentContainerStyle={s.scrollContent}
+    >
+      <View style={s.content}>
+        <View style={s.header}>
+          <Text style={s.label}>News</Text>
+          <Text style={s.title}>{news.title}</Text>
+        </View>
 
-      <Text style={s.description}>{news.description}</Text>
+        <Text style={s.description}>{news.description}</Text>
+      </View>
 
       <Button fullWidth dark style={s.button} onPress={onClose}>
         Close
@@ -31,6 +37,12 @@ export const NewsModal: FC<NewsModalProps> = ({ visible, news, onClose }) => {
 };
 
 const s = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flexGrow: 1,
+  },
   header: {
     paddingBottom: 12,
     borderBottomWidth: 1,
