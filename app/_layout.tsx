@@ -24,6 +24,7 @@ import { useUserStore } from '@/stores/useUserStore';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useWatchUpdate } from '@/updates/useWatchUpdate';
 import { useCreditsStore } from '@/stores';
+import { useNewsStore } from '@/stores/useNewsStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,6 +39,7 @@ export default function RootLayout() {
   const { getDeviceId, appDeviceId } = useAppStore();
   const getUserSelf = useUserStore((s) => s.getUserSelf);
   const initializeCreditStore = useCreditsStore((s) => s.initialize);
+  const initializeNewsStore = useNewsStore((s) => s.initialize);
 
   const { hasChecked, updateMode, onDismiss } = useWatchUpdate();
 
@@ -52,6 +54,7 @@ export default function RootLayout() {
 
     getDeviceId().then(async () => {
       await Promise.all([initializeCreditStore(), getUserSelf()]);
+      await initializeNewsStore();
     });
   }, [loaded]);
 

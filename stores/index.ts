@@ -7,4 +7,5 @@ export * from './useProductsStore';
 export * from './useTryOnSamplesStore';
 export * from './useTryOnPresetsStore';
 export * from './useModalsStore';
+export * from './useNewsStore';
 export * from './creditStore';

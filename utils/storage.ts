@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const STORAGE_KEYS = {
   PreferredProductCategories: 'PreferredProductCategories',
+  ViewedNewsHash: 'ViewedNewsHash',
 };
 
 class Storage {
@@ -26,11 +27,21 @@ class Storage {
 
 class AppAsyncStorage extends Storage {
   get preferredProductCategories(): Promise<string[]> {
-    return this.get(STORAGE_KEYS.PreferredProductCategories) ?? [];
+    return this.get(STORAGE_KEYS.PreferredProductCategories).then(
+      (value) => value ?? [],
+    );
   }
 
   set preferredProductCategories(value: string[]) {
     this.set(STORAGE_KEYS.PreferredProductCategories, value);
+  }
+
+  get viewedNewsHash(): Promise<string | null> {
+    return this.get(STORAGE_KEYS.ViewedNewsHash);
+  }
+
+  set viewedNewsHash(value: string) {
+    this.set(STORAGE_KEYS.ViewedNewsHash, value);
   }
 }
 

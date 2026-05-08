@@ -1,7 +1,8 @@
 import { LoginModal } from '@/components/auth';
 import { PaywallModal } from '@/components/billing';
+import { NewsModal } from '@/components/NewsModal';
 import React from 'react';
-import { useModalsStore } from '@/stores';
+import { useModalsStore, useNewsStore } from '@/stores';
 
 export const ModalsList = () => {
   const {
@@ -12,9 +13,15 @@ export const ModalsList = () => {
     closeLogin,
     closePaywall,
   } = useModalsStore();
+  const { latestNews, isNewsModalOpen, closeLatestNews } = useNewsStore();
 
   return (
     <>
+      <NewsModal
+        visible={isNewsModalOpen}
+        news={latestNews}
+        onClose={closeLatestNews}
+      />
       <LoginModal visible={isLoginOpen} onClose={closeLogin} />
       <PaywallModal
         visible={isPaywallOpen}
