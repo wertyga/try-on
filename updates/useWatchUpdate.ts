@@ -43,11 +43,11 @@ export const useWatchUpdate = (): TUseWatchUpdateReturn => {
       if (state === 'active') {
         run();
       } else {
-        setState({
+        setState((prev) => ({
+          ...prev,
           isCritical: false,
           isUpdateAvailable: false,
-          hasChecked: false,
-        });
+        }));
       }
     });
 

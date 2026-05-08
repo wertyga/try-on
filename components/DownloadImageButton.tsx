@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Alert, StyleProp, ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import Toast from 'react-native-toast-message';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -30,41 +30,25 @@ export const DownloadImageButton: React.FC<DownloadImageButtonProps> = ({
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
 
-  const ensurePermission = useCallback(async () => {
-    const perm = await MediaLibrary.getPermissionsAsync();
-    if (perm.granted) return true;
-
-    const req = await MediaLibrary.requestPermissionsAsync();
-    return req.granted;
-  }, []);
-
   const handleDownload = useCallback(async () => {
     if (!imageUrl || saving) return;
 
     setSaving(true);
     try {
-      // const hasPermission = await ensurePermission();
-      // if (!hasPermission) {
-      //   Alert.alert(
-      //     t('permissions.required'),
-      //     Platform.OS === 'ios'
-      //       ? t('permissions.photos.ios')
-      //       : t('permissions.photos.android'),
-      //   );
-      //   return;
-      // }
-
       const ext = getExtFromUrl(imageUrl);
       const normalizedFileName = fileName.includes('.')
         ? fileName
         : `${fileName}.${ext}`;
 
-      const downloadTarget = `${FileSystem.cacheDirectory}${normalizedFileName}`;
-
-      const { uri } = await FileSystem.downloadAsync(imageUrl, downloadTarget);
+      const downloadTarget = new File(Paths.cache, normalizedFileName);
+      const downloadedFile = await File.downloadFileAsync(
+        imageUrl,
+        downloadTarget,
+        { idempotent: true },
+      );
 
       // ✅ сохраняем в Фото
-      const asset = await MediaLibrary.createAssetAsync(uri);
+      const asset = await MediaLibrary.createAssetAsync(downloadedFile.uri);
 
       // (опционально) положить в альбом TryOn
       try {
@@ -79,11 +63,12 @@ export const DownloadImageButton: React.FC<DownloadImageButtonProps> = ({
         text1: t('common.savedToPhotos'),
       });
     } catch (e) {
+      console.log({ e });
       Alert.alert(t('common.error'), t('errors.saveImageFailed'));
     } finally {
       setSaving(false);
     }
-  }, [albumName, ensurePermission, fileName, imageUrl, saving, t]);
+  }, [albumName, fileName, imageUrl, saving, t]);
 
   return (
     <Button
