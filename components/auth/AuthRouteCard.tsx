@@ -40,7 +40,7 @@ export function AuthRouteCard({
         {/*)}*/}
       </View>
 
-      {/*{children}*/}
+      {children}
 
       {/*{!!secondarySwitchLabel && !!onSecondarySwitchPress && (*/}
       {/*  <Button*/}
