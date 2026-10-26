@@ -10,15 +10,15 @@ const commonConfig = {};
 
 const inAppConfigMap = {
   [Channels.Production]: {
-    API_URL: 'https://api.zws.ink',
+    API_URL: 'https://tryon.carcostatlas.com',
     ...commonConfig,
   },
   [Channels.Development]: {
-    API_URL: `http://192.168.18.5:3001`,
+    API_URL: 'https://tryon.carcostatlas.com',
     ...commonConfig,
   },
   [Channels.Preview]: {
-    API_URL: 'https://api.zws.ink',
+    API_URL: 'https://tryon.carcostatlas.com',
     ...commonConfig,
   },
 };
