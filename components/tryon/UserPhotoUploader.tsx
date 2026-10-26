@@ -73,19 +73,6 @@ export function UserPhotoUploader({ title }: UserPhotoUploaderProps) {
     setIsPhotoLoading(true);
 
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (perm.status !== 'granted') {
-        Alert.alert(
-          t('permissions.required'),
-          Platform.select({
-            ios: t('permissions.photos.ios'),
-            android: t('permissions.photos.android'),
-          }) as string,
-        );
-        return;
-      }
-
       const res = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,

@@ -25,11 +25,14 @@ const androidConfig = (version) => {
     },
     // googleServicesFile: './google-services.json',
     edgeToEdgeEnabled: true,
-    permissions: [
-      'CAMERA',
-      'READ_MEDIA_IMAGES',
-      'READ_EXTERNAL_STORAGE',
-      'com.google.android.gms.permission.AD_ID',
+    permissions: ['CAMERA', 'com.google.android.gms.permission.AD_ID'],
+    // Google Play policy: use the system Photo Picker instead of READ_MEDIA_*.
+    // expo-media-library adds these to the manifest by itself, so block them.
+    blockedPermissions: [
+      'android.permission.READ_MEDIA_IMAGES',
+      'android.permission.READ_MEDIA_VIDEO',
+      'android.permission.READ_MEDIA_AUDIO',
+      'android.permission.READ_MEDIA_VISUAL_USER_SELECTED',
     ],
     package: 'com.wertyga.tryon',
   };

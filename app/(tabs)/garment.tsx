@@ -5,7 +5,6 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
-  Platform,
   StyleSheet,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -41,19 +40,6 @@ export default function Garment() {
 
   async function pick(slot: TTryOnImagesKeys) {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (perm.status !== 'granted') {
-        Alert.alert(
-          t('permissions.required'),
-          // платформенный текст уже есть в en.json (photos.ios / photos.android)
-          Platform.select({
-            ios: t('permissions.photos.ios'),
-            android: t('permissions.photos.android'),
-          }) as string,
-        );
-        return;
-      }
-
       const r = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
