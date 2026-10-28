@@ -47,6 +47,17 @@ const pluginsConfig = [
       ios: {
         useFrameworks: 'static',
       },
+      // Google Play requires R8 minification/obfuscation of DEX code.
+      android: {
+        enableProguardInReleaseBuilds: true,
+        enableShrinkResourcesInReleaseBuilds: true,
+        extraProguardRules: [
+          '-keep class com.swmansion.reanimated.** { *; }',
+          '-keep class com.facebook.react.turbomodule.** { *; }',
+          '-dontwarn com.stripe.android.pushProvisioning.**',
+          '-dontwarn com.reactnativestripesdk.pushprovisioning.**',
+        ].join('\n'),
+      },
     },
   ],
   [
